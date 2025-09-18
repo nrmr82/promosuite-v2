@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider } from './contexts/AuthContext';
 import { TemplateProvider } from './contexts/TemplateContext';
 import { ProductProvider } from './contexts/ProductContext';
@@ -170,6 +171,7 @@ function App() {
       <div className="app-loading">
         <div className="loading-spinner"></div>
         <p>Loading PromoSuite...</p>
+        <Analytics />
       </div>
     );
   }
@@ -183,6 +185,7 @@ function App() {
             <LandingPage onAuthSuccess={handleAuthSuccess} />
           </div>
         </AuthProvider>
+        <Analytics />
       </ErrorBoundary>
     );
   }
@@ -204,6 +207,7 @@ function App() {
           </ProductProvider>
         </TemplateProvider>
       </AuthProvider>
+      <Analytics />
     </ErrorBoundary>
   );
 }
