@@ -1,0 +1,212 @@
+/**
+ * PromoSuite V2 - Supabase Configuration
+ * Centralized Supabase client configuration and initialization
+ */
+
+import { createClient } from '@supabase/supabase-js';
+
+// Supabase configuration
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+
+// Validate required environment variables
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn(
+    'Missing Supabase environment variables. The app will run in offline mode for development. Please check your .env file and ensure REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY are set for production.'
+  );
+}
+
+// Create Supabase client with configuration
+const actualUrl = supabaseUrl || 'https://dummy.supabase.co';
+const actualKey = supabaseAnonKey || 'dummy-key-for-development';
+
+export const supabase = createClient(actualUrl, actualKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce'
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'promosuite-v2'
+    }
+  }
+});
+
+/**
+ * Database table names
+ */
+export const TABLES = {
+  USERS: 'users',
+  PROFILES: 'profiles',
+  SUBSCRIPTIONS: 'subscriptions',
+  SUBSCRIPTION_PLANS: 'subscription_plans',
+  TEMPLATES: 'templates',
+  TEMPLATE_CATEGORIES: 'template_categories',
+  FLYERS: 'flyers',
+  MEDIA: 'media',
+  SOCIAL_POSTS: 'social_posts',
+  ANALYTICS: 'analytics',
+  USER_USAGE: 'user_usage',
+  USER_ANALYTICS: 'user_analytics'
+};
+
+/**
+ * Storage bucket names
+ */
+export const BUCKETS = {
+  TEMPLATES: 'templates',
+  FLYERS: 'flyers',
+  USER_UPLOADS: 'user-uploads',
+  MEDIA: 'media',
+  AVATARS: 'avatars'
+};
+
+/**
+ * Helper function to handle Supabase errors
+ */
+export const handleSupabaseError = (error, context = '') => {
+  console.error(`Supabase error ${context}:`, error);
+  
+  // Map common Supabase errors to user-friendly messages
+  const errorMessages = {
+    'Invalid login credentials': 'Invalid email or password',
+    'Email not confirmed': 'Please verify your email address before signing in',
+    'User not found': 'No account found with this email address',
+    'Email already registered': 'An account with this email already exists',
+    'Password should be at least 6 characters': 'Password must be at least 6 characters long',
+    'Row Level Security policy violation': 'You do not have permission to perform this action',
+    'JWT expired': 'Your session has expired. Please sign in again'
+  };
+
+  const userMessage = errorMessages[error.message] || error.message || 'An unexpected error occurred';
+  
+  return {
+    message: userMessage,
+    code: error.code || 'UNKNOWN_ERROR',
+    details: error.details || null
+  };
+};
+
+/**
+ * Helper function to get current user
+ */
+export const getCurrentUser = async () => {
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error) throw error;
+    return user;
+  } catch (error) {
+    console.error('Error getting current user:', error);
+    return null;
+  }
+};
+
+/**
+ * Helper function to get user session
+ */
+export const getCurrentSession = async () => {
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    return session;
+  } catch (error) {
+    console.error('Error getting current session:', error);
+    return null;
+  }
+};
+
+/**
+ * Helper function to check if user is authenticated
+ */
+export const isAuthenticated = async () => {
+  const session = await getCurrentSession();
+  return !!session?.user;
+};
+
+/**
+ * Upload file to Supabase Storage
+ */
+export const uploadFile = async (bucket, filePath, file, options = {}) => {
+  try {
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+        ...options
+      });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Upload error:', error);
+    throw handleSupabaseError(error, 'uploading file');
+  }
+};
+
+/**
+ * Get public URL for file
+ */
+export const getPublicUrl = (bucket, filePath) => {
+  try {
+    const { data } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(filePath);
+    
+    return data.publicUrl;
+  } catch (error) {
+    console.error('Get public URL error:', error);
+    return null;
+  }
+};
+
+/**
+ * Delete file from storage
+ */
+export const deleteFile = async (bucket, filePaths) => {
+  try {
+    const paths = Array.isArray(filePaths) ? filePaths : [filePaths];
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .remove(paths);
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Delete file error:', error);
+    throw handleSupabaseError(error, 'deleting file');
+  }
+};
+
+/**
+ * Real-time subscription helper
+ */
+export const subscribeToTable = (table, callback, filter = {}) => {
+  let channel = supabase
+    .channel(`${table}_changes`)
+    .on('postgres_changes', 
+      { 
+        event: '*', 
+        schema: 'public', 
+        table: table,
+        ...filter 
+      }, 
+      callback
+    )
+    .subscribe();
+
+  return channel;
+};
+
+/**
+ * Unsubscribe from real-time updates
+ */
+export const unsubscribeFromTable = (channel) => {
+  if (channel) {
+    supabase.removeChannel(channel);
+  }
+};
+
+export default supabase;

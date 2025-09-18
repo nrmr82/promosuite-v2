@@ -1,0 +1,15 @@
+[build]
+  publish = "build"
+  command = "npm run build"
+
+[functions]
+  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Environment variables (you'll need to set these in Netlify dashboard)
+# REACT_APP_SUPABASE_URL - your Supabase URL
+# SUPABASE_SERVICE_ROLE_KEY - your Supabase service role key (NOT the anon key!)

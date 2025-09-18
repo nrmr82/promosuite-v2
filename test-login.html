@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Direct Supabase Login Test</title>
+</head>
+<body>
+    <h2>Quick Supabase Login Test</h2>
+    <div>
+        <h3>Register/Login with Email:</h3>
+        <input type="email" id="email" placeholder="your-email@example.com" value="test@example.com">
+        <input type="password" id="password" placeholder="password123" value="password123">
+        <button onclick="signUp()">Sign Up</button>
+        <button onclick="signIn()">Sign In</button>
+    </div>
+    <div style="margin-top: 20px;">
+        <h3>Google OAuth:</h3>
+        <button onclick="signInWithGoogle()">Sign In with Google</button>
+    </div>
+    <div id="result" style="margin-top: 20px; padding: 10px; background: #f0f0f0;"></div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase;
+        
+        const supabaseUrl = 'https://iimjgbzrtazeiuamhvlc.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpbWpnYnpydGF6ZWl1YW1odmxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MDI1MjcsImV4cCI6MjA3MzE3ODUyN30.eZOmLoGvev2i2GD5ZbODHqbXTn0vwRkqn2lIIZvevB0';
+        
+        const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+        
+        async function signUp() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const { data, error } = await supabaseClient.auth.signUp({
+                email: email,
+                password: password,
+            });
+            
+            if (error) {
+                document.getElementById('result').innerHTML = `<strong>Error:</strong> ${error.message}`;
+            } else {
+                document.getElementById('result').innerHTML = `<strong>Success:</strong> User created! ${data.user ? 'User ID: ' + data.user.id : 'Check your email for confirmation.'}`;
+            }
+        }
+        
+        async function signIn() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+            
+            if (error) {
+                document.getElementById('result').innerHTML = `<strong>Error:</strong> ${error.message}`;
+            } else {
+                document.getElementById('result').innerHTML = `<strong>Success:</strong> Logged in! User ID: ${data.user.id}`;
+                console.log('User data:', data);
+            }
+        }
+        
+        async function signInWithGoogle() {
+            const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin + '/auth/callback'
+                }
+            });
+            
+            if (error) {
+                document.getElementById('result').innerHTML = `<strong>OAuth Error:</strong> ${error.message}`;
+            } else {
+                document.getElementById('result').innerHTML = `<strong>OAuth:</strong> Redirecting to Google...`;
+            }
+        }
+    </script>
+</body>
+</html>

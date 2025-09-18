@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{{SUBJECT}}</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    <style type="text/css">
+        /* Reset and base styles */
+        body, table, td, p, a, li, blockquote {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+        
+        /* PromoSuite Brand Colors */
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #764ba2;
+            --secondary-color: #f093fb;
+            --success-color: #10b981;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --background: #f8fafc;
+            --white: #ffffff;
+        }
+        
+        /* Main container */
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: var(--background);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            padding: 32px 24px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        /* Content area */
+        .content {
+            background-color: var(--white);
+            padding: 40px 32px;
+        }
+        
+        .content h1 {
+            color: var(--text-primary);
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 16px 0;
+            line-height: 1.3;
+        }
+        
+        .content p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0 0 20px 0;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            margin: 8px 0;
+            transition: transform 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+        }
+        
+        /* Info box */
+        .info-box {
+            background-color: #f0f7ff;
+            border: 1px solid #e0f2fe;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        
+        .info-box p {
+            margin: 0;
+            color: #0369a1;
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: #f8fafc;
+            padding: 32px 24px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin: 0 0 8px 0;
+        }
+        
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .social-links {
+            margin: 16px 0;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            margin: 0 8px;
+            padding: 8px;
+            background-color: var(--white);
+            border-radius: 6px;
+            text-decoration: none;
+        }
+        
+        /* Responsive */
+        @media screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+            
+            .header, .content, .footer {
+                padding-left: 20px !important;
+                padding-right: 20px !important;
+            }
+            
+            .content h1 {
+                font-size: 20px !important;
+            }
+            
+            .btn {
+                display: block !important;
+                width: 100% !important;
+                box-sizing: border-box;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .content {
+                background-color: #1f2937 !important;
+            }
+            
+            .content h1 {
+                color: #f9fafb !important;
+            }
+            
+            .content p {
+                color: #d1d5db !important;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc;">
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <a href="{{SITE_URL}}" class="logo">
+                <div class="logo-icon">🚀</div>
+                PromoSuite
+            </a>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            {{CONTENT}}
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>PromoSuite</strong> - Real Estate Marketing Platform</p>
+            <p>Create stunning flyers and automate your social media</p>
+            
+            <div class="social-links">
+                <a href="{{SITE_URL}}">🏠 Visit Website</a>
+                <a href="{{SITE_URL}}/support">💬 Support</a>
+            </div>
+            
+            <p>
+                <a href="{{SITE_URL}}/privacy">Privacy Policy</a> | 
+                <a href="{{SITE_URL}}/terms">Terms of Service</a> | 
+                <a href="{{UNSUBSCRIBE_URL}}">Unsubscribe</a>
+            </p>
+            
+            <p style="font-size: 12px; color: #9ca3af; margin-top: 16px;">
+                This email was sent to {{EMAIL}}. If you didn't request this email, you can safely ignore it.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

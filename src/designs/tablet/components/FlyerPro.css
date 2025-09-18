@@ -1,0 +1,506 @@
+/* FlyerPro.css - Dark Theme */
+.flyerpro-page {
+  min-height: 100vh;
+  background: transparent;
+  color: #ffffff;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.compact-page {
+  position: relative;
+  z-index: 1;
+}
+
+.main-content-section {
+  padding: 10rem 0;
+  position: relative;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Page Header */
+.page-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  position: relative;
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background: linear-gradient(90deg, #7877c6, #ff7675, #48bb78);
+  border-radius: 2px;
+}
+
+.page-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #ffffff, #e2e8f0, #a0aec0);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  font-size: 1.25rem;
+  color: #a0aec0;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Tools Grid */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 4rem;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 4rem;
+}
+
+.tool-card {
+  background: rgba(42, 42, 42, 0.7);
+  border: 1px solid rgba(68, 68, 68, 0.5);
+  border-radius: 12px;
+  padding: 1.5rem;
+  position: relative;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+}
+
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+
+.tool-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+              0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* AI Feature Cards */
+.ai-feature-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(120, 119, 198, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+}
+
+.ai-copy-feature-card::after {
+  background: radial-gradient(circle, rgba(255, 118, 117, 0.2) 0%, transparent 70%);
+}
+
+.template-feature-card::after {
+  background: radial-gradient(circle, rgba(72, 187, 120, 0.2) 0%, transparent 70%);
+}
+
+.editor-feature-card::after {
+  background: radial-gradient(circle, rgba(237, 137, 54, 0.2) 0%, transparent 70%);
+}
+
+/* Tool Headers */
+.tool-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.tool-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 1;
+}
+
+.ai-icon {
+  background: linear-gradient(135deg, rgba(120, 119, 198, 0.2), rgba(120, 119, 198, 0.1));
+  border-color: rgba(120, 119, 198, 0.3);
+  color: #7877c6;
+}
+
+.template-icon {
+  background: linear-gradient(135deg, rgba(72, 187, 120, 0.2), rgba(72, 187, 120, 0.1));
+  border-color: rgba(72, 187, 120, 0.3);
+  color: #48bb78;
+}
+
+.editor-icon {
+  background: linear-gradient(135deg, rgba(237, 137, 54, 0.2), rgba(237, 137, 54, 0.1));
+  border-color: rgba(237, 137, 54, 0.3);
+  color: #ed8936;
+}
+
+.tool-title-section {
+  width: 100%;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.tool-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.375rem;
+  line-height: 1.3;
+}
+
+.tool-description {
+  color: #a0aec0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+/* Tool Features */
+.tool-features {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #e2e8f0;
+}
+
+.feature-icon {
+  width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+}
+
+/* Tool CTA Buttons - FORCE OVERRIDE */
+.tool-cta,
+.flyerpro-page .tool-cta,
+.main-content-section .tool-cta,
+.tools-grid .tool-cta,
+.tool-card .tool-cta {
+  width: 100% !important;
+  padding: 0.875rem 1.5rem !important;
+  background: #e91e63 !important;
+  color: #ffffff !important;
+  border: 1px solid #e91e63 !important;
+  border-radius: 6px !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  position: relative !important;
+  overflow: hidden !important;
+  z-index: 1 !important;
+  box-shadow: none !important;
+}
+
+.tool-cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.tool-cta:hover,
+.flyerpro-page .tool-cta:hover,
+.main-content-section .tool-cta:hover,
+.tools-grid .tool-cta:hover,
+.tool-card .tool-cta:hover {
+  transform: translateY(-1px) !important;
+  background: #d81b60 !important;
+  border-color: #d81b60 !important;
+  box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4) !important;
+}
+
+.tool-cta:hover::before {
+  left: 100%;
+}
+
+.ai-feature-card .tool-cta {
+  background: linear-gradient(135deg, #7877c6, #6366f1);
+  border-color: rgba(120, 119, 198, 0.5);
+}
+
+.ai-feature-card .tool-cta:hover {
+  background: linear-gradient(135deg, #6366f1, #7877c6);
+  box-shadow: 0 8px 25px rgba(120, 119, 198, 0.4);
+}
+
+
+.template-feature-card .tool-cta {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  border-color: rgba(72, 187, 120, 0.5);
+}
+
+.template-feature-card .tool-cta:hover {
+  background: linear-gradient(135deg, #38a169, #48bb78);
+  box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+}
+
+.editor-feature-card .tool-cta {
+  background: linear-gradient(135deg, #ed8936, #dd6b20);
+  border-color: rgba(237, 137, 54, 0.5);
+}
+
+.editor-feature-card .tool-cta:hover {
+  background: linear-gradient(135deg, #dd6b20, #ed8936);
+  box-shadow: 0 8px 25px rgba(237, 137, 54, 0.4);
+}
+
+/* Features Overview Section */
+.features-overview {
+  text-align: center;
+  padding: 3rem 0;
+  position: relative;
+}
+
+.overview-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 3rem;
+  background: linear-gradient(135deg, #ffffff, #e2e8f0);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.benefit-card {
+  padding: 2rem;
+  background: #2a2a2a !important;
+  border: 1px solid #444 !important;
+  border-radius: 16px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.benefit-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  transition: left 0.6s;
+}
+
+.benefit-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.benefit-card:hover::before {
+  left: 100%;
+}
+
+.benefit-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.benefit-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.75rem;
+}
+
+.benefit-description {
+  color: #a0aec0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Legacy styles for backward compatibility */
+.flyer-pro {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+  color: #ffffff;
+  padding: 2rem;
+}
+
+.flyer-pro__header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.flyer-pro__title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.flyer-pro__subtitle {
+  color: #a0aec0;
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.flyer-pro__features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.flyer-pro__feature {
+  padding: 2rem;
+  background: rgba(26, 32, 44, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.flyer-pro__feature:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.flyer-pro__feature-icon {
+  font-size: 2.5rem;
+  color: #7877c6;
+  margin-bottom: 1rem;
+}
+
+.flyer-pro__feature-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.75rem;
+}
+
+.flyer-pro__feature-description {
+  color: #a0aec0;
+  line-height: 1.6;
+}
+
+.flyer-pro__cta {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.flyer-pro__button {
+  background: linear-gradient(135deg, #7877c6, #6366f1);
+  color: #ffffff;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(120, 119, 198, 0.3);
+}
+
+.flyer-pro__button:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #6366f1, #7877c6);
+  box-shadow: 0 8px 25px rgba(120, 119, 198, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 2.5rem;
+  }
+  
+  .tools-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .benefits-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .container {
+    padding: 0 1rem;
+  }
+  
+  .main-content-section {
+    padding: 3rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .tools-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}

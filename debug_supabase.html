@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Supabase Debug Test</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Supabase Connection Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        // Replace these with your actual values
+        const SUPABASE_URL = 'https://iimjgbzrtazeiuamhvlc.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key-here'; // You'll need to add this
+        
+        const { createClient } = supabase;
+        const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        async function testConnection() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing connection...</p>';
+            
+            try {
+                // Test 1: Basic connection
+                results.innerHTML += '<h3>Test 1: Basic Connection</h3>';
+                const { data: healthData, error: healthError } = await client
+                    .from('profiles')
+                    .select('count', { count: 'exact', head: true });
+                
+                if (healthError) {
+                    results.innerHTML += `<p style="color:red">❌ Health check failed: ${healthError.message}</p>`;
+                    results.innerHTML += `<p>Error code: ${healthError.code}</p>`;
+                    results.innerHTML += `<p>Error details: ${JSON.stringify(healthError.details)}</p>`;
+                } else {
+                    results.innerHTML += `<p style="color:green">✅ Health check passed</p>`;
+                }
+                
+                // Test 2: Check auth
+                results.innerHTML += '<h3>Test 2: Auth Status</h3>';
+                const { data: { user }, error: userError } = await client.auth.getUser();
+                
+                if (userError) {
+                    results.innerHTML += `<p style="color:red">❌ Auth check failed: ${userError.message}</p>`;
+                } else if (user) {
+                    results.innerHTML += `<p style="color:green">✅ User authenticated: ${user.email}</p>`;
+                    
+                    // Test 3: Try to query profiles with auth
+                    results.innerHTML += '<h3>Test 3: Authenticated Profile Query</h3>';
+                    const { data: profileData, error: profileError } = await client
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', user.id)
+                        .single();
+                    
+                    if (profileError) {
+                        results.innerHTML += `<p style="color:red">❌ Profile query failed: ${profileError.message}</p>`;
+                        results.innerHTML += `<p>Error code: ${profileError.code}</p>`;
+                        results.innerHTML += `<p>HTTP Status: ${profileError.status || 'unknown'}</p>`;
+                    } else {
+                        results.innerHTML += `<p style="color:green">✅ Profile query succeeded</p>`;
+                        results.innerHTML += `<pre>${JSON.stringify(profileData, null, 2)}</pre>`;
+                    }
+                } else {
+                    results.innerHTML += '<p style="color:orange">⚠️ No user authenticated</p>';
+                }
+                
+            } catch (error) {
+                results.innerHTML += `<p style="color:red">❌ Unexpected error: ${error.message}</p>`;
+            }
+        }
+        
+        // Run test on page load
+        testConnection();
+    </script>
+</body>
+</html>

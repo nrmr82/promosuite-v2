@@ -1,0 +1,32 @@
+/* MainLayout.css */
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+}
+
+.main-content {
+  flex: 1;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.main-content.with-sidebar {
+  margin-left: 280px;
+  width: calc(100% - 280px);
+  min-width: 0;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .main-layout {
+    flex-direction: column;
+  }
+  
+  .main-content.with-sidebar {
+    margin-left: 0;
+    width: 100%;
+    min-width: auto;
+  }
+}

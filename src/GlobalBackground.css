@@ -1,0 +1,55 @@
+/* GlobalBackground.css - Apply gradient background throughout entire project */
+
+/* Base dark background with gradient overlay */
+body, html {
+  min-height: 100vh;
+  background: #1a1a1a;
+  color: #ffffff;
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+/* Global gradient overlay applied to all pages - Strong asymmetric gradient */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    /* Strong light grey gradient from left side */
+    linear-gradient(90deg, rgba(140, 140, 140, 0.45) 0%, rgba(100, 100, 100, 0.25) 25%, rgba(60, 60, 60, 0.15) 50%, transparent 100%),
+    /* Additional radial gradients for depth */
+    radial-gradient(ellipse at 20% 30%, rgba(160, 160, 160, 0.4) 0%, rgba(120, 120, 120, 0.2) 30%, transparent 60%),
+    radial-gradient(ellipse at 80% 70%, rgba(80, 80, 80, 0.25) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Ensure all page content is positioned above the gradient */
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* Apply to common page containers */
+.app,
+.main-app,
+.page-container,
+.dashboard,
+.flyerpro-page,
+.socialspark-page {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure main containers have transparent backgrounds */
+.dashboard,
+.flyerpro-page,
+.socialspark-page,
+.main-content,
+.page-wrapper {
+  background: transparent;
+}

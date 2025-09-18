@@ -1,0 +1,59 @@
+/* Device Indicator CSS */
+
+.device-indicator {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  user-select: none;
+}
+
+.device-indicator:hover {
+  opacity: 1;
+}
+
+.device-icon {
+  font-size: 0.875rem;
+}
+
+.device-label {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .device-indicator {
+    top: 4.5rem;
+    right: 0.75rem;
+    font-size: 0.7rem;
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .device-indicator {
+    top: 4.5rem;
+    right: 0.5rem;
+    padding: 0.35rem 0.5rem;
+  }
+  
+  .device-label {
+    display: none;
+  }
+}

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Confirm Your PromoSuite Account</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    <style type="text/css">
+        /* Reset and base styles */
+        body, table, td, p, a, li, blockquote {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+        
+        /* PromoSuite Brand Colors */
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 32px 24px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .content {
+            background-color: #ffffff;
+            padding: 40px 32px;
+        }
+        
+        .content h1 {
+            color: #1f2937;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 16px 0;
+            line-height: 1.3;
+        }
+        
+        .content p {
+            color: #6b7280;
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0 0 20px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            margin: 24px 0;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .welcome-features {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 32px 0;
+            border: 1px solid #e0f2fe;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0 0 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            color: #0369a1;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feature-icon {
+            background: #0369a1;
+            color: white;
+            border-radius: 4px;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .footer {
+            background-color: #f8fafc;
+            padding: 32px 24px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer p {
+            color: #6b7280;
+            font-size: 14px;
+            margin: 0 0 8px 0;
+        }
+        
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .social-links {
+            margin: 16px 0;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            margin: 0 8px;
+            padding: 8px;
+            background-color: #ffffff;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+        
+        /* Responsive */
+        @media screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+            
+            .header, .content, .footer {
+                padding-left: 20px !important;
+                padding-right: 20px !important;
+            }
+            
+            .content h1 {
+                font-size: 20px !important;
+            }
+            
+            .btn {
+                display: block !important;
+                width: 100% !important;
+                box-sizing: border-box;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .content {
+                background-color: #1f2937 !important;
+            }
+            
+            .content h1 {
+                color: #f9fafb !important;
+            }
+            
+            .content p {
+                color: #d1d5db !important;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc;">
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <a href="{{ .SiteURL }}" class="logo">
+                <div class="logo-icon">🚀</div>
+                PromoSuite
+            </a>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <h1>Welcome to PromoSuite! 🎉</h1>
+            
+            <p>Hi there!</p>
+            
+            <p>Thanks for signing up for PromoSuite! You're just one click away from creating stunning real estate marketing content.</p>
+            
+            <p>Click the button below to confirm your email address and activate your account:</p>
+            
+            <div style="text-align: center;">
+                <a href="{{ .ConfirmationURL }}" class="btn">
+                    ✨ Confirm Your Account
+                </a>
+            </div>
+            
+            <div class="welcome-features">
+                <h3 style="margin: 0 0 16px 0; color: #0369a1;">What you'll get with PromoSuite:</h3>
+                <ul class="feature-list">
+                    <li>
+                        <span class="feature-icon">🎨</span>
+                        <strong>FlyerPro:</strong> Create professional real estate flyers in minutes
+                    </li>
+                    <li>
+                        <span class="feature-icon">📱</span>
+                        <strong>SocialSpark:</strong> Automate your social media marketing
+                    </li>
+                    <li>
+                        <span class="feature-icon">🎯</span>
+                        <strong>Brand Kit:</strong> Keep your branding consistent across all platforms
+                    </li>
+                    <li>
+                        <span class="feature-icon">⚡</span>
+                        <strong>Free Trial:</strong> Try all tools once, no credit card required
+                    </li>
+                </ul>
+            </div>
+            
+            <p style="font-size: 14px; color: #9ca3af;">
+                If you didn't create an account with PromoSuite, you can safely ignore this email.
+            </p>
+            
+            <p style="font-size: 14px; color: #9ca3af;">
+                This confirmation link will expire in 24 hours.
+            </p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>PromoSuite</strong> - Real Estate Marketing Platform</p>
+            <p>Create stunning flyers and automate your social media</p>
+            
+            <div class="social-links">
+                <a href="{{ .SiteURL }}">🏠 Visit Website</a>
+                <a href="{{ .SiteURL }}/support">💬 Support</a>
+            </div>
+            
+            <p>
+                <a href="{{ .SiteURL }}/privacy">Privacy Policy</a> | 
+                <a href="{{ .SiteURL }}/terms">Terms of Service</a>
+            </p>
+            
+            <p style="font-size: 12px; color: #9ca3af; margin-top: 16px;">
+                This email was sent to {{ .Email }}. 
+            </p>
+        </div>
+    </div>
+</body>
+</html>
