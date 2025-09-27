@@ -193,6 +193,11 @@ function ResponsiveApp() {
   const renderCurrentView = () => {
     if (!deviceComponents) return <LoadingSpinner />;
 
+    if (currentView === 'auth') {
+      const AuthModal = lazy(() => import('./components/AuthModal'));
+      return <AuthModal isOpen={true} onClose={() => handleNavigate('socialspark')} onAuthSuccess={handleAuthSuccess} />;
+    }
+
     const {
       Dashboard,
       FlyerPro,
@@ -211,7 +216,7 @@ function ResponsiveApp() {
       case 'flyerpro':
         return <FlyerPro user={user} />;
       case 'socialspark':
-        return <SocialSpark user={user} />;
+        return <SocialSpark user={user} onOpenAuth={() => handleNavigate('auth')} onToolUsage={() => handleNavigate('socialspark')} />;
       case 'templates':
         return <Templates user={user} />;
       case 'collections':

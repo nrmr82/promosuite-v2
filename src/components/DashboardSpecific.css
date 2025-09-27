@@ -1,9 +1,9 @@
 /* DashboardSpecific.css - Separate CSS for Dashboard horizontal layout */
 
-/* Dashboard Tools Grid - 2 boxes side by side */
+/* Dashboard Tools Grid - Responsive layout */
 .dashboard-tools-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(300px, 1fr));
   gap: 1.5rem;
   width: 100%;
   margin-bottom: 2rem;
@@ -62,17 +62,18 @@
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* Dashboard Tool Preview */
+/* Dashboard Tool Preview - Responsive */
 .dashboard-tool-preview {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   background: #1a1a1a;
   border: 1px solid #333;
   border-radius: 6px;
-  padding: 8px;
+  padding: clamp(8px, 1.5vw, 16px);
   overflow: visible;
   position: relative;
+  min-height: clamp(120px, 18vw, 180px);
 }
 
 /* Dashboard Tool Content */
@@ -163,10 +164,160 @@
   box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
 }
 
-/* Responsive Design */
+/* Comprehensive Responsive Design for Dashboard-Specific Elements */
+
+/* Large screens */
+@media (max-width: 1400px) {
+  .dashboard-tool-card {
+    min-height: 260px;
+    padding: 1.25rem;
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  .dashboard-tools-grid {
+    gap: 1.25rem;
+  }
+  
+  .dashboard-tool-card {
+    min-height: 240px;
+    padding: 1.25rem;
+    gap: 1.25rem;
+  }
+}
+
+/* Very large screens - ensure boxes grow properly */
+@media (min-width: 1400px) {
+  .dashboard-tools-grid {
+    grid-template-columns: repeat(2, minmax(400px, 1fr));
+    gap: 2rem;
+  }
+  
+  .dashboard-tool-card {
+    min-height: 320px;
+    padding: 2rem;
+    gap: 2rem;
+  }
+}
+
+/* Intermediate breakpoint for better responsiveness */
+@media (max-width: 1100px) {
+  .dashboard-tools-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+}
+
+/* Tablet and medium screens */
+@media (max-width: 1024px) {
+  .dashboard-tools-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.25rem;
+  }
+  
+  .dashboard-tool-card {
+    min-height: 220px;
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+  
+  .dashboard-tool-title {
+    font-size: 1.15rem;
+  }
+  
+  .dashboard-tool-description {
+    font-size: 0.95rem;
+  }
+}
+
+/* Another intermediate breakpoint */
+@media (max-width: 900px) {
+  .dashboard-tools-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+/* Large mobile and small tablet */
 @media (max-width: 768px) {
   .dashboard-tools-grid {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 1.25rem;
+  }
+  
+  .dashboard-tool-card {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 1.25rem;
+    gap: 1.25rem;
+  }
+  
+  .dashboard-tool-preview {
+    order: -1;
+    margin-bottom: 1rem;
+    padding: 1.25rem;
+  }
+}
+
+/* Mobile devices */
+@media (max-width: 600px) {
+  .dashboard-tools-grid {
+    gap: 1rem;
+  }
+  
+  .dashboard-tool-card {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .dashboard-tool-preview {
+    padding: 1rem;
+  }
+  
+  .dashboard-tool-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+  
+  .dashboard-tool-title {
+    font-size: 1rem;
+  }
+  
+  .dashboard-tool-description {
+    font-size: 0.85rem;
+    margin: 0 0 1rem 0;
+  }
+  
+  .dashboard-tool-features li {
+    font-size: 0.8rem;
+  }
+  
+  .dashboard-tool-cta {
+    font-size: 0.85rem;
+    padding: 0.7rem 1rem;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .dashboard-tool-card {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+  
+  .dashboard-tool-preview {
+    padding: 0.75rem;
+  }
+  
+  .dashboard-tool-title {
+    font-size: 0.95rem;
+  }
+  
+  .dashboard-tool-description {
+    font-size: 0.8rem;
+  }
+  
+  .dashboard-tool-features li {
+    font-size: 0.75rem;
   }
 }

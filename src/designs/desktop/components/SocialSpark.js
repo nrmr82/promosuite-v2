@@ -22,6 +22,9 @@ import './SocialSpark.css';
 
 const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
   const [showConnectionModal, setShowConnectionModal] = useState(false);
+  
+  // Initialize hook and prevent early returns
+  const socialConnections = useSocialConnections();
   const {
     connections,
     loading: connectionsLoading,
@@ -34,7 +37,31 @@ const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
     isPlatformLoading,
     getConnectionCount,
     clearError
-  } = useSocialConnections();
+  } = socialConnections || {};
+
+  useEffect(() => {
+    // Ensure the hook is properly initialized
+    if (!socialConnections) return;
+    
+    // Initialize connections on mount
+    const initializeConnections = async () => {
+      try {
+        const platforms = ['instagram', 'twitter', 'linkedin', 'youtube', 'tiktok'];
+        for (const platform of platforms) {
+          if (!isPlatformConnected(platform)) {
+            const status = await socialConnections.checkPlatformStatus(platform);
+            if (status === 'expired' || status === 'error') {
+              await refreshPlatform(platform);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to initialize social connections:', err);
+      }
+    };
+    
+    initializeConnections();
+  }, [socialConnections]);
 
   const platforms = [
     { 
@@ -75,14 +102,43 @@ const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
   ];
 
   // Connection handlers
-  const handleConnect = async (platformId) => {
+const handleConnect = async (platformId) => {
+    if (!user) {
+      onOpenAuth();
+      return;
+    }
+
     try {
+      // Show loading state
+      const currentBox = document.querySelector(`[data-platform-id="${platformId}"]`);
+      if (currentBox) {
+        currentBox.classList.add('loading');
+      }
+
       await connectPlatform(platformId);
-      // Show success message or toast
+      
+      // Show success message
+      const statusElement = currentBox?.querySelector('.connection-status');
+      if (statusElement) {
+        statusElement.textContent = 'Connected';
+        statusElement.classList.add('status-connected');
+      }
+
       console.log(`Successfully connected to ${platformId}`);
     } catch (error) {
       console.error(`Failed to connect to ${platformId}:`, error);
-      // Error is already handled by the hook
+      // Show error in the UI
+      const errorElement = document.querySelector('.connection-error');
+      if (errorElement) {
+        errorElement.textContent = `Failed to connect to ${platformId}: ${error.message}`;
+        errorElement.style.display = 'block';
+      }
+    } finally {
+      // Remove loading state
+      const currentBox = document.querySelector(`[data-platform-id="${platformId}"]`);
+      if (currentBox) {
+        currentBox.classList.remove('loading');
+      }
     }
   };
 
@@ -152,8 +208,20 @@ const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
                   <span>AI suggestions</span>
                 </div>
               </div>
-              <button className="tool-cta" onClick={user ? onToolUsage : onOpenAuth}>
-                {user ? 'Start Scheduling' : 'Get Started'}
+<button 
+                className="tool-cta" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (user) {
+                    onToolUsage('scheduling');
+                  } else {
+                    onOpenAuth();
+                  }
+                }}
+                disabled={connectionsLoading}
+              >
+                {connectionsLoading ? 'Loading...' : user ? 'Start Scheduling' : 'Get Started'}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -184,8 +252,20 @@ const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
                   <span>Growth insights</span>
                 </div>
               </div>
-              <button className="tool-cta" onClick={user ? onToolUsage : onOpenAuth}>
-                {user ? 'View Analytics' : 'Get Started'}
+<button 
+                className="tool-cta" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (user) {
+                    onToolUsage('analytics');
+                  } else {
+                    onOpenAuth();
+                  }
+                }}
+                disabled={connectionsLoading}
+              >
+                {connectionsLoading ? 'Loading...' : user ? 'View Analytics' : 'Get Started'}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -216,8 +296,20 @@ const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
                   <span>Text editor</span>
                 </div>
               </div>
-              <button className="tool-cta" onClick={user ? onToolUsage : onOpenAuth}>
-                {user ? 'Create Content' : 'Get Started'}
+<button 
+                className="tool-cta" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (user) {
+                    onToolUsage('content');
+                  } else {
+                    onOpenAuth();
+                  }
+                }}
+                disabled={connectionsLoading}
+              >
+                {connectionsLoading ? 'Loading...' : user ? 'Create Content' : 'Get Started'}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -254,6 +346,7 @@ const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
                 return (
                   <div 
                     key={platform.id} 
+                    data-platform-id={platform.id}
                     className={`platform-card-enhanced ${
                       isConnected ? 'connected' : 'disconnected'
                     } ${isLoading ? 'loading' : ''}`}
@@ -358,13 +451,20 @@ const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
               })}
             </div>
             
-            {error && (
-              <div className="connection-error">
-                <AlertCircle className="w-5 h-5 text-red-500" />
-                <span>{error}</span>
-                <button onClick={clearError} className="error-dismiss">
-                  <X className="w-4 h-4" />
-                </button>
+            {/* Connection Error Display */}
+            <div className="connection-error" style={{ display: error ? 'flex' : 'none' }}>
+              <AlertCircle className="w-5 h-5 text-red-500" />
+              <span>{error}</span>
+              <button onClick={clearError} className="error-dismiss">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Loading State */}
+            {connectionsLoading && (
+              <div className="connection-loading">
+                <Loader className="w-5 h-5 animate-spin text-gray-400" />
+                <span>Connecting to platforms...</span>
               </div>
             )}
           </div>

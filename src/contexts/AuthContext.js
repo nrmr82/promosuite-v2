@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '../utils/supabase';
+import SignInOutPopup from '../components/SignInOutPopup';
 
 const AuthContext = createContext({});
 
@@ -15,6 +16,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState(null);
+const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
 
   useEffect(() => {
     // Get initial session
@@ -27,9 +30,19 @@ export const AuthProvider = ({ children }) => {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event);
+      if (event === 'SIGNED_IN') {
+        setPopupMessage('Signing in...');
+setIsPopupVisible(true);
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        setSession(session);
+        setUser(session?.user ?? null);
+setIsPopupVisible(false);
+      } else if (event === 'SIGNED_OUT') {
+        setSession(null);
+        setUser(null);
+      }
       setLoading(false);
     });
 
@@ -56,14 +69,49 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    return { error };
+    try {
+      // Show popup immediately
+      setPopupMessage('Signing out...');
+      setIsPopupVisible(true);
+      
+      // Delay actual sign-out to show popup
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // Perform sign out
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      // Keep popup visible briefly after sign-out
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setIsPopupVisible(false);
+      
+      // Delay page refresh to allow popup to be seen
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 500);
+      
+    } catch (error) {
+      console.error('Sign out error:', error);
+      setPopupMessage('Error signing out');
+      setIsPopupVisible(true);
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      setIsPopupVisible(false);
+    }
   };
 
   const resetPassword = async (email) => {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email);
     return { data, error };
   };
+
+  const showPopup = useCallback((message) => {
+    setPopupMessage(message);
+    setIsPopupVisible(true);
+  }, []);
+
+  const hidePopup = useCallback(() => {
+    setIsPopupVisible(false);
+  }, []);
 
   const value = {
     user,
@@ -73,11 +121,16 @@ export const AuthProvider = ({ children }) => {
     signUp,
     signOut,
     resetPassword,
+    isPopupVisible,
+    popupMessage,
+    showPopup,
+    hidePopup,
   };
 
   return (
     <AuthContext.Provider value={value}>
       {children}
+      <SignInOutPopup show={isPopupVisible} message={popupMessage} />
     </AuthContext.Provider>
   );
 };

@@ -215,7 +215,7 @@ export const getErrorBoundaryFallback = (error, errorInfo) => {
   };
 };
 
-export default {
+const errorHandlingUtils = {
   ERROR_TYPES,
   ERROR_SEVERITY,
   errorHandler,
@@ -224,3 +224,5 @@ export default {
   createRetryFunction,
   getErrorBoundaryFallback
 };
+
+export default errorHandlingUtils;

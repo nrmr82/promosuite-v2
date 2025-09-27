@@ -17,7 +17,15 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
   const [error, setError] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [confirmationSent, setConfirmationSent] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
 
+  const showPopup = useCallback((message) => {
+    setPopupMessage(message);
+    const timer = setTimeout(() => {
+      setPopupMessage('');
+    }, 3000); // Popup disappears after 3 seconds
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSocialAuth = async (provider) => {
     setLoading(true);
@@ -45,6 +53,7 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
     } catch (error) {
       console.error('Social auth error:', error);
       setError(`${provider} authentication failed: ${error.message}`);
+      showPopup(`${provider} authentication failed`);
       setLoading(false);
     }
     
@@ -291,13 +300,14 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, handleClose]);
+  }, [isOpen, handleClose, popupMessage]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="auth-modal-overlay" onClick={handleOverlayClick}>
-      <div className="auth-modal" onClick={handleModalClick}>
+    <>
+      <div className="auth-modal-overlay" onClick={handleOverlayClick}>
+        <div className="auth-modal" onClick={handleModalClick}>
         {showForgotPassword ? (
           <div className="forgot-password-section">
             {!passwordResetSent ? (
@@ -374,6 +384,12 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
           </div>
         ) : (
           <>
+            {popupMessage && (
+              <div className="auth-popup-message">
+                <span>{popupMessage}</span>
+              </div>
+            )}
+
             <div style={{ marginBottom: '2rem' }}>
               <div className="logo-container" style={{ 
                 display: 'flex',
@@ -558,8 +574,10 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
             </div>
           </>
         )}
+        </div>
       </div>
-    </div>
+      
+    </>
   );
 };
 

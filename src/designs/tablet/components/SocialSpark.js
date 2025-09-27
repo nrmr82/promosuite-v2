@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Calendar, 
-  BarChart3, 
-  Target, 
+import {
+  Calendar,
+  BarChart3,
+  Target,
   Video,
   ArrowRight,
   Instagram,
   Twitter,
   Linkedin,
   Youtube,
+  Facebook,
   Edit3,
   Check,
   Plus,
@@ -18,6 +19,8 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useSocialConnections } from '../hooks/useSocialConnections';
+import instagramOAuthHandler from '../../services/oauth/InstagramOAuthHandler';
+import tiktokOAuthHandler from '../../services/oauth/TikTokOAuthHandler';
 import './SocialSpark.css';
 
 const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
@@ -37,6 +40,13 @@ const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
   } = useSocialConnections();
 
   const platforms = [
+    { 
+      id: 'facebook',
+      name: "Facebook", 
+      icon: <Facebook className="w-6 h-6" />, 
+      color: "#1877F2",
+      description: "Connect and share updates" 
+    },
     { 
       id: 'instagram',
       name: "Instagram", 
@@ -76,14 +86,55 @@ const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
 
   // Connection handlers
   const handleConnect = async (platformId) => {
+    // For Instagram and TikTok, use custom OAuth
+    if (platformId === 'instagram' || platformId === 'tiktok') {
+      try {
+        const handler = platformId === 'instagram' ? instagramOAuthHandler : tiktokOAuthHandler;
+        
+        // Generate state for CSRF protection
+        const state = crypto.randomUUID();
+        
+        // Store state and platform in session storage
+        sessionStorage.setItem('oauth_state', state);
+        sessionStorage.setItem('oauth_platform', platformId);
+        
+        // Generate and redirect to OAuth URL
+        const authUrl = handler.generateAuthUrl({ state });
+        window.location.href = authUrl;
+      } catch (error) {
+        console.error(`Failed to connect to ${platformId}:`, error);
+        clearError();
+        setError(`Failed to initiate ${platformId} connection. Please try again later.`);
+      }
+      return;
+    }
+    
+    // For other platforms, use Supabase OAuth
     try {
-      await connectPlatform(platformId);
-      // Show success message or toast
-      console.log(`Successfully connected to ${platformId}`);
+      // Get OAuth handler for the platform
+      const handler = oAuthHandlerFactory.getHandler(platformId);
+      if (!handler) {
+        throw new Error(`Unsupported platform: ${platformId}`);
+      }
+
+      // Generate state parameter for CSRF protection
+      const state = crypto.randomUUID();
+      
+      // Generate OAuth URL
+      const authUrl = handler.generateAuthUrl({ state });
+      
+      // Store state in session storage for validation
+      sessionStorage.setItem('oauth_state', state);
+      sessionStorage.setItem('oauth_platform', platformId);
+      
+      // Redirect to OAuth provider
+      window.location.href = authUrl;
     } catch (error) {
       console.error(`Failed to connect to ${platformId}:`, error);
-      // Error is already handled by the hook
+      clearError();
+      setError(`Failed to initiate ${platformId} connection. Please try again later.`);
     }
+  };
   };
 
   const handleDisconnect = async (platformId) => {

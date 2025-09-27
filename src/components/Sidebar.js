@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { FaHome, FaPalette, FaVideo, FaFileAlt, FaFolderOpen, FaCrown, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
 import useClickOutside from '../hooks/useClickOutside';
+import { useAuth } from '../contexts/AuthContext';
 import './Sidebar.css';
 
-const Sidebar = ({ currentView = 'home', onNavigate, user, onLogout }) => {
+const Sidebar = ({ currentView = 'home', onNavigate, user }) => {
+  const { signOut } = useAuth();
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [collapsed] = useState(false);
   
   // Hook to handle clicks outside dropdown
   const dropdownRef = useClickOutside(() => {
@@ -33,21 +34,6 @@ const Sidebar = ({ currentView = 'home', onNavigate, user, onLogout }) => {
     setUserDropdownOpen(false);
   };
 
-  const toggleUserDropdown = () => {
-    setUserDropdownOpen(!userDropdownOpen);
-  };
-
-  const handleLogout = () => {
-    alert('handleLogout called!');
-    console.log('handleLogout called!, onLogout exists:', !!onLogout);
-    setUserDropdownOpen(false);
-    if (onLogout) {
-      console.log('Calling onLogout...');
-      onLogout();
-    } else {
-      alert('onLogout is not defined!');
-    }
-  };
 
   return (
     <div className="sidebar">
@@ -181,17 +167,9 @@ const Sidebar = ({ currentView = 'home', onNavigate, user, onLogout }) => {
           
           {/* Logout Button */}
           <button 
-            onClick={() => {
+            onClick={async () => {
               console.log('🔐 Sidebar: Logout button clicked');
-              if (onLogout) {
-                console.log('🔐 Sidebar: Calling onLogout prop');
-                onLogout();
-              } else {
-                console.log('🔐 Sidebar: No onLogout prop, doing manual logout');
-                localStorage.removeItem('promosuiteUser');
-                sessionStorage.clear();
-                window.location.reload();
-              }
+              await signOut();
             }}
             style={{
               background: '#e91e63',

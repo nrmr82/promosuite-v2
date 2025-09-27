@@ -1,22 +1,13 @@
 import React, { useState } from 'react';
 import { 
-  CheckCircle, 
   Sparkles, 
   Crown, 
-  Zap, 
-  Video, 
-  Image, 
   FileText,
-  Users,
-  Download,
-  Cloud,
-  Shield,
-  Headphones,
-  Star,
   X,
   Coins,
   CreditCard
 } from 'lucide-react';
+import { handleSubscription } from '../utils/stripe';
 import './Pricing.css';
 
 const Pricing = ({ user, onUpgrade, onClose }) => {
@@ -100,23 +91,41 @@ const Pricing = ({ user, onUpgrade, onClose }) => {
     }
   ];
 
-  const handlePlanSelect = (planId) => {
+  const handlePlanSelect = async (planId) => {
     if (planId === 'free') {
       return; // Already on free plan
     }
     
-    if (onUpgrade) {
-      onUpgrade(planId, billingCycle);
-    } else {
-      console.log(`Upgrade to ${planId} plan (${billingCycle})`);
+    try {
+      // Get the Stripe price ID based on the plan and billing cycle
+      const priceId = getPriceId(planId, billingCycle);
+      
+      // Redirect to Stripe Checkout
+      await handleSubscription(priceId);
+      
+      if (onUpgrade) {
+        onUpgrade(planId, billingCycle);
+      }
+    } catch (error) {
+      console.error('Error processing subscription:', error);
+      // Handle error (show error message to user)
     }
   };
 
-  const handleCreditPurchase = (packageId) => {
-    if (onUpgrade) {
-      onUpgrade(packageId, 'credits');
-    } else {
-      console.log(`Purchase credits package: ${packageId}`);
+  const handleCreditPurchase = async (packageId) => {
+    try {
+      // Get the Stripe price ID for the credit package
+      const priceId = getCreditPackagePriceId(packageId);
+      
+      // Redirect to Stripe Checkout
+      await handleSubscription(priceId);
+      
+      if (onUpgrade) {
+        onUpgrade(packageId, 'credits');
+      }
+    } catch (error) {
+      console.error('Error purchasing credits:', error);
+      // Handle error (show error message to user)
     }
   };
 
@@ -133,6 +142,31 @@ const Pricing = ({ user, onUpgrade, onClose }) => {
 
   const getCurrentCredits = () => {
     return user?.credits || 500; // Default 500 remaining credits
+  };
+
+  // Helper function to get Stripe price ID for subscriptions
+  const getPriceId = (planId, cycle) => {
+    const priceMap = {
+      starter: {
+        monthly: process.env.REACT_APP_STRIPE_STARTER_MONTHLY_PRICE_ID,
+        annually: process.env.REACT_APP_STRIPE_STARTER_YEARLY_PRICE_ID
+      },
+      pro: {
+        monthly: process.env.REACT_APP_STRIPE_PRO_MONTHLY_PRICE_ID,
+        annually: process.env.REACT_APP_STRIPE_PRO_YEARLY_PRICE_ID
+      }
+    };
+    return priceMap[planId]?.[cycle];
+  };
+
+  // Helper function to get Stripe price ID for credit packages
+  const getCreditPackagePriceId = (packageId) => {
+    const priceMap = {
+      'credits-500': process.env.REACT_APP_STRIPE_CREDITS_500_PRICE_ID,
+      'credits-1500': process.env.REACT_APP_STRIPE_CREDITS_1500_PRICE_ID,
+      'credits-5000': process.env.REACT_APP_STRIPE_CREDITS_5000_PRICE_ID
+    };
+    return priceMap[packageId];
   };
 
   return (

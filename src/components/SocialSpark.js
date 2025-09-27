@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Calendar, 
   BarChart3, 
-  Target, 
   Video,
   ArrowRight,
   Instagram,
@@ -15,16 +14,15 @@ import {
   X,
   RefreshCw,
   Loader,
-  AlertCircle
+  AlertCircle,
+  Image
 } from 'lucide-react';
 import { useSocialConnections } from '../hooks/useSocialConnections';
 import './SocialSpark.css';
 
 const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
-  const [showConnectionModal, setShowConnectionModal] = useState(false);
+  const [, setShowConnectionModal] = useState(false);
   const {
-    connections,
-    loading: connectionsLoading,
     error,
     connectPlatform,
     disconnectPlatform,
@@ -36,7 +34,7 @@ const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
     clearError
   } = useSocialConnections();
 
-  const platforms = [
+const platforms = [
     { 
       id: 'instagram',
       name: "Instagram", 
@@ -71,6 +69,13 @@ const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
       icon: <Video className="w-6 h-6" />, 
       color: "#000000",
       description: "Short-form video content" 
+    },
+    { 
+      id: 'pinterest',
+      name: "Pinterest", 
+      icon: <Image className="w-6 h-6" />, 
+      color: "#E60023",
+      description: "Visual discovery platform" 
     }
   ];
 

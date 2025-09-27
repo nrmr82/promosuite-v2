@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import { 
   FiHome, 
   FiLayers, 
@@ -7,16 +8,17 @@ import {
   FiChevronRight,
   FiZap,
   FiVideo,
-  FiFolder
+  FiFolder,
+  FiLogOut
 } from 'react-icons/fi';
 import './Sidebar.css';
 
 const Sidebar = ({ 
   user,
   currentView,
-  onNavigate, 
-  onLogout 
+  onNavigate
 }) => {
+  const { signOut } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const sections = [
@@ -65,14 +67,20 @@ const Sidebar = ({
           icon: FiLayers,
           view: 'pricing',
           badge: { text: 'Discount', type: 'discount' }
+        },
+        {
+          id: 'logout',
+          label: 'Logout',
+          icon: FiLogOut,
+          action: 'logout'
         }
       ]
     }
   ];
 
-  const handleNavigation = (item) => {
+  const handleNavigation = async (item) => {
     if (item.action === 'logout') {
-      onLogout();
+      await signOut();
     } else {
       onNavigate(item.view);
     }

@@ -1,11 +1,210 @@
 import { supabase } from '../utils/supabase';
+import oAuthHandlerFactory from './oauth/OAuthHandlerFactory';
+import tokenRefreshManager from './TokenRefreshManager';
+import { broadcastChannel } from '../utils/broadcastChannel';
 
 /**
  * SocialConnectionsService
  * Handles OAuth flows and manages social platform connections
  */
 class SocialConnectionsService {
+  constructor() {
+    // Initialize connection cache
+    this.connectionCache = new Map();
+    this.connectionPools = new Map();
+    this.activeSessions = new Set();
+    this.healthCheckInterval = 5 * 60 * 1000; // 5 minutes
+    
+    // Start token refresh manager
+    tokenRefreshManager.start();
+    
+    // Initialize broadcast channel for cross-tab sync
+    this.initializeBroadcastChannel();
+    
+    // Start health monitoring
+    this.startHealthMonitoring();
+  }
   
+  /**
+   * Initialize broadcast channel for cross-tab synchronization
+   */
+  initializeBroadcastChannel() {
+    broadcastChannel.addEventListener('message', (event) => {
+      if (event.data.type === 'connection_update') {
+        this.handleConnectionUpdate(event.data.connection);
+      } else if (event.data.type === 'connection_deleted') {
+        this.handleConnectionDeleted(event.data.connectionId);
+      }
+    });
+  }
+  
+  /**
+   * Start periodic health monitoring
+   */
+  startHealthMonitoring() {
+    this.healthCheckInterval = setInterval(() => {
+      this.checkConnectionHealth();
+    }, this.healthCheckInterval);
+  }
+  
+  /**
+   * Check health of all active connections
+   */
+  async checkConnectionHealth() {
+    const activeConnections = Array.from(this.connectionCache.values())
+      .filter(conn => conn.connection_status === 'active');
+      
+    for (const connection of activeConnections) {
+      try {
+        const handler = oAuthHandlerFactory.getHandler(connection.platform);
+        const isValid = await handler.validateToken(connection.encrypted_access_token);
+        
+        if (!isValid) {
+          await this.handleInvalidToken(connection);
+        }
+      } catch (error) {
+        console.error(`Health check failed for connection ${connection.id}:`, error);
+      }
+    }
+  }
+  
+  /**
+   * Handle invalid token detection
+   */
+  async handleInvalidToken(connection) {
+    try {
+      // Queue token refresh
+      await tokenRefreshManager.forceRefresh(connection.id);
+      
+      // Send webhook notification if configured
+      if (process.env.REACT_APP_CONNECTION_WEBHOOK) {
+        await fetch(process.env.REACT_APP_CONNECTION_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'connection_invalid',
+            connection_id: connection.id,
+            platform: connection.platform,
+            timestamp: new Date().toISOString()
+          })
+        });
+      }
+    } catch (error) {
+      console.error(`Error handling invalid token for connection ${connection.id}:`, error);
+    }
+  }
+  
+  /**
+   * Handle connection updates from other tabs
+   */
+  handleConnectionUpdate(connection) {
+    // Update cache
+    this.connectionCache.set(connection.id, connection);
+    
+    // Update connection pool if active
+    const pool = this.connectionPools.get(connection.platform);
+    if (pool) {
+      pool.set(connection.id, connection);
+    }
+    
+    // Emit connection update event
+    this.emit('connection_updated', connection);
+  }
+  
+  /**
+   * Handle connection deletions from other tabs
+   */
+  handleConnectionDeleted(connectionId) {
+    // Get connection before removal
+    const connection = this.connectionCache.get(connectionId);
+    if (!connection) return;
+    
+    // Remove from cache
+    this.connectionCache.delete(connectionId);
+    
+    // Remove from connection pool
+    const pool = this.connectionPools.get(connection.platform);
+    if (pool) {
+      pool.delete(connectionId);
+    }
+    
+    // Emit connection deleted event
+    this.emit('connection_deleted', connectionId);
+  }
+  
+  /**
+   * Get connection from cache or database
+   */
+  async getConnection(connectionId) {
+    // Check cache first
+    const cached = this.connectionCache.get(connectionId);
+    if (cached) return cached;
+    
+    // Fetch from database
+    const { data: connection, error } = await supabase
+      .from('social_connections_safe')
+      .select('*')
+      .eq('id', connectionId)
+      .single();
+      
+    if (error) throw error;
+    if (!connection) return null;
+    
+    // Update cache
+    this.connectionCache.set(connectionId, connection);
+    
+    return connection;
+  }
+  
+  /**
+   * Get or create connection pool for a platform
+   */
+  getConnectionPool(platform) {
+    let pool = this.connectionPools.get(platform);
+    if (!pool) {
+      pool = new Map();
+      this.connectionPools.set(platform, pool);
+    }
+    return pool;
+  }
+  
+/**
+   * Track active session
+   */
+  trackSession(connectionId) {
+    this.activeSessions.add(connectionId);
+  }
+  
+  /**
+   * Stop tracking session
+   */
+  releaseSession(connectionId) {
+    this.activeSessions.delete(connectionId);
+  }
+  
+  /**
+   * Check if connection has active sessions
+   */
+  hasActiveSessions(connectionId) {
+    return this.activeSessions.has(connectionId);
+  }
+  
+  /**
+   * Event emitter methods
+   */
+  emit(event, data) {
+    const customEvent = new CustomEvent(`social_connection_${event}`, { detail: data });
+    window.dispatchEvent(customEvent);
+  }
+  
+  on(event, callback) {
+    window.addEventListener(`social_connection_${event}`, (e) => callback(e.detail));
+  }
+  
+  off(event, callback) {
+    window.removeEventListener(`social_connection_${event}`, callback);
+  }
+
   /**
    * Get all social connections for the current user
    */
@@ -14,15 +213,23 @@ class SocialConnectionsService {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { data, error } = await supabase
+const { data: connections, error } = await supabase
         .from('social_connections_safe')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
-
+        
       if (error) throw error;
+      
+      // Update connection cache and pools
+      for (const connection of connections) {
+        this.connectionCache.set(connection.id, connection);
+        
+        const pool = this.getConnectionPool(connection.platform);
+        pool.set(connection.id, connection);
+      }
 
-      return { connections: data || [] };
+return { connections: connections || [] };
     } catch (error) {
       console.error('Error fetching social connections:', error);
       throw error;
@@ -37,12 +244,29 @@ class SocialConnectionsService {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
+// Check cache first
+      const cached = Array.from(this.connectionCache.values())
+        .find(conn => conn.user_id === user.id && conn.platform === platform);
+      if (cached) return { connection: cached };
+      
       const { data, error } = await supabase
         .from('social_connections_safe')
         .select('*')
         .eq('user_id', user.id)
         .eq('platform', platform)
         .single();
+        
+      if (error && error.code !== 'PGRST116') { // Not found error
+        throw error;
+      }
+      
+      // Update cache if connection found
+      if (data) {
+        this.connectionCache.set(data.id, data);
+        
+        const pool = this.getConnectionPool(platform);
+        pool.set(data.id, data);
+      }
 
       if (error && error.code !== 'PGRST116') { // Not found error
         throw error;
@@ -98,7 +322,7 @@ class SocialConnectionsService {
         platform_data: oauthData.platformData || {}
       };
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('social_connections')
         .upsert(connectionData, { 
           onConflict: 'user_id,platform',
@@ -119,6 +343,28 @@ class SocialConnectionsService {
   /**
    * Disconnect a platform
    */
+/**
+   * Clean up connection resources
+   */
+  async cleanupConnection(connectionId) {
+    // Remove from cache
+    this.connectionCache.delete(connectionId);
+    
+    // Remove from connection pools
+    for (const pool of this.connectionPools.values()) {
+      pool.delete(connectionId);
+    }
+    
+    // Remove active sessions
+    this.activeSessions.delete(connectionId);
+    
+    // Broadcast deletion to other tabs
+    broadcastChannel.postMessage({
+      type: 'connection_deleted',
+      connectionId
+    });
+  }
+
   async disconnectPlatform(platform) {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -335,4 +581,5 @@ class SocialConnectionsService {
   }
 }
 
-export default new SocialConnectionsService();
+const socialConnectionsService = new SocialConnectionsService();
+export default socialConnectionsService;

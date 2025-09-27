@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Analytics } from '@vercel/analytics/react';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TemplateProvider } from './contexts/TemplateContext';
 import { ProductProvider } from './contexts/ProductContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import MainLayout from './components/MainLayout';
 import Dashboard from './components/Dashboard';
 import LandingPage from './components/LandingPage';
+import AuthModal from './components/AuthModal';
 import FlyerPro from './components/FlyerPro';
 import SocialSpark from './components/SocialSpark';
 import UserCollections from './components/UserCollections';
@@ -14,7 +15,8 @@ import Pricing from './components/Pricing';
 import Templates from './pages/Templates';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
-// AuthCallback removed - using simpler OAuth flow
+import SessionTimeoutWarning from './components/SessionTimeoutWarning';
+import OAuthCallback from './components/oauth/OAuthCallback';
 import authService from './services/authService';
 import './App.css';
 import './GlobalBackground.css';
@@ -36,7 +38,6 @@ function App() {
   const [currentView, setCurrentView] = useState('home');
 
   // Simple OAuth handling - let Supabase handle it automatically
-  const isOAuthCallback = false; // Disable complex callback handling
 
   // Initialize app and check authentication
   useEffect(() => {
@@ -45,6 +46,19 @@ function App() {
 
   const initializeApp = async () => {
     try {
+      // Initialize session timeout service
+      authService.initializeSessionTimeout({
+        timeoutAfterClose: 30, // 30 minutes after browser close
+        inactivityTimeout: 120, // 2 hours of inactivity
+      });
+      
+      // Check session validity before continuing
+      if (!authService.checkInitialSessionValidity()) {
+        console.log('🔍 App: Session expired during initialization');
+        setLoading(false);
+        return;
+      }
+      
       // Check for OAuth session first (in case we just came back from OAuth)
       console.log('🔍 App: Checking for OAuth session...');
       const userData = await authService.initializeAuth();
@@ -92,31 +106,34 @@ function App() {
 
   const handleAuthSuccess = (userData) => {
     setUser(userData);
+    // Session timeout tracking is already started by authService.login/register
+    console.log('🎉 App: User authenticated, session timeout active');
   };
+
+  const { signOut } = useAuth();
 
   const handleLogout = async () => {
     console.log('🔐 App: Logout handler called');
     try {
-      console.log('🔐 App: Calling authService.logout()');
-      await authService.logout();
-      console.log('🔐 App: AuthService logout complete');
+      // Call AuthContext's signOut which handles the popup
+      await signOut();
       
-      // Force immediate state update
+      // Clear local state
       setUser(null);
       setCurrentView('home');
       
-      console.log('🔐 App: Logout complete - user should be null now');
-      
-      // Force a page refresh to ensure clean state (temporary fix)
-      window.location.href = '/';
-      
+      // Force a page refresh after popup shows
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 3000);
     } catch (error) {
       console.error('🔐 App: Logout failed:', error);
-      // Even if auth service fails, clear local state
       localStorage.removeItem('promosuiteUser');
       setUser(null);
       setCurrentView('home');
-      window.location.href = '/';
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 3000);
     }
   };
 
@@ -141,13 +158,15 @@ function App() {
   // Render the current view component
   const renderCurrentView = () => {
     switch (currentView) {
+      case 'auth':
+        return <AuthModal isOpen={true} onClose={() => handleNavigate('socialspark')} onAuthSuccess={handleAuthSuccess} />;
       case 'home':
       case 'dashboard':
         return <Dashboard user={user} onNavigateToTool={handleNavigateToTool} />;
       case 'flyerpro':
         return <FlyerPro user={user} />;
       case 'socialspark':
-        return <SocialSpark user={user} />;
+        return <SocialSpark user={user} onOpenAuth={() => handleNavigate('auth')} onToolUsage={() => handleNavigate('socialspark')} />;
       case 'templates':
         return <Templates user={user} />;
       case 'collections':
@@ -158,6 +177,8 @@ function App() {
         return <Profile user={user} onNavigate={handleNavigate} />;
       case 'settings':
         return <Settings user={user} onLogout={handleLogout} />;
+      case 'oauth_callback':
+        return <OAuthCallback />;
       default:
         return <Dashboard user={user} onNavigateToTool={handleNavigateToTool} />;
     }
@@ -204,6 +225,7 @@ function App() {
             >
               {renderCurrentView()}
             </MainLayout>
+            <SessionTimeoutWarning />
           </ProductProvider>
         </TemplateProvider>
       </AuthProvider>

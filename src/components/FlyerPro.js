@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Layout, 
   Palette, 
-  Type,
   ArrowRight
 } from 'lucide-react';
 import { useTemplate } from '../contexts/TemplateContext';
@@ -18,33 +17,19 @@ import './FlyerPro.css';
 
 const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
   const {
-    canUseTemplate,
-    remainingFreeTemplates,
-    useTemplate: recordTemplateUsage,
     // toggleFavorite: contextToggleFavorite,
-    previewTemplate,
     trackEvent,
     ANALYTICS_EVENTS
   } = useTemplate();
 
   // const [showDemo, setShowDemo] = useState(false);
-  const [_showTemplatePreview, setShowTemplatePreview] = useState(false);
-  const [_selectedTemplate, setSelectedTemplate] = useState(null);
-  const [_showTemplateBrowser, setShowTemplateBrowser] = useState(false);
-  const [_showUpgradePrompt, setShowUpgradePrompt] = useState(false);
-  const [templateFilter, setTemplateFilter] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [_isLoadingTemplates, setIsLoadingTemplates] = useState(true);
-  
-  // Editor and property input state
-  const [_showEditor, setShowEditor] = useState(false);
-  const [_showPropertyInput, setShowPropertyInput] = useState(false);
-  const [_showAIGenerator, setShowAIGenerator] = useState(false);
-  const [_showAITemplateGenerator, setShowAITemplateGenerator] = useState(false);
-  const [_aiGeneratorMode, setAIGeneratorMode] = useState('flyer'); // 'flyer', 'analysis', 'copywriting'
-  const [_editorTemplate, setEditorTemplate] = useState(null);
-  const [_propertyData, setPropertyData] = useState({});
-  const [_brandData, setBrandData] = useState({});
+  const [, setShowTemplateBrowser] = useState(false);
+  const [, setShowAIGenerator] = useState(false);
+  const [, setShowAITemplateGenerator] = useState(false);
+  const [, setAIGeneratorMode] = useState('flyer'); // 'flyer', 'analysis', 'copywriting'
+  const [, setEditorTemplate] = useState(null);
+  const [, setIsLoadingTemplates] = useState(true);
+  const [, setShowPropertyInput] = useState(false);
 
   // Error handling and accessibility hooks - simplified for debugging
   // const { handleError, handleTemplateError } = useErrorHandler();
@@ -54,12 +39,6 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
   // const prefersReducedMotion = false; // useReducedMotion();
   // const { liveRegionRef, announceToRegion } = useAriaLive();
   
-  // Temporary simplified error handling - currently unused
-  // const handleError = (error, context) => console.error('Error:', error, context);
-  const handleTemplateError = (error, templateId) => console.error('Template Error:', error, templateId);
-  const saveFocus = () => {};
-  const announce = (message, priority) => console.log('Announce:', message, priority);
-  const announceToRegion = (message) => console.log('Live region:', message);
 
   const templates = [
     {
@@ -175,13 +154,6 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
   ];
 
 
-  // Filter templates based on category and search
-  const filteredTemplates = templates.filter(template => {
-    const matchesCategory = templateFilter === 'all' || template.category === templateFilter;
-    const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         template.category.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
 
   // Batch loading for templates with lazy loading - simplified for debugging
   // const { visibleItems: visibleTemplates, hasMore, isLoading: isBatchLoading, loadNextBatch } = useBatchLoading(
@@ -202,7 +174,7 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
       setIsLoadingTemplates(false);
     }, 1500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [setIsLoadingTemplates]);
 
   // Enhanced handler functions with error handling and accessibility
   // const handleTemplatePreview = (template) => {

@@ -25,7 +25,31 @@ export const supabase = createClient(actualUrl, actualKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    flowType: 'pkce'
+    flowType: 'pkce',
+    storage: {
+      getItem: (key) => {
+        // Try sessionStorage first, then fallback to localStorage for OAuth flow
+        let value = sessionStorage.getItem(key);
+        if (!value) {
+          value = localStorage.getItem(key);
+          // If found in localStorage, migrate to sessionStorage
+          if (value) {
+            sessionStorage.setItem(key, value);
+            localStorage.removeItem(key);
+          }
+        }
+        return value;
+      },
+      setItem: (key, value) => {
+        // Store in both for OAuth redirect, will clean up localStorage after
+        sessionStorage.setItem(key, value);
+        localStorage.setItem(key, value);
+      },
+      removeItem: (key) => {
+        sessionStorage.removeItem(key);
+        localStorage.removeItem(key);
+      }
+    }
   },
   global: {
     headers: {
@@ -96,9 +120,59 @@ export const getCurrentUser = async () => {
   try {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error) throw error;
-    return user;
+    if (user) return user;
+    
+    // Fallback: If Supabase API doesn't return user but we have localStorage session
+    console.log('🔍 getCurrentUser: No user from Supabase API, checking localStorage fallback...');
+    const storedUser = localStorage.getItem('promosuiteUser');
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        if (userData && userData.id && userData.session) {
+          console.log('✅ getCurrentUser: Using localStorage fallback for user:', userData.email);
+          // Return a user object that matches Supabase user structure
+          return {
+            id: userData.id,
+            email: userData.email,
+            user_metadata: userData.user_metadata || {},
+            app_metadata: userData.app_metadata || {},
+            aud: userData.aud || 'authenticated',
+            created_at: userData.created_at,
+            updated_at: userData.updated_at
+          };
+        }
+      } catch (parseError) {
+        console.warn('getCurrentUser: Error parsing localStorage user data:', parseError);
+      }
+    }
+    
+    return null;
   } catch (error) {
     console.error('Error getting current user:', error);
+    
+    // Try localStorage fallback on any error
+    console.log('🔍 getCurrentUser: Supabase error, trying localStorage fallback...');
+    try {
+      const storedUser = localStorage.getItem('promosuiteUser');
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        if (userData && userData.id && userData.session) {
+          console.log('✅ getCurrentUser: Using localStorage fallback after error for user:', userData.email);
+          return {
+            id: userData.id,
+            email: userData.email,
+            user_metadata: userData.user_metadata || {},
+            app_metadata: userData.app_metadata || {},
+            aud: userData.aud || 'authenticated',
+            created_at: userData.created_at,
+            updated_at: userData.updated_at
+          };
+        }
+      }
+    } catch (fallbackError) {
+      console.error('getCurrentUser: Fallback also failed:', fallbackError);
+    }
+    
     return null;
   }
 };

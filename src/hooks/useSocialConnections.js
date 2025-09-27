@@ -1,45 +1,172 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import socialConnectionsService from '../services/socialConnectionsService';
+import errorHandler from '../services/ErrorHandler';
+import tokenRefreshManager from '../services/TokenRefreshManager';
+import { toast } from 'react-toastify';
 
 /**
  * Custom hook for managing social platform connections
  */
 export const useSocialConnections = () => {
+  // State management
   const [connections, setConnections] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [connecting, setConnecting] = useState({});
-
-  // Load all connections on mount
-  useEffect(() => {
-    loadConnections();
-  }, []);
-
+  const [healthStatus, setHealthStatus] = useState({});
+  const [refreshStatus, setRefreshStatus] = useState({});
+  
+  // Refs for cleanup and debouncing
+  const cleanupRef = useRef();
+  const healthCheckTimerRef = useRef();
+  const batchTimeoutRef = useRef();
+  const batchQueueRef = useRef(new Set());
+  
+  // Event listener refs
+  const errorListenerRef = useRef();
+  const connectionListenerRef = useRef();
+  
+  // Constants
+  const HEALTH_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
+  const BATCH_DELAY = 1000; // 1 second
+  
   /**
-   * Load all user connections from the database
+   * Set up event listeners
    */
-  const loadConnections = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const { connections: userConnections } = await socialConnectionsService.getUserConnections();
-      
-      // Convert array to object for easier access
-      const connectionsMap = {};
-      userConnections.forEach(connection => {
-        connectionsMap[connection.platform] = connection;
-      });
-      
-      setConnections(connectionsMap);
-    } catch (err) {
-      console.error('Error loading connections:', err);
-      setError('Failed to load social connections');
-    } finally {
-      setLoading(false);
-    }
+  const setupEventListeners = useCallback(() => {
+    // Error listener
+    errorListenerRef.current = (error, recovery) => {
+      if (error.category === 'token' || error.category === 'authentication') {
+        setHealthStatus(prev => ({
+          ...prev,
+          [error.platform]: { status: 'error', error }
+        }));
+        
+        // Show user notification
+        toast.error(`Connection error with ${error.platform}: ${error.message}`);
+      }
+    };
+    errorHandler.addListener(errorListenerRef.current);
+    
+    // Connection update listener
+    connectionListenerRef.current = (event) => {
+      const { type, data } = event.detail;
+      if (type === 'health_update') {
+        setHealthStatus(prev => ({
+          ...prev,
+          [data.platform]: data
+        }));
+      } else if (type === 'refresh_status') {
+        setRefreshStatus(prev => ({
+          ...prev,
+          [data.platform]: data
+        }));
+      }
+    };
+    window.addEventListener('social_connection_update', connectionListenerRef.current);
+    
+    return () => {
+      if (errorListenerRef.current) {
+        errorHandler.removeListener(errorListenerRef.current);
+      }
+      if (connectionListenerRef.current) {
+        window.removeEventListener('social_connection_update', connectionListenerRef.current);
+      }
+    };
   }, []);
-
+  
+  /**
+   * Set up health checks
+   */
+  const setupHealthChecks = useCallback(() => {
+    const checkHealth = async () => {
+      const platforms = Object.keys(connections);
+      for (const platform of platforms) {
+        try {
+          const isHealthy = await socialConnectionsService.checkConnectionHealth(platform);
+          setHealthStatus(prev => ({
+            ...prev,
+            [platform]: {
+              status: isHealthy ? 'healthy' : 'unhealthy',
+              lastCheck: new Date()
+            }
+          }));
+        } catch (error) {
+          console.error(`Health check failed for ${platform}:`, error);
+        }
+      }
+    };
+    
+    // Initial check
+    checkHealth();
+    
+    // Set up interval
+    healthCheckTimerRef.current = setInterval(checkHealth, HEALTH_CHECK_INTERVAL);
+    
+    return () => {
+      if (healthCheckTimerRef.current) {
+        clearInterval(healthCheckTimerRef.current);
+      }
+    };
+  }, [connections]);
+  
+  /**
+   * Batch connection operations
+   */
+  const batchOperation = useCallback(async (operation, platforms) => {
+    const results = {
+      success: [],
+      failed: []
+    };
+    
+    for (const platform of platforms) {
+      try {
+        await operation(platform);
+        results.success.push(platform);
+      } catch (error) {
+        results.failed.push({ platform, error });
+      }
+    }
+    
+    return results;
+  }, []);
+  
+  /**
+   * Queue platform for batch operation
+   */
+  const queueForBatch = useCallback((platform, operation) => {
+    batchQueueRef.current.add({ platform, operation });
+    
+    if (batchTimeoutRef.current) {
+      clearTimeout(batchTimeoutRef.current);
+    }
+    
+    batchTimeoutRef.current = setTimeout(() => {
+      const queue = Array.from(batchQueueRef.current);
+      batchQueueRef.current.clear();
+      
+      const platformsByOperation = queue.reduce((acc, { platform, operation }) => {
+        if (!acc[operation]) acc[operation] = [];
+        acc[operation].push(platform);
+        return acc;
+      }, {});
+      
+      Object.entries(platformsByOperation).forEach(([operation, platforms]) => {
+        switch (operation) {
+          case 'connect':
+            batchConnect(platforms);
+            break;
+          case 'disconnect':
+            batchDisconnect(platforms);
+            break;
+          case 'refresh':
+            batchRefresh(platforms);
+            break;
+        }
+      });
+    }, BATCH_DELAY);
+  }, []);
+  
   /**
    * Connect to a social platform
    */
@@ -123,6 +250,95 @@ export const useSocialConnections = () => {
   }, []);
 
   /**
+   * Batch connection operations
+   */
+  const batchConnect = useCallback(async (platforms) => {
+    const results = await batchOperation(connectPlatform, platforms);
+    if (results.failed.length > 0) {
+      toast.error(`Failed to connect to ${results.failed.map(f => f.platform).join(', ')}`);
+    }
+    if (results.success.length > 0) {
+      toast.success(`Successfully connected to ${results.success.join(', ')}`);
+    }
+  }, [batchOperation, connectPlatform]);
+
+  const batchDisconnect = useCallback(async (platforms) => {
+    const results = await batchOperation(disconnectPlatform, platforms);
+    if (results.failed.length > 0) {
+      toast.error(`Failed to disconnect from ${results.failed.map(f => f.platform).join(', ')}`);
+    }
+    if (results.success.length > 0) {
+      toast.success(`Successfully disconnected from ${results.success.join(', ')}`);
+    }
+  }, [batchOperation, disconnectPlatform]);
+
+  const batchRefresh = useCallback(async (platforms) => {
+    const results = await batchOperation(refreshPlatform, platforms);
+    if (results.failed.length > 0) {
+      toast.error(`Failed to refresh ${results.failed.map(f => f.platform).join(', ')}`);
+    }
+    if (results.success.length > 0) {
+      toast.success(`Successfully refreshed ${results.success.join(', ')}`);
+    }
+  }, [batchOperation, refreshPlatform]);
+
+  // Cleanup function
+  const cleanup = useCallback(() => {
+    if (cleanupRef.current) {
+      cleanupRef.current();
+    }
+    if (healthCheckTimerRef.current) {
+      clearInterval(healthCheckTimerRef.current);
+    }
+    if (batchTimeoutRef.current) {
+      clearTimeout(batchTimeoutRef.current);
+    }
+  }, []);
+
+  // Load all connections on mount
+  const loadConnections = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { connections: userConnections } = await socialConnectionsService.getUserConnections();
+      
+      // Convert array to object for easier access
+      const connectionsMap = {};
+      userConnections.forEach(connection => {
+        connectionsMap[connection.platform] = connection;
+      });
+      
+      setConnections(connectionsMap);
+    } catch (err) {
+      console.error('Error loading connections:', err);
+      setError('Failed to load social connections');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Set up event listeners and health checks
+  useEffect(() => {
+    // Load connections
+    loadConnections();
+    
+    // Set up cleanup function
+    cleanupRef.current = setupEventListeners();
+    
+    // Start health checks
+    const healthCheckCleanup = setupHealthChecks();
+    
+    // Cleanup
+    return () => {
+      cleanup();
+      healthCheckCleanup();
+    };
+  }, [loadConnections, setupEventListeners, setupHealthChecks, cleanup]);
+
+
+
+  /**
    * Check if a platform is connected
    */
   const isPlatformConnected = useCallback((platform) => {
@@ -172,12 +388,18 @@ export const useSocialConnections = () => {
     loading,
     error,
     connecting,
+    healthStatus,
+    refreshStatus,
     
     // Actions
     loadConnections,
     connectPlatform,
     disconnectPlatform,
     refreshPlatform,
+    queueForBatch,
+    batchConnect,
+    batchDisconnect,
+    batchRefresh,
     
     // Getters
     isPlatformConnected,
@@ -186,6 +408,15 @@ export const useSocialConnections = () => {
     getConnectedPlatforms,
     getConnectionCount,
     isPlatformLoading,
+    
+    // Health monitoring
+    checkHealth: setupHealthChecks,
+    getHealthStatus: platform => healthStatus[platform] || { status: 'unknown' },
+    isHealthy: platform => healthStatus[platform]?.status === 'healthy',
+    
+    // Refresh status
+    getRefreshStatus: platform => refreshStatus[platform],
+    isRefreshing: platform => refreshStatus[platform]?.status === 'refreshing',
     
     // Utils
     clearError: () => setError(null)

@@ -6,12 +6,14 @@
 import { supabase, handleSupabaseError, getCurrentUser, getCurrentSession, TABLES } from '../utils/supabase';
 import apiClient from '../utils/api';
 import API_ENDPOINTS from '../config/apiEndpoints';
+import sessionTimeoutService from './sessionTimeoutService';
 
 class SupabaseAuthService {
   constructor() {
     this._dbAvailable = undefined; // undefined = unknown, true = working, false = unavailable
     this._dbUnavailableWarningShown = false;
     this._profileCache = new Map(); // Cache profiles to avoid repeated queries
+    this._sessionTimeoutInitialized = false;
   }
 
   /**
@@ -38,9 +40,15 @@ class SupabaseAuthService {
       // Store in localStorage for backward compatibility
       localStorage.setItem('promosuiteUser', JSON.stringify(userData));
       
+      // Start session timeout tracking
+      this.startSessionTimeout();
+      
       return userData;
     } catch (error) {
       console.error('Login error:', error);
+      
+      // Ensure session tracking is cleared on failed login
+      this.stopSessionTimeout();
       
       // Provide specific error messages for login issues
       if (error.message?.includes('Invalid login credentials') ||
@@ -190,6 +198,10 @@ class SupabaseAuthService {
         });
         
         localStorage.setItem('promosuiteUser', JSON.stringify(newUserData));
+        
+        // Start session timeout tracking
+        this.startSessionTimeout();
+        
         return newUserData;
       }
       
@@ -325,6 +337,9 @@ class SupabaseAuthService {
       console.error('Logout error:', error);
       // Continue with local cleanup even if API call fails
     } finally {
+      // Stop session timeout tracking
+      this.stopSessionTimeout();
+      
       // Always clear local storage
       localStorage.removeItem('promosuiteUser');
     }
@@ -680,10 +695,15 @@ class SupabaseAuthService {
           };
           
           localStorage.setItem('promosuiteUser', JSON.stringify(userData));
+          
+          // Start session timeout tracking for OAuth login
+          this.startSessionTimeout();
         } catch (error) {
           console.error('Error getting user profile during auth state change:', error);
         }
       } else {
+        // Stop session timeout tracking on logout
+        this.stopSessionTimeout();
         localStorage.removeItem('promosuiteUser');
       }
       
@@ -844,10 +864,188 @@ class SupabaseAuthService {
     if (userCheck.isOAuthOnly) {
       return `An account with ${email} already exists and was created with Google or LinkedIn. Please use the social login buttons instead.`;
     } else if (userCheck.exists) {
-      return `An account with ${email} already exists. Please try signing in instead, or use Google/LinkedIn if you signed up with those methods.`;
+      return `An account with ${email} already exists. You can login with your password or reset it if you've forgotten.`;
     }
     
-    return `An account with this email already exists. Please try signing in instead.`;
+    return `Unable to determine account status for ${email}. Please try signing up or logging in.`;
+  }
+
+  /**
+   * Initialize session timeout service
+   * @param {Object} options - Configuration options for session timeout
+   */
+  initializeSessionTimeout(options = {}) {
+    if (this._sessionTimeoutInitialized) {
+      return;
+    }
+
+    const defaultConfig = {
+      timeoutAfterClose: 30, // 30 minutes after browser close
+      inactivityTimeout: 120, // 2 hours of inactivity
+    };
+
+    const config = { ...defaultConfig, ...options };
+
+    // Setup initial session data with grace period
+    const sessionData = {
+      startTime: Date.now(),
+      graceperiod: true
+    };
+    sessionStorage.setItem('sessionData', JSON.stringify(sessionData));
+
+    // Remove grace period after 5 seconds
+    setTimeout(() => {
+      const data = JSON.parse(sessionStorage.getItem('sessionData') || '{}');
+      data.graceperiod = false;
+      sessionStorage.setItem('sessionData', JSON.stringify(data));
+      console.log('🕒 Grace period ended');
+    }, 5000);
+
+    // Initialize session timeout with automatic logout callback
+    sessionTimeoutService.initialize((reason) => {
+      if (this.isInGracePeriod()) {
+        console.log('🕒 Ignoring timeout during grace period');
+        return;
+      }
+      console.log('🕒 Session timeout triggered, reason:', reason);
+      this.handleSessionTimeout(reason);
+    }, config);
+
+    this._sessionTimeoutInitialized = true;
+    console.log('🕒 Session timeout service initialized with config:', config);
+  }
+
+  isInGracePeriod() {
+    try {
+      const sessionData = JSON.parse(sessionStorage.getItem('sessionData') || '{}');
+      const isInGrace = sessionData.graceperiod && 
+        (Date.now() - sessionData.startTime) < 5000; // 5 second grace period
+      
+      if (isInGrace) {
+        console.log('🕒 In grace period - session valid');
+      }
+      
+      return isInGrace;
+    } catch (error) {
+      console.error('Error checking grace period:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Start session timeout tracking (called on successful login)
+   */
+  startSessionTimeout() {
+    if (!this._sessionTimeoutInitialized) {
+      this.initializeSessionTimeout();
+    }
+    
+    sessionTimeoutService.startSession();
+    console.log('🕒 Session timeout tracking started');
+  }
+
+  /**
+   * Stop session timeout tracking (called on logout)
+   */
+  stopSessionTimeout() {
+    sessionTimeoutService.clearSession();
+    console.log('🕒 Session timeout tracking stopped');
+  }
+
+  /**
+   * Extend current session (reset timeout)
+   */
+  extendSession() {
+    sessionTimeoutService.extendSession();
+    console.log('🕒 Session extended');
+  }
+
+  /**
+   * Check if session is close to expiring
+   * @param {number} warningMinutes - Minutes before expiry to show warning
+   * @returns {boolean}
+   */
+  isSessionCloseToExpiring(warningMinutes = 5) {
+    return sessionTimeoutService.isSessionCloseToExpiring(warningMinutes);
+  }
+
+  /**
+   * Get remaining session time
+   * @returns {Object} - Remaining time information
+   */
+  getSessionRemainingTime() {
+    return sessionTimeoutService.getRemainingTime();
+  }
+
+  /**
+   * Handle session timeout (automatic logout)
+   * @param {string} reason - Reason for timeout
+   */
+  async handleSessionTimeout(reason) {
+    console.log('🕒 Handling session timeout, reason:', reason);
+    
+    try {
+      // Perform logout without calling stopSessionTimeout again (it's already called by sessionTimeoutService)
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.warn('Session timeout logout error (continuing):', error);
+      }
+    } catch (error) {
+      console.warn('Session timeout logout failed (continuing):', error);
+    }
+    
+    // Clear local storage
+    localStorage.removeItem('promosuiteUser');
+    this._profileCache.clear();
+    
+    // Force page reload to return to login state
+    setTimeout(() => {
+      window.location.href = '/?session=expired&reason=' + encodeURIComponent(reason);
+    }, 100);
+  }
+
+  /**
+   * Check session validity on app initialization
+   * @returns {boolean} - True if session is valid, false if expired
+   */
+  checkInitialSessionValidity() {
+    if (!this._sessionTimeoutInitialized) {
+      this.initializeSessionTimeout();
+    }
+
+    // If browser was closed, check when it was closed
+    const wasBrowserClosed = localStorage.getItem('ps_browser_closed') === 'true' || 
+                            sessionStorage.getItem('ps_browser_closed') === 'true';
+    if (wasBrowserClosed) {
+      console.log('🕒 Detected previous browser close - checking timeout');
+      const closeTime = parseInt(localStorage.getItem('ps_browser_close_time') || 
+                                sessionStorage.getItem('ps_browser_close_time') || '0');
+      const timeoutDuration = 30 * 60 * 1000; // 30 minutes in milliseconds
+      const timeSinceClose = Date.now() - closeTime;
+
+      if (timeSinceClose > timeoutDuration) {
+        console.log('🕒 Session expired due to browser close timeout');
+        this.stopSessionTimeout();
+        localStorage.removeItem('promosuiteUser');
+        // Clear browser close flags and time
+        localStorage.removeItem('ps_browser_closed');
+        localStorage.removeItem('ps_browser_close_time');
+        sessionStorage.removeItem('ps_browser_closed');
+        sessionStorage.removeItem('ps_browser_close_time');
+        return false;
+      } else {
+        console.log('🕒 Browser was closed but within timeout window - restoring session');
+      }
+    }
+    
+    const isValid = sessionTimeoutService.checkSessionValidity();
+    if (!isValid) {
+      console.log('🕒 Initial session check failed - session expired');
+      // Clear any stored user data
+      localStorage.removeItem('promosuiteUser');
+    }
+    
+    return isValid;
   }
 
   /**

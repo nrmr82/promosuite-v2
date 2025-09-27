@@ -7,6 +7,7 @@
   overflow-x: hidden;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(180deg, rgba(26, 26, 26, 0.95) 0%, rgba(26, 26, 26, 0.98) 100%);
 }
 
 .pricing-page-kravix::before {
@@ -16,9 +17,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 30% 20%, rgba(233, 30, 99, 0.08) 0%, rgba(233, 30, 99, 0.03) 40%, transparent 70%),
-              radial-gradient(circle at 70% 80%, rgba(233, 30, 99, 0.06) 0%, rgba(233, 30, 99, 0.02) 50%, transparent 80%),
-              #1a1a1a;
+  background: transparent;
   z-index: 0;
 }
 
@@ -27,20 +26,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2rem 3rem;
-  border-bottom: 1px solid rgba(233, 30, 99, 0.1);
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
   z-index: 1;
-  backdrop-filter: blur(10px);
 }
 
 .pricing-title {
   font-size: 2.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #ffffff, #e91e63, #ffffff);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #e91e63;
   margin: 0;
 }
 
@@ -78,12 +73,12 @@
 .tab-btn {
   background: none;
   border: none;
-  color: #888;
-  padding: 1.25rem 2.5rem;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 1rem 2rem;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2px solid transparent;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
@@ -112,7 +107,7 @@
 .tab-btn.active {
   color: #e91e63;
   border-bottom-color: #e91e63;
-  background: rgba(233, 30, 99, 0.1);
+  background: transparent;
 }
 
 /* Content Area */
@@ -131,20 +126,20 @@
 .subscription-plans {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2.5rem;
+  gap: 1.5rem;
   max-width: 1200px;
   width: 100%;
   justify-items: center;
+  padding: 0 1rem;
 }
 
 .kravix-plan-card {
-  background: rgba(42, 42, 42, 0.8);
-  border: 1px solid rgba(68, 68, 68, 0.6);
-  border-radius: 16px;
-  padding: 2rem;
+  background: rgba(42, 42, 42, 0.7);
+  border: 1px solid rgba(68, 68, 68, 0.4);
+  border-radius: 12px;
+  padding: 1.5rem;
   position: relative;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(15px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
   width: 100%;
   max-width: 350px;
@@ -161,24 +156,21 @@
 }
 
 .kravix-plan-card:hover {
-  transform: translateY(-8px) scale(1.03);
+  transform: translateY(-4px);
   border-color: rgba(233, 30, 99, 0.5);
   background: rgba(42, 42, 42, 0.9);
-  box-shadow: 0 20px 40px rgba(233, 30, 99, 0.15),
-              0 0 0 1px rgba(233, 30, 99, 0.3),
-              0 0 60px rgba(233, 30, 99, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .kravix-plan-card.active {
   border-color: rgba(233, 30, 99, 0.6);
   background: rgba(42, 42, 42, 0.9);
-  box-shadow: 0 12px 30px rgba(233, 30, 99, 0.2),
-              0 0 0 1px rgba(233, 30, 99, 0.4);
   transform: scale(1.05);
 }
 
 .kravix-plan-card.active:hover {
-  transform: scale(1.05) translateY(-8px);
+  transform: scale(1.05) translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .kravix-plan-card.current {
@@ -196,25 +188,14 @@
   position: absolute;
   top: -1px;
   right: 1.5rem;
-  background: linear-gradient(135deg, #e91e63, #d81b60);
+  background: #e91e63;
   color: #ffffff;
   padding: 0.5rem 1rem;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 8px 8px;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
-  animation: glow 2s infinite alternate;
-}
-
-@keyframes glow {
-  from {
-    box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
-  }
-  to {
-    box-shadow: 0 4px 20px rgba(233, 30, 99, 0.6), 0 0 30px rgba(233, 30, 99, 0.2);
-  }
 }
 
 .plan-header {
@@ -389,7 +370,6 @@
 
 .subscribe-btn.primary:hover {
   background: linear-gradient(135deg, #d81b60, #c2185b);
-  box-shadow: 0 8px 25px rgba(233, 30, 99, 0.4);
   transform: translateY(-2px);
 }
 
@@ -402,7 +382,6 @@
 .subscribe-btn.secondary:hover {
   background: #e91e63;
   color: white;
-  box-shadow: 0 8px 25px rgba(233, 30, 99, 0.4);
   transform: translateY(-2px);
 }
 
@@ -410,7 +389,6 @@
   background: linear-gradient(135deg, #e91e63, #d81b60);
   color: white;
   cursor: default;
-  box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3);
 }
 
 .subscribe-btn.current:hover {
@@ -451,9 +429,10 @@
 
 .credits-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
   justify-items: center;
+  padding: 0 1rem;
 }
 
 .credit-package-card {
@@ -482,38 +461,33 @@
 .credit-package-card.popular {
   border-color: rgba(233, 30, 99, 0.6);
   background: rgba(42, 42, 42, 0.9);
-  box-shadow: 0 12px 30px rgba(233, 30, 99, 0.2),
-              0 0 0 1px rgba(233, 30, 99, 0.4);
   transform: scale(1.05);
 }
 
 .credit-package-card:hover {
-  transform: translateY(-8px) scale(1.03);
+  transform: translateY(-4px);
   border-color: rgba(233, 30, 99, 0.5);
   background: rgba(42, 42, 42, 0.9);
-  box-shadow: 0 20px 40px rgba(233, 30, 99, 0.15),
-              0 0 0 1px rgba(233, 30, 99, 0.3),
-              0 0 60px rgba(233, 30, 99, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .credit-package-card.popular:hover {
-  transform: scale(1.05) translateY(-8px);
+  transform: scale(1.05) translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .popular-badge-credits {
   position: absolute;
   top: -1px;
   right: 1.5rem;
-  background: linear-gradient(135deg, #e91e63, #d81b60);
+  background: #e91e63;
   color: #ffffff;
   padding: 0.5rem 1rem;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 8px 8px;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
-  animation: glow 2s infinite alternate;
 }
 
 .package-header {
@@ -619,7 +593,6 @@
 .buy-credits-btn:hover {
   background: linear-gradient(135deg, #e91e63, #d81b60);
   color: white;
-  box-shadow: 0 8px 25px rgba(233, 30, 99, 0.4);
   transform: translateY(-2px);
 }
 

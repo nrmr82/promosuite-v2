@@ -392,16 +392,16 @@
 /* Enhanced Platform Grid */
 .platforms-grid-enhanced {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
   margin-bottom: 2rem;
 }
 
 .platform-card-enhanced {
   background: #2a2a2a;
   border: 1px solid #444;
-  border-radius: 16px;
-  padding: 1.5rem;
+  border-radius: 12px;
+  padding: 1rem;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -973,6 +973,12 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .platforms-grid-enhanced {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .page-title {
     font-size: 2.5rem;
