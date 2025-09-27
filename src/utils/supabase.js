@@ -11,14 +11,40 @@ const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
 // Validate required environment variables
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn(
-    'Missing Supabase environment variables. The app will run in offline mode for development. Please check your .env file and ensure REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY are set for production.'
-  );
+  const errorMessage = `Missing Supabase environment variables:
+- REACT_APP_SUPABASE_URL: ${supabaseUrl ? '✓' : '✗ Missing'}
+- REACT_APP_SUPABASE_ANON_KEY: ${supabaseAnonKey ? '✓' : '✗ Missing'}
+
+Please check your .env file (local) or Vercel environment variables (production).`;
+  
+  console.error(errorMessage);
+  
+  // In production, throw an error instead of falling back to dummy values
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(errorMessage);
+  }
+  
+  console.warn('Running in development mode with missing variables. Some features may not work.');
 }
 
-// Create Supabase client with configuration
-const actualUrl = supabaseUrl || 'https://dummy.supabase.co';
-const actualKey = supabaseAnonKey || 'dummy-key-for-development';
+// Prevent dummy URL usage in production
+if ((supabaseUrl && supabaseUrl.includes('dummy.supabase.co')) || 
+    (supabaseAnonKey && supabaseAnonKey.includes('dummy'))) {
+  const errorMessage = 'Detected dummy Supabase configuration in production. Please set real Supabase environment variables.';
+  console.error(errorMessage);
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(errorMessage);
+  }
+}
+
+// Create Supabase client with configuration - NO FALLBACKS
+const actualUrl = supabaseUrl;
+const actualKey = supabaseAnonKey;
+
+// Final validation before creating client
+if (!actualUrl || !actualKey) {
+  throw new Error('Cannot create Supabase client without valid URL and API key');
+}
 
 export const supabase = createClient(actualUrl, actualKey, {
   auth: {
