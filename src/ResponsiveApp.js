@@ -4,26 +4,12 @@ import { TemplateProvider } from './contexts/TemplateContext';
 import { ProductProvider } from './contexts/ProductContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import DeviceIndicator from './components/DeviceIndicator';
-import { detectDevice, useDeviceType, DEVICE_TYPES } from './utils/deviceDetection';
+import { useDeviceType, DEVICE_TYPES } from './utils/deviceDetection';
 import authService from './services/authService';
 import './App.css';
 import './GlobalBackground.css';
 
 // Lazy load components based on device type
-const loadDeviceComponent = (componentName, deviceType) => {
-  try {
-    // First try device-specific component
-    return lazy(() => import(`./designs/${deviceType}/components/${componentName}`));
-  } catch {
-    // Fallback to desktop version
-    try {
-      return lazy(() => import(`./designs/desktop/components/${componentName}`));
-    } catch {
-      // Final fallback to original component
-      return lazy(() => import(`./components/${componentName}`));
-    }
-  }
-};
 
 // Loading component
 const LoadingSpinner = () => (
@@ -52,9 +38,10 @@ function ResponsiveApp() {
         if (deviceType === DEVICE_TYPES.MOBILE) {
           components.MainLayout = lazy(() => import('./designs/mobile/components/MainLayout'));
           components.Sidebar = lazy(() => import('./designs/mobile/components/Sidebar'));
-          // Mobile components can fallback to desktop for pages not yet optimized
-          components.Dashboard = lazy(() => import('./designs/desktop/components/Dashboard'));
-          components.LandingPage = lazy(() => import('./designs/desktop/components/LandingPage'));
+          components.Dashboard = lazy(() => import('./designs/mobile/components/Dashboard'));
+          components.LandingPage = lazy(() => import('./designs/mobile/components/LandingPage'));
+          components.FlyerPro = lazy(() => import('./designs/mobile/components/FlyerPro'));
+          components.SocialSpark = lazy(() => import('./designs/mobile/components/SocialSpark'));
         } else if (deviceType === DEVICE_TYPES.TABLET) {
           // For now, tablets will use desktop components
           // TODO: Create tablet-specific designs later
@@ -68,9 +55,13 @@ function ResponsiveApp() {
           components.LandingPage = lazy(() => import('./designs/desktop/components/LandingPage'));
         }
         
-        // Common components that don't need device-specific versions yet
-        components.FlyerPro = lazy(() => import('./components/FlyerPro'));
-        components.SocialSpark = lazy(() => import('./components/SocialSpark'));
+        // Load common components (fallback to desktop versions if device-specific not loaded above)
+        if (!components.FlyerPro) {
+          components.FlyerPro = lazy(() => import('./components/FlyerPro'));
+        }
+        if (!components.SocialSpark) {
+          components.SocialSpark = lazy(() => import('./components/SocialSpark'));
+        }
         components.UserCollections = lazy(() => import('./components/UserCollections'));
         components.Pricing = lazy(() => import('./components/Pricing'));
         components.Templates = lazy(() => import('./pages/Templates'));

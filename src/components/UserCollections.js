@@ -16,7 +16,7 @@ import flyerProService from '../services/flyerProService';
 import { getCurrentUser, supabase } from '../utils/supabase';
 import './UserCollections.css';
 
-const UserCollections = ({ onEditTemplate, onEditFlyer, onClose }) => {
+const UserCollections = ({ onEditTemplate, onEditFlyer, onClose, mode = 'modal' }) => {
   const [activeTab, setActiveTab] = useState('templates');
   const [viewMode, setViewMode] = useState('grid');
   const [searchTerm, setSearchTerm] = useState('');
@@ -360,106 +360,112 @@ const UserCollections = ({ onEditTemplate, onEditFlyer, onClose }) => {
   const aiTemplates = templates.filter(t => t.isAIGenerated).length;
   const aiFlyers = flyers.filter(f => f.isAIGenerated).length;
 
+  const isDashboard = mode === 'dashboard';
+
   return (
-    <div className="collections-container">
-      <div className="collections-header">
-        <div className="header-left">
-          <h2>My Collections</h2>
-          <p>Manage your AI-generated and custom templates and flyers</p>
-        </div>
-        
-        <div className="header-stats">
-          <div className="stat-card">
-            <Palette size={16} aria-hidden="true" />
-            <div>
-              <span className="stat-number">{totalTemplates}</span>
-              <span className="stat-label">Templates</span>
-              <span className="stat-detail">({aiTemplates} AI)</span>
-            </div>
-          </div>
-          <div className="stat-card">
-            <FileText size={16} aria-hidden="true" />
-            <div>
-              <span className="stat-number">{totalFlyers}</span>
-              <span className="stat-label">Flyers</span>
-              <span className="stat-detail">({aiFlyers} AI)</span>
-            </div>
-          </div>
-        </div>
-        
-        <button onClick={onClose} className="close-btn">×</button>
-      </div>
-
-      <div className="collections-controls">
-        <div className="tab-buttons">
-          <button 
-            className={`tab-btn ${activeTab === 'templates' ? 'active' : ''}`}
-            onClick={() => setActiveTab('templates')}
-          >
-            <Palette size={16} />
-            Templates ({totalTemplates})
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'flyers' ? 'active' : ''}`}
-            onClick={() => setActiveTab('flyers')}
-          >
-            <FileText size={16} />
-            Flyers ({totalFlyers})
-          </button>
-        </div>
-
-        <div className="controls-right">
-          <div className="search-box">
-            <Search size={16} />
-            <input
-              type="text"
-              placeholder="Search collections..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+    <div className={`collections-container ${isDashboard ? 'dashboard-mode' : ''}`}>
+      {!isDashboard && (
+        <div className="collections-header">
+          <div className="header-left">
+            <h2>My Collections</h2>
+            <p>Manage your AI-generated and custom templates and flyers</p>
           </div>
           
-          <div className="filter-controls">
-            <select 
-              value={filterBy} 
-              onChange={(e) => setFilterBy(e.target.value)}
-              className="filter-select"
+          <div className="header-stats">
+            <div className="stat-card">
+              <Palette size={16} aria-hidden="true" />
+              <div>
+                <span className="stat-number">{totalTemplates}</span>
+                <span className="stat-label">Templates</span>
+                <span className="stat-detail">({aiTemplates} AI)</span>
+              </div>
+            </div>
+            <div className="stat-card">
+              <FileText size={16} aria-hidden="true" />
+              <div>
+                <span className="stat-number">{totalFlyers}</span>
+                <span className="stat-label">Flyers</span>
+                <span className="stat-detail">({aiFlyers} AI)</span>
+              </div>
+            </div>
+          </div>
+          
+          <button onClick={onClose} className="close-btn">×</button>
+        </div>
+      )}
+
+      {!isDashboard && (
+        <div className="collections-controls">
+          <div className="tab-buttons">
+            <button 
+              className={`tab-btn ${activeTab === 'templates' ? 'active' : ''}`}
+              onClick={() => setActiveTab('templates')}
             >
-              <option value="all">All Items</option>
-              <option value="ai">AI Generated</option>
-              <option value="manual">Manual</option>
-              <option value="favorites">Favorites</option>
-            </select>
+              <Palette size={16} />
+              Templates ({totalTemplates})
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'flyers' ? 'active' : ''}`}
+              onClick={() => setActiveTab('flyers')}
+            >
+              <FileText size={16} />
+              Flyers ({totalFlyers})
+            </button>
+          </div>
+
+          <div className="controls-right">
+            <div className="search-box">
+              <Search size={16} />
+              <input
+                type="text"
+                placeholder="Search collections..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
             
-            <select 
-              value={sortBy} 
-              onChange={(e) => setSortBy(e.target.value)}
-              className="sort-select"
-            >
-              <option value="recent">Most Recent</option>
-              <option value="oldest">Oldest First</option>
-              <option value="name">Name (A-Z)</option>
-            </select>
-          </div>
-          
-          <div className="view-toggle">
-            <button 
-              className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-              onClick={() => setViewMode('grid')}
-              aria-label="Grid view"
-            >
-              <Grid size={16} />
-            </button>
-            <button 
-              className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-              onClick={() => setViewMode('list')}
-              aria-label="List view"
-            >
-              <List size={16} />
-            </button>
+            <div className="filter-controls">
+              <select 
+                value={filterBy} 
+                onChange={(e) => setFilterBy(e.target.value)}
+                className="filter-select"
+              >
+                <option value="all">All Items</option>
+                <option value="ai">AI Generated</option>
+                <option value="manual">Manual</option>
+                <option value="favorites">Favorites</option>
+              </select>
+              
+              <select 
+                value={sortBy} 
+                onChange={(e) => setSortBy(e.target.value)}
+                className="sort-select"
+              >
+                <option value="recent">Most Recent</option>
+                <option value="oldest">Oldest First</option>
+                <option value="name">Name (A-Z)</option>
+              </select>
+            </div>
+            
+            <div className="view-toggle">
+              <button 
+                className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                onClick={() => setViewMode('grid')}
+                aria-label="Grid view"
+              >
+                <Grid size={16} />
+              </button>
+              <button 
+                className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+                onClick={() => setViewMode('list')}
+                aria-label="List view"
+              >
+                <List size={16} />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="collections-content">
         {filteredItems.length === 0 ? (

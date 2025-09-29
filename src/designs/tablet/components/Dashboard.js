@@ -15,7 +15,7 @@ import {
   FolderOpen,
   Sparkles
 } from 'lucide-react';
-import UserCollections from './UserCollections';
+import UserCollections from '../../../components/UserCollections';
 import './Dashboard.css';
 import './DashboardSpecific.css';
 

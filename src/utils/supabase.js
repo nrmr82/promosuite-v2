@@ -52,6 +52,8 @@ export const supabase = createClient(actualUrl, actualKey, {
     persistSession: true,
     detectSessionInUrl: true,
     flowType: 'pkce',
+    // Use dynamic origin for OAuth redirects (supports localhost, network IP, and production)
+    redirectTo: `${window.location.origin}/`,
     storage: {
       getItem: (key) => {
         // Try sessionStorage first, then fallback to localStorage for OAuth flow

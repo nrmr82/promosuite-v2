@@ -1,0 +1,102 @@
+/**
+ * Mobile Bottom Navigation Styles
+ * Fixed bottom navigation with desktop theme
+ */
+
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--mobile-z-fixed);
+  background: var(--mobile-bg-secondary);
+  border-top: 1px solid var(--mobile-border-card);
+  padding-bottom: max(var(--mobile-safe-bottom), 0);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.mobile-bottom-nav__container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: var(--mobile-space-sm) var(--mobile-space-md);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.mobile-bottom-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--mobile-touch-target);
+  min-width: var(--mobile-touch-target);
+  padding: var(--mobile-space-xs) var(--mobile-space-sm);
+  background: transparent;
+  border: none;
+  border-radius: var(--mobile-border-radius-sm);
+  cursor: pointer;
+  transition: all var(--mobile-transition-fast);
+  color: var(--mobile-text-secondary);
+  font-family: var(--mobile-font-family);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-bottom-nav__item:hover,
+.mobile-bottom-nav__item:focus {
+  background: var(--mobile-primary-light);
+  color: var(--mobile-primary);
+  outline: none;
+}
+
+.mobile-bottom-nav__item--active {
+  color: var(--mobile-primary);
+  background: var(--mobile-primary-light);
+}
+
+.mobile-bottom-nav__icon {
+  font-size: var(--mobile-font-lg);
+  line-height: 1;
+  margin-bottom: var(--mobile-space-xs);
+  display: block;
+}
+
+.mobile-bottom-nav__label {
+  font-size: var(--mobile-font-xs);
+  font-weight: 500;
+  line-height: 1;
+  text-align: center;
+}
+
+/* Active item indicator */
+.mobile-bottom-nav__item--active .mobile-bottom-nav__icon {
+  transform: scale(1.1);
+}
+
+.mobile-bottom-nav__item--active .mobile-bottom-nav__label {
+  font-weight: 600;
+}
+
+/* Safe area adjustments for devices with home indicators */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .mobile-bottom-nav {
+    padding-bottom: max(var(--mobile-space-sm), env(safe-area-inset-bottom));
+  }
+}
+
+/* Animation for tab switching */
+@keyframes nav-tap {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.mobile-bottom-nav__item:active {
+  animation: nav-tap 150ms ease-out;
+}
+
+/* Ensure nav doesn't interfere with content */
+.mobile-app-content {
+  padding-bottom: calc(var(--mobile-nav-height) + var(--mobile-safe-bottom));
+}

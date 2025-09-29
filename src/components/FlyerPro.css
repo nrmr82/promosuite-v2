@@ -74,6 +74,41 @@
   margin-bottom: 4rem;
 }
 
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .flyerpro-page {
+    min-height: calc(100vh - 56px);
+  }
+  
+  .main-content-section {
+    padding: 2rem 0;
+  }
+  
+  .container {
+    padding: 0 1rem;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .page-subtitle {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .tools-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .tool-card {
+    padding: 1rem;
+  }
+}
+
 .tool-card {
   background: rgba(42, 42, 42, 0.7);
   border: 1px solid rgba(68, 68, 68, 0.5);

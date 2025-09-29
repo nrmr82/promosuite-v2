@@ -1,0 +1,309 @@
+/* Mobile Responsive Fixes for Desktop Components */
+
+/* Apply only on mobile devices */
+@media (max-width: 768px) {
+  
+  /* Global mobile fixes */
+  * {
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  
+  body {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  /* Make all images responsive */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Container fixes */
+  .container, 
+  [class*="container"],
+  .main-layout,
+  .app-authenticated,
+  .app-unauthenticated {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    margin: 0 auto !important;
+  }
+  
+  /* Header fixes */
+  header {
+    padding: 0.5rem 1rem !important;
+    width: 100% !important;
+  }
+  
+  /* Navigation fixes */
+  nav {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+  
+  nav > * {
+    font-size: 0.9rem !important;
+    padding: 0.5rem !important;
+  }
+  
+  /* Button fixes - make touch friendly */
+  button, 
+  .btn,
+  [role="button"],
+  input[type="submit"],
+  input[type="button"] {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 1rem !important;
+    border-radius: 8px !important;
+  }
+  
+  /* Form fixes */
+  input, 
+  textarea, 
+  select {
+    width: 100% !important;
+    font-size: 16px !important; /* Prevents iOS zoom */
+    padding: 0.75rem !important;
+    border-radius: 6px !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  /* Grid/Flex layout fixes */
+  .grid, 
+  [class*="grid"],
+  .flex,
+  [class*="flex"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  /* Card fixes */
+  .card,
+  [class*="card"],
+  .tool-card,
+  [class*="tool"] {
+    width: 100% !important;
+    margin: 0 0 1rem 0 !important;
+    padding: 1rem !important;
+  }
+  
+  /* Dashboard specific fixes */
+  .dashboard {
+    padding: 1rem !important;
+  }
+  
+  .dashboard-header,
+  [class*="header"] {
+    margin-bottom: 1.5rem !important;
+    text-align: center !important;
+  }
+  
+  .dashboard-tools,
+  .tools-grid,
+  [class*="tools"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  /* Typography fixes */
+  h1 {
+    font-size: 1.75rem !important;
+    line-height: 1.3 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  h2 {
+    font-size: 1.5rem !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  h3 {
+    font-size: 1.25rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  p {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  /* Sidebar fixes - hide on mobile by default */
+  .sidebar,
+  [class*="sidebar"] {
+    position: fixed !important;
+    left: -100% !important;
+    top: 0 !important;
+    height: 100vh !important;
+    width: 85% !important;
+    max-width: 320px !important;
+    z-index: 1000 !important;
+    transition: left 0.3s ease !important;
+    background: #1a1a1a !important;
+  }
+  
+  /* Main content adjustments when sidebar is hidden */
+  .main-content,
+  [class*="main-content"] {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 1rem !important;
+  }
+  
+  /* Landing page fixes */
+  .hero-section,
+  [class*="hero"] {
+    padding: 2rem 1rem !important;
+    text-align: center !important;
+  }
+  
+  .hero-title,
+  [class*="hero"] h1 {
+    font-size: 2rem !important;
+    line-height: 1.2 !important;
+  }
+  
+  .hero-subtitle,
+  [class*="hero"] p {
+    font-size: 1.1rem !important;
+    margin-bottom: 2rem !important;
+  }
+  
+  /* CTA button fixes */
+  .cta-primary,
+  .cta-secondary,
+  [class*="cta"] {
+    width: 100% !important;
+    max-width: 300px !important;
+    margin: 0 auto 1rem auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+  }
+  
+  /* Modal fixes */
+  .modal,
+  [class*="modal"] {
+    width: 95% !important;
+    max-width: 95% !important;
+    max-height: 90vh !important;
+    margin: 5vh auto !important;
+    padding: 1rem !important;
+  }
+  
+  /* Table fixes - make scrollable */
+  table {
+    width: 100% !important;
+    font-size: 0.9rem !important;
+  }
+  
+  table, 
+  thead, 
+  tbody, 
+  th, 
+  td, 
+  tr {
+    display: block !important;
+  }
+  
+  thead tr {
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+  }
+  
+  tr {
+    border: 1px solid #333 !important;
+    margin-bottom: 0.5rem !important;
+    padding: 0.5rem !important;
+    border-radius: 6px !important;
+  }
+  
+  td {
+    border: none !important;
+    padding: 0.5rem !important;
+    position: relative !important;
+  }
+  
+  /* Utility classes */
+  .hide-on-mobile {
+    display: none !important;
+  }
+  
+  .mobile-only {
+    display: block !important;
+  }
+  
+  /* Fix any fixed positioning issues */
+  [style*="position: fixed"] {
+    position: relative !important;
+  }
+  
+  /* Fix any absolute positioning that might cause overflow */
+  [style*="position: absolute"] {
+    position: relative !important;
+  }
+  
+  /* Ensure all flex containers stack on mobile */
+  [style*="display: flex"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  /* Fix any inline width styles */
+  [style*="width:"] {
+    width: 100% !important;
+  }
+  
+  /* Touch interaction improvements */
+  * {
+    -webkit-tap-highlight-color: rgba(233, 30, 99, 0.2) !important;
+    touch-action: manipulation !important;
+  }
+  
+  /* Focus improvements for mobile */
+  :focus {
+    outline: 2px solid #e91e63 !important;
+    outline-offset: 2px !important;
+  }
+  
+  /* Animation performance */
+  * {
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+  }
+}
+
+/* Very small screens (iPhone SE) */
+@media (max-width: 375px) {
+  .container, 
+  [class*="container"] {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  
+  h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  .modal,
+  [class*="modal"] {
+    width: 98% !important;
+    margin: 1vh auto !important;
+  }
+}

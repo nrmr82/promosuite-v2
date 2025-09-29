@@ -12,8 +12,7 @@ import {
   Linkedin,
   CheckCircle,
   Facebook,
-  FolderOpen,
-  Sparkles
+  FolderOpen
 } from 'lucide-react';
 import UserCollections from './UserCollections';
 import './Dashboard.css';
@@ -21,7 +20,6 @@ import './DashboardSpecific.css';
 
 const Dashboard = ({ user, onNavigateToTool }) => {
   const [hoveredTool, setHoveredTool] = useState(null);
-  const [showCollections, setShowCollections] = useState(false);
 
   // Custom hook for count-up animation - creates smooth number transitions
   // Respects prefers-reduced-motion for accessibility
@@ -310,67 +308,32 @@ const Dashboard = ({ user, onNavigateToTool }) => {
         <div className="container">
           <div className="collections-content">
             <div className="collections-header">
-              <div className="collections-header-left">
-                <h2 className="collections-title">
-                  <FolderOpen className="title-icon" />
-                  My Collections
-                </h2>
-                <p className="collections-subtitle">
-                  Manage your AI-generated templates and flyers
-                </p>
-              </div>
-              <button 
-                className="collections-cta"
-                onClick={() => setShowCollections(true)}
-              >
-                <Sparkles className="cta-icon" />
-                Browse Collections
-                <FaArrowRight />
-              </button>
+            <div className="collections-header-left">
+              <h2 className="collections-title">
+                <FolderOpen className="title-icon" />
+                My Collections
+              </h2>
+              <p className="collections-subtitle">
+                View and manage your AI-generated templates and flyers
+              </p>
             </div>
-            
-            <div className="collections-preview">
-              <div className="preview-card">
-                <div className="preview-icon">
-                  <FaPalette />
-                </div>
-                <div className="preview-content">
-                  <h4>AI Templates</h4>
-                  <p>Custom generated templates</p>
-                  <span className="preview-count">View all →</span>
-                </div>
-              </div>
-              
-              <div className="preview-card">
-                <div className="preview-icon flyer">
-                  <FaVideo />
-                </div>
-                <div className="preview-content">
-                  <h4>AI Flyers</h4>
-                  <p>Property marketing materials</p>
-                  <span className="preview-count">View all →</span>
-                </div>
-              </div>
-            </div>
+          </div>
+          
+          <UserCollections 
+            mode="dashboard"
+            onEditTemplate={(template) => {
+              console.log('Edit template:', template);
+              // Navigate to template editor if needed
+            }}
+            onEditFlyer={(flyer) => {
+              console.log('Edit flyer:', flyer);
+              // Navigate to flyer editor if needed
+            }}
+          />
           </div>
         </div>
       </section>
 
-      
-      {/* Collections Modal */}
-      {showCollections && (
-        <UserCollections 
-          onEditTemplate={(template) => {
-            console.log('Edit template:', template);
-            // Could navigate to template editor
-          }}
-          onEditFlyer={(flyer) => {
-            console.log('Edit flyer:', flyer);
-            // Could navigate to flyer editor
-          }}
-          onClose={() => setShowCollections(false)}
-        />
-      )}
     </div>
   );
 };

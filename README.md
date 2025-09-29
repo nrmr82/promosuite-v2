@@ -1,3 +1,9 @@
+# 🚨 READ FIRST: IMPORTANT_PROJECT_STRUCTURE.md 🚨
+
+**BEFORE MAKING ANY CODE CHANGES** read `IMPORTANT_PROJECT_STRUCTURE.md` to understand the multi-platform folder structure.
+
+---
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

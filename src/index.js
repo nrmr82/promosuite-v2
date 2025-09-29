@@ -3,8 +3,6 @@ import ReactDOM from 'react-dom/client';
 import './themes/promosuite.css';
 import './styles/variables.css';
 import './styles/global.css';
-import './styles/mobile.css';
-import './mobile/mobile.css';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';

@@ -1,0 +1,200 @@
+/**
+ * Mobile Button Styles
+ * Touch-optimized with desktop theme colors
+ */
+
+.mobile-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mobile-font-family);
+  font-weight: 600;
+  line-height: var(--mobile-leading-normal);
+  border: none;
+  border-radius: var(--mobile-border-radius);
+  cursor: pointer;
+  transition: all var(--mobile-transition-fast);
+  overflow: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  text-decoration: none;
+  outline: none;
+}
+
+.mobile-button:focus-visible {
+  outline: 2px solid var(--mobile-primary);
+  outline-offset: 2px;
+}
+
+/* Button sizes - touch-friendly */
+.mobile-button--small {
+  min-height: var(--mobile-touch-target-sm);
+  padding: var(--mobile-space-sm) var(--mobile-space-md);
+  font-size: var(--mobile-font-sm);
+}
+
+.mobile-button--medium {
+  min-height: var(--mobile-button-height);
+  padding: var(--mobile-space-sm) var(--mobile-space-lg);
+  font-size: var(--mobile-font-base);
+}
+
+.mobile-button--large {
+  min-height: 56px;
+  padding: var(--mobile-space-md) var(--mobile-space-xl);
+  font-size: var(--mobile-font-lg);
+}
+
+.mobile-button--full-width {
+  width: 100%;
+}
+
+/* Primary Button - Desktop Pink Theme */
+.mobile-button--primary {
+  background: var(--mobile-primary);
+  color: var(--mobile-text-primary);
+  box-shadow: var(--mobile-shadow-sm);
+}
+
+.mobile-button--primary:hover {
+  background: var(--mobile-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--mobile-shadow-md);
+}
+
+.mobile-button--primary:active {
+  transform: translateY(0);
+  box-shadow: var(--mobile-shadow-sm);
+}
+
+/* Secondary Button - Desktop Card Theme */
+.mobile-button--secondary {
+  background: var(--mobile-bg-secondary);
+  color: var(--mobile-text-primary);
+  border: 1px solid var(--mobile-border-card);
+  box-shadow: var(--mobile-shadow-sm);
+}
+
+.mobile-button--secondary:hover {
+  background: var(--mobile-bg-tertiary);
+  border-color: var(--mobile-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--mobile-shadow-md);
+}
+
+.mobile-button--secondary:active {
+  transform: translateY(0);
+  box-shadow: var(--mobile-shadow-sm);
+}
+
+/* Ghost Button */
+.mobile-button--ghost {
+  background: transparent;
+  color: var(--mobile-text-secondary);
+  border: 1px solid transparent;
+}
+
+.mobile-button--ghost:hover {
+  background: var(--mobile-primary-light);
+  color: var(--mobile-primary);
+  border-color: var(--mobile-primary-light);
+}
+
+.mobile-button--ghost:active {
+  background: rgba(233, 30, 99, 0.15);
+}
+
+/* Danger Button */
+.mobile-button--danger {
+  background: var(--mobile-error);
+  color: var(--mobile-text-primary);
+  box-shadow: var(--mobile-shadow-sm);
+}
+
+.mobile-button--danger:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: var(--mobile-shadow-md);
+}
+
+.mobile-button--danger:active {
+  transform: translateY(0);
+  box-shadow: var(--mobile-shadow-sm);
+}
+
+/* Disabled state */
+.mobile-button--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.mobile-button--disabled:hover {
+  transform: none;
+  box-shadow: var(--mobile-shadow-sm);
+}
+
+/* Loading state */
+.mobile-button--loading {
+  cursor: default;
+}
+
+.mobile-button--loading .mobile-button__content {
+  opacity: 0.7;
+}
+
+/* Button content wrapper */
+.mobile-button__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mobile-space-sm);
+  position: relative;
+  z-index: 1;
+}
+
+/* Loading spinner */
+.mobile-button__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Ripple effect */
+.mobile-button__ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  animation: ripple 400ms ease-out;
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* Touch improvements for iOS */
+@supports (-webkit-touch-callout: none) {
+  .mobile-button {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+  }
+}

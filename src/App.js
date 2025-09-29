@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Analytics } from '@vercel/analytics/react';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 import { TemplateProvider } from './contexts/TemplateContext';
 import { ProductProvider } from './contexts/ProductContext';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -10,14 +10,16 @@ import LandingPage from './components/LandingPage';
 import AuthModal from './components/AuthModal';
 import FlyerPro from './components/FlyerPro';
 import SocialSpark from './components/SocialSpark';
-import UserCollections from './components/UserCollections';
 import Pricing from './components/Pricing';
-import Templates from './pages/Templates';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import SessionTimeoutWarning from './components/SessionTimeoutWarning';
 import OAuthCallback from './components/oauth/OAuthCallback';
 import authService from './services/authService';
+// Mobile support
+import MobileApp from './platforms/mobile/MobileApp';
+import { getDeviceType, DEVICE_TYPES } from './shared/utils/deviceDetection';
+import LogoutButton from './components/LogoutButton';
 import './App.css';
 import './GlobalBackground.css';
 
@@ -36,6 +38,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState('home');
+  const [deviceType] = useState(() => getDeviceType());
 
   // Simple OAuth handling - let Supabase handle it automatically
 
@@ -110,30 +113,46 @@ function App() {
     console.log('🎉 App: User authenticated, session timeout active');
   };
 
-  const { signOut } = useAuth();
-
-  const handleLogout = async () => {
+  const handleLogout = async (authContext = null) => {
     console.log('🔐 App: Logout handler called');
+    
+    // Show logout popup if authContext is available
+    if (authContext && authContext.showPopup) {
+      authContext.showPopup('Signing out...');
+    }
+    
     try {
-      // Call AuthContext's signOut which handles the popup
-      await signOut();
+      // Call authService logout (correct method name)
+      await authService.logout();
       
       // Clear local state
       setUser(null);
       setCurrentView('home');
       
-      // Force a page refresh after popup shows
+      // Wait a moment to show the popup, then refresh
       setTimeout(() => {
+        if (authContext && authContext.hidePopup) {
+          authContext.hidePopup();
+        }
         window.location.href = '/';
-      }, 3000);
+      }, 2000); // Increased time to show logout message
     } catch (error) {
       console.error('🔐 App: Logout failed:', error);
+      
+      // Show error in popup if available
+      if (authContext && authContext.showPopup) {
+        authContext.showPopup('Error signing out');
+        setTimeout(() => {
+          authContext.hidePopup();
+        }, 2000);
+      }
+      
       localStorage.removeItem('promosuiteUser');
       setUser(null);
       setCurrentView('home');
       setTimeout(() => {
         window.location.href = '/';
-      }, 3000);
+      }, 2000);
     }
   };
 
@@ -167,10 +186,6 @@ function App() {
         return <FlyerPro user={user} />;
       case 'socialspark':
         return <SocialSpark user={user} onOpenAuth={() => handleNavigate('auth')} onToolUsage={() => handleNavigate('socialspark')} />;
-      case 'templates':
-        return <Templates user={user} />;
-      case 'collections':
-        return <UserCollections user={user} />;
       case 'pricing':
         return <Pricing user={user} onUpgrade={handleUpgrade} />;
       case 'profile':
@@ -197,8 +212,27 @@ function App() {
     );
   }
 
-  // If no user is logged in, show landing page
+  // If no user is logged in, show platform-specific landing page
   if (!user) {
+    if (deviceType === DEVICE_TYPES.MOBILE) {
+      return (
+        <ErrorBoundary level="full">
+          <AuthProvider>
+            <MobileApp 
+              user={null}
+              currentView={currentView}
+              onNavigate={handleNavigate}
+              onAuthSuccess={handleAuthSuccess}
+              onLogout={handleLogout}
+              loading={loading}
+            />
+          </AuthProvider>
+          <Analytics />
+        </ErrorBoundary>
+      );
+    }
+    
+    // Desktop landing page
     return (
       <ErrorBoundary level="full">
         <AuthProvider>
@@ -211,7 +245,49 @@ function App() {
     );
   }
 
-  // Main authenticated app
+  // Main authenticated app - mobile gets simple dashboard
+  if (deviceType === DEVICE_TYPES.MOBILE) {
+    return (
+      <ErrorBoundary level="full">
+        <AuthProvider>
+          <TemplateProvider user={user}>
+            <ProductProvider>
+              <div className="app-mobile mobile-dashboard-visible">
+                {/* Mobile Header */}
+                <header className="mobile-header">
+                  <div className="mobile-header-content">
+                    <div className="mobile-logo">
+                      <div className="mobile-logo-icon">P</div>
+                      <div className="mobile-logo-text">
+                        <div className="mobile-logo-title">PromoSuite</div>
+                      </div>
+                    </div>
+                    <div className="mobile-user-menu">
+                      {user && (
+                        <LogoutButton 
+                          className="mobile-user-button"
+                          onLogout={handleLogout}
+                          confirmMessage="Logout?"
+                        >
+                          {user.email?.charAt(0).toUpperCase()}
+                        </LogoutButton>
+                      )}
+                    </div>
+                  </div>
+                </header>
+                {/* Desktop Dashboard at Bottom */}
+                {renderCurrentView()}
+              </div>
+              <SessionTimeoutWarning />
+            </ProductProvider>
+          </TemplateProvider>
+        </AuthProvider>
+        <Analytics />
+      </ErrorBoundary>
+    );
+  }
+  
+  // Desktop authenticated app (unchanged)
   return (
     <ErrorBoundary level="full">
       <AuthProvider>

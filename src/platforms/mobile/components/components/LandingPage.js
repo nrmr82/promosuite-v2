@@ -349,7 +349,7 @@ const LandingPage = ({ onAuthSuccess }) => {
       {showAuthModal && (
         <AuthModal
           mode={authMode}
-          onSuccess={handleAuthSuccess}
+          onAuthSuccess={handleAuthSuccess}
           onClose={handleAuthClose}
           onSwitchMode={(mode) => setAuthMode(mode)}
         />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaHome, FaPalette, FaVideo, FaFileAlt, FaFolderOpen, FaCrown, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import { FaHome, FaPalette, FaVideo, FaCrown, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
 import useClickOutside from '../hooks/useClickOutside';
 import { useAuth } from '../contexts/AuthContext';
 import './Sidebar.css';
@@ -96,21 +96,7 @@ const Sidebar = ({ currentView = 'home', onNavigate, user }) => {
           <span className="sidebar__nav-text">SocialSpark</span>
         </button>
         
-        <button 
-          className={`sidebar__nav-item ${currentView === 'templates' ? 'sidebar__nav-item--active' : ''}`}
-          onClick={() => handleNavigation('templates')}
-        >
-          <span className="sidebar__nav-icon"><FaFileAlt /></span>
-          <span className="sidebar__nav-text">Templates</span>
-        </button>
         
-        <button 
-          className={`sidebar__nav-item ${currentView === 'collections' ? 'sidebar__nav-item--active' : ''}`}
-          onClick={() => handleNavigation('collections')}
-        >
-          <span className="sidebar__nav-icon"><FaFolderOpen /></span>
-          <span className="sidebar__nav-text">Collections</span>
-        </button>
         
         <button 
           className={`sidebar__nav-item ${currentView === 'pricing' ? 'sidebar__nav-item--active' : ''}`}

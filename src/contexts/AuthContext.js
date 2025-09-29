@@ -20,33 +20,10 @@ const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event);
-      if (event === 'SIGNED_IN') {
-        setPopupMessage('Signing in...');
-setIsPopupVisible(true);
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        setSession(session);
-        setUser(session?.user ?? null);
-setIsPopupVisible(false);
-      } else if (event === 'SIGNED_OUT') {
-        setSession(null);
-        setUser(null);
-      }
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    // Note: Auth state management is handled by the main App component
+    // This AuthContext is only used for the popup functionality
+    // Initial session is handled by authService in App.js
+    setLoading(false);
   }, []);
 
   const signIn = async (email, password) => {

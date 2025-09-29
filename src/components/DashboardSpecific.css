@@ -9,6 +9,9 @@
   margin-bottom: 2rem;
 }
 
+/* Mobile responsive styles are handled in Dashboard.css for floating mobile interface */
+/* This file focuses on desktop-specific horizontal layout */
+
 /* Dashboard Tool Cards - Horizontal Layout */
 .dashboard-tool-card {
   background: #2a2a2a;

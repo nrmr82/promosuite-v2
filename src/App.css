@@ -18,6 +18,23 @@ body {
   min-height: 100vh;
 }
 
+/* Platform-specific CSS isolation */
+.app-mobile {
+  /* Reset desktop overrides for mobile */
+}
+
+.app-mobile * {
+  /* Prevent desktop styles from bleeding into mobile */
+}
+
+.app-tablet {
+  /* Reset desktop overrides for tablet */
+}
+
+.app-desktop {
+  /* Desktop styles only apply here */
+}
+
 .app-loading {
   display: flex;
   flex-direction: column;
@@ -44,4 +61,116 @@ body {
 
 .app-unauthenticated {
   min-height: 100vh;
+}
+
+/* Mobile Header Styles */
+@media (max-width: 768px) {
+  .mobile-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1020;
+    background: rgba(42, 42, 42, 0.8);
+    border-bottom: 1px solid rgba(68, 68, 68, 0.5);
+    height: 56px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  .mobile-header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 0 1rem;
+  }
+  
+  .mobile-safe-container {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+  
+  .mobile-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .mobile-logo-icon {
+    width: 24px;
+    height: 24px;
+    background: #e91e63;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  
+  .mobile-logo-text {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .mobile-logo-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1;
+  }
+  
+  .mobile-logo-subtitle {
+    font-size: 10px;
+    color: #aaaaaa;
+    text-transform: uppercase;
+    line-height: 1;
+    margin-top: 1px;
+  }
+  
+  .mobile-user-menu {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+  }
+  
+  .mobile-user-button {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(42, 42, 42, 0.8);
+    border: 1px solid rgba(68, 68, 68, 0.5);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .mobile-user-button:hover,
+  .mobile-user-button:focus {
+    background: rgba(233, 30, 99, 0.1);
+    color: #e91e63;
+    border-color: #e91e63;
+    outline: none;
+  }
+  
+  .mobile-user-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  /* Add top padding to content when mobile header is present */
+  .app-mobile .mobile-dashboard-visible {
+    padding-top: 56px;
+  }
 }

@@ -44,23 +44,11 @@ const Sidebar = ({
           view: 'social-spark',
           badge: { text: 'New', type: 'new' }
         },
-        {
-          id: 'templates',
-          label: 'Templates',
-          icon: FiFolder,
-          view: 'templates'
-        }
       ]
     },
     {
       title: 'USER',
       items: [
-        {
-          id: 'collections',
-          label: 'Collections',
-          icon: FiFolder,
-          view: 'collections'
-        },
         {
           id: 'pricing',
           label: 'Pricing',

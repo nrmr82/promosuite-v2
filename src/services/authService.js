@@ -330,18 +330,27 @@ class SupabaseAuthService {
    * Logout user
    */
   async logout() {
+    console.log('🔐 AuthService: Starting logout process');
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      console.log('🔐 AuthService: Supabase signOut successful');
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('🔐 AuthService: Logout error:', error);
       // Continue with local cleanup even if API call fails
     } finally {
       // Stop session timeout tracking
       this.stopSessionTimeout();
       
-      // Always clear local storage
+      // Always clear all user-related storage
       localStorage.removeItem('promosuiteUser');
+      sessionStorage.removeItem('sb-localhost-auth-token');
+      sessionStorage.removeItem('supabase.auth.token');
+      
+      // Clear profile cache
+      this._profileCache.clear();
+      
+      console.log('🔐 AuthService: Local cleanup completed');
     }
   }
 
@@ -683,9 +692,11 @@ class SupabaseAuthService {
    */
   onAuthStateChange(callback) {
     return supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔐 AuthService: Auth state changed -', event, session ? 'with session' : 'no session');
       let userData = null;
       
-      if (session?.user) {
+      if (session?.user && event !== 'SIGNED_OUT') {
+        console.log('🔐 AuthService: Processing sign-in for user:', session.user.email);
         try {
           const profile = await this.getUserProfile(session.user.id);
           userData = {
@@ -701,10 +712,15 @@ class SupabaseAuthService {
         } catch (error) {
           console.error('Error getting user profile during auth state change:', error);
         }
-      } else {
+      } else if (event === 'SIGNED_OUT') {
+        console.log('🔐 AuthService: Processing sign-out - clearing data');
         // Stop session timeout tracking on logout
         this.stopSessionTimeout();
         localStorage.removeItem('promosuiteUser');
+        sessionStorage.removeItem('sb-localhost-auth-token');
+        sessionStorage.removeItem('supabase.auth.token');
+        this._profileCache.clear();
+        userData = null;
       }
       
       callback(event, userData);

@@ -5,6 +5,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { useTemplate } from '../contexts/TemplateContext';
+import FlyerTemplateBrowser from './FlyerTemplateBrowser';
 // Temporarily commenting out complex imports for debugging
 // import VideoPlayer from './VideoPlayer';
 // import { LoadingState } from './LoadingSkeleton';
@@ -23,7 +24,7 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
   } = useTemplate();
 
   // const [showDemo, setShowDemo] = useState(false);
-  const [, setShowTemplateBrowser] = useState(false);
+  const [showTemplateBrowser, setShowTemplateBrowser] = useState(false);
   const [, setShowAIGenerator] = useState(false);
   const [, setShowAITemplateGenerator] = useState(false);
   const [, setAIGeneratorMode] = useState('flyer'); // 'flyer', 'analysis', 'copywriting'
@@ -310,6 +311,23 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
     setShowPropertyInput(true);
   };
 
+  // Template browser handlers
+  const handleTemplateSelect = (template) => {
+    console.log('Template selected:', template);
+    setEditorTemplate(template);
+    setShowTemplateBrowser(false);
+    setShowPropertyInput(true);
+  };
+
+  const handleTemplatePreview = (template) => {
+    console.log('Preview template:', template);
+    // Could open a preview modal here
+  };
+
+  const handleTemplateBrowserClose = () => {
+    setShowTemplateBrowser(false);
+  };
+
   // AI Generator handlers
   // const handleAIGeneratorComplete = (generatedFlyer) => {
   //   setPropertyData(generatedFlyer.property || {});
@@ -486,6 +504,18 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
 
         </div>
       </section>
+
+      {/* Template Browser Modal */}
+      {showTemplateBrowser && (
+        <FlyerTemplateBrowser
+          templates={templates}
+          onTemplateSelect={handleTemplateSelect}
+          onTemplatePreview={handleTemplatePreview}
+          onClose={handleTemplateBrowserClose}
+          trackEvent={trackEvent}
+          ANALYTICS_EVENTS={ANALYTICS_EVENTS}
+        />
+      )}
     </div>
   );
 };

@@ -12,12 +12,12 @@ class SessionTimeoutService {
   constructor() {
     // Configuration
     this.config = {
-      // Default timeout after browser closure (in seconds)
-      timeoutAfterClose: 5, // 5 seconds for quick session closure
+      // Default timeout after browser closure (in minutes, not seconds!)
+      timeoutAfterClose: 30, // 30 minutes after browser closure
       // Activity timeout (logout if inactive for this duration in minutes)
       inactivityTimeout: 120, // 2 hours of inactivity
       // Activity check interval (in seconds)
-      activityCheckInterval: 1, // Check every second when browser is closed
+      activityCheckInterval: 60, // Check every minute, not every second
       // Events that count as user activity
       activityEvents: ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'],
       // Storage keys
@@ -114,18 +114,16 @@ class SessionTimeoutService {
     // Start periodic session validity checks
     this.startActivityChecking();
     
-    // Clean up on page unload - use capture and synchronous execution
+    // Clean up on page unload - DISABLED to prevent aggressive logout
+    // The session timeout will handle actual timeouts based on time, not page navigation
     window.addEventListener('unload', (event) => {
       const count = parseInt(localStorage.getItem(this.config.storageKeys.activeTabCount) || '1');
       try {
         if (count <= 1) {
-          // Last tab closing - force synchronous cleanup
+          // Mark browser as closed but don't immediately clear user data
           localStorage.setItem('ps_browser_closed', 'true');
-          sessionStorage.setItem('ps_browser_closed', 'true');
-          localStorage.setItem('ps_last_tab_closed', 'true');
-          localStorage.removeItem('promosuiteUser');
-          sessionStorage.removeItem('supabase.auth.token');
-          this.clearSession();
+          localStorage.setItem('ps_browser_close_time', Date.now().toString());
+          // Don't clear user data here - let the timeout service handle it based on time
         } else {
           // Decrement tab count
           localStorage.setItem(this.config.storageKeys.activeTabCount, (count - 1).toString());
@@ -233,14 +231,9 @@ class SessionTimeoutService {
       // Use synchronous storage operations to ensure they complete
       localStorage.setItem(this.config.storageKeys.browserCloseTime, now.toString());
       localStorage.setItem('ps_browser_closed', 'true');
-      sessionStorage.setItem('ps_browser_closed', 'true');
       
-      // Immediately clear auth data
-      localStorage.removeItem('promosuiteUser');
-      sessionStorage.removeItem('supabase.auth.token');
-      
-      // Force immediate session cleanup
-      this.clearSession();
+      // Don't immediately clear auth data - let timeout service handle it
+      // The user might just be navigating or refreshing
       
       // Set last tab flag if this is the last tab
       const count = parseInt(localStorage.getItem(this.config.storageKeys.activeTabCount) || '1');
@@ -322,12 +315,12 @@ class SessionTimeoutService {
     // If no explicit close flag but we have a close time, check timeout
     if (browserCloseTime > 0) {
       const timeSinceClose = now - browserCloseTime;
-      const timeoutAfterCloseMs = this.config.timeoutAfterClose * 1000; // Convert seconds to ms
+      const timeoutAfterCloseMs = this.config.timeoutAfterClose * 60 * 1000; // Convert minutes to ms
       
       if (timeSinceClose > timeoutAfterCloseMs) {
         console.log('🕒 SessionTimeout: Session expired after browser close timeout', {
-          timeSinceCloseSeconds: Math.round(timeSinceClose / 1000),
-          timeoutSeconds: this.config.timeoutAfterClose
+          timeSinceCloseMinutes: Math.round(timeSinceClose / 60000),
+          timeoutMinutes: this.config.timeoutAfterClose
         });
         return false;
       }

@@ -18,10 +18,12 @@ import {
   Image
 } from 'lucide-react';
 import { useSocialConnections } from '../hooks/useSocialConnections';
+import SocialTemplateBrowser from './SocialTemplateBrowser';
 import './SocialSpark.css';
 
 const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
   const [, setShowConnectionModal] = useState(false);
+  const [showTemplateBrowser, setShowTemplateBrowser] = useState(false);
   const {
     error,
     connectPlatform,
@@ -109,6 +111,28 @@ const platforms = [
     } catch (error) {
       console.error(`Failed to refresh ${platformId} connection:`, error);
     }
+  };
+
+  // Template browser handlers
+  const handleTemplateSelect = (template) => {
+    console.log('Social template selected:', template);
+    setShowTemplateBrowser(false);
+    // Here you would typically navigate to the content creation flow
+    // For now, just show an alert
+    alert(`Selected ${template.name} - Content creation flow would start here`);
+  };
+
+  const handleTemplatePreview = (template) => {
+    console.log('Preview social template:', template);
+    // Could open a preview modal here
+  };
+
+  const handleTemplateBrowserClose = () => {
+    setShowTemplateBrowser(false);
+  };
+
+  const handleBrowseTemplates = () => {
+    setShowTemplateBrowser(true);
   };
 
   return (
@@ -221,8 +245,8 @@ const platforms = [
                   <span>Text editor</span>
                 </div>
               </div>
-              <button className="tool-cta" onClick={user ? onToolUsage : onOpenAuth}>
-                {user ? 'Create Content' : 'Get Started'}
+              <button className="tool-cta" onClick={user ? handleBrowseTemplates : onOpenAuth}>
+                {user ? 'Browse Templates' : 'Get Started'}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -376,6 +400,17 @@ const platforms = [
 
         </div>
       </section>
+
+      {/* Social Template Browser Modal */}
+      {showTemplateBrowser && (
+        <SocialTemplateBrowser
+          onTemplateSelect={handleTemplateSelect}
+          onTemplatePreview={handleTemplatePreview}
+          onClose={handleTemplateBrowserClose}
+          // trackEvent={trackEvent}
+          // ANALYTICS_EVENTS={ANALYTICS_EVENTS}
+        />
+      )}
     </div>
   );
 };
