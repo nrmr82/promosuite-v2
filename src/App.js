@@ -18,7 +18,6 @@ import SessionTimeoutWarning from './components/SessionTimeoutWarning';
 import OAuthCallback from './components/oauth/OAuthCallback';
 import authService from './services/authService';
 // Mobile support
-import MobileApp from './platforms/mobile/MobileApp';
 import { getDeviceType, DEVICE_TYPES } from './shared/utils/deviceDetection';
 import LogoutButton from './components/LogoutButton';
 import './App.css';
@@ -221,13 +220,9 @@ function App() {
       return (
         <ErrorBoundary level="full">
           <AuthProvider>
-            <MobileApp 
-              user={null}
-              currentView={currentView}
-              onNavigate={handleNavigate}
+            <LandingPage 
               onAuthSuccess={handleAuthSuccess}
-              onLogout={handleLogout}
-              loading={loading}
+              isMobile={true} // Indicate that it's a mobile landing page
             />
           </AuthProvider>
           <Analytics />
