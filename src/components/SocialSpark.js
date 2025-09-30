@@ -186,38 +186,6 @@ const platforms = [
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
-            
-            <div className="tool-card analytics-card">
-              <div className="tool-header">
-                <div className="tool-icon">
-                  <BarChart3 className="w-6 h-6" />
-                </div>
-                <div className="tool-title-section">
-                  <h3 className="tool-title">Advanced Analytics</h3>
-                  <p className="tool-description">
-                    Track engagement, reach, and ROI with detailed insights
-                  </p>
-                </div>
-              </div>
-              <div className="tool-features">
-                <div className="feature-item">
-                  <span className="feature-icon">📊</span>
-                  <span>Performance tracking</span>
-                </div>
-                <div className="feature-item">
-                  <span className="feature-icon">💰</span>
-                  <span>ROI measurement</span>
-                </div>
-                <div className="feature-item">
-                  <span className="feature-icon">📈</span>
-                  <span>Growth insights</span>
-                </div>
-              </div>
-              <button className="tool-cta" onClick={user ? onToolUsage : onOpenAuth}>
-                {user ? 'View Analytics' : 'Get Started'}
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
 
             <div className="tool-card content-card">
               <div className="tool-header">
@@ -396,6 +364,68 @@ const platforms = [
                 </button>
               </div>
             )}
+          </div>
+
+          {/* Template Browser Section */}
+          <div className="template-browser-section">
+            <div className="section-header">
+              <div className="section-title-section">
+                <h2 className="section-title">Social Media Templates</h2>
+                <p className="section-subtitle">
+                  Browse and select from our collection of social media content templates for Instagram, Facebook, LinkedIn, and more.
+                </p>
+              </div>
+            </div>
+            
+            <div className="template-categories">
+              <div className="template-category">
+                <div className="category-header">
+                  <div className="category-icon">
+                    <Video className="w-6 h-6" />
+                  </div>
+                  <div className="category-info">
+                    <h3>Instagram Reels & Stories</h3>
+                    <p>Short-form video templates optimized for engagement</p>
+                  </div>
+                </div>
+                <button className="category-cta" onClick={user ? handleBrowseTemplates : onOpenAuth}>
+                  {user ? 'Browse Templates' : 'Login to Browse'}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+              
+              <div className="template-category">
+                <div className="category-header">
+                  <div className="category-icon">
+                    <Image className="w-6 h-6" />
+                  </div>
+                  <div className="category-info">
+                    <h3>Square Posts & Carousels</h3>
+                    <p>Professional post designs for feed content</p>
+                  </div>
+                </div>
+                <button className="category-cta" onClick={user ? handleBrowseTemplates : onOpenAuth}>
+                  {user ? 'Browse Templates' : 'Login to Browse'}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+              
+              <div className="template-category">
+                <div className="category-header">
+                  <div className="category-icon">
+                    <Edit3 className="w-6 h-6" />
+                  </div>
+                  <div className="category-info">
+                    <h3>Custom Templates</h3>
+                    <p>Create and manage your own template designs</p>
+                  </div>
+                </div>
+                <button className="category-cta" onClick={user ? handleBrowseTemplates : onOpenAuth}>
+                  {user ? 'Browse Templates' : 'Login to Browse'}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           </div>
 
         </div>

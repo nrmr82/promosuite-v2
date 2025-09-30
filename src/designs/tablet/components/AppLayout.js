@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useProduct } from '../contexts/ProductContext';
 import Sidebar from './Sidebar';
 import { FaBars, FaTimes } from 'react-icons/fa';
-import './AppLayout.css';
+import '../../../components/AppLayout.css';
 
 const AppLayout = ({ 
   children, 

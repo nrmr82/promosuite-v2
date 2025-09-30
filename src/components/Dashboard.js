@@ -148,40 +148,53 @@ const Dashboard = ({ user, onNavigateToTool }) => {
               onClick={() => handleToolClick('flyerpro')}
             >
               <div className="dashboard-tool-preview">
-                <div className="flyer-preview-stack">
-                  <div className="preview-card card-1">
-                    <div className="preview-header">
-                      <div className="preview-logo">🏠</div>
-                      <div className="preview-agent">{user.name || user.profile?.full_name || 'Your Name'}</div>
+                <div className="flyerpro-feature-preview">
+                  <div className="flyer-creation-demo">
+                    <div className="template-selection">
+                      <div className="template template-1 active">
+                        <div className="template-thumb">■</div>
+                        <span>Modern</span>
+                      </div>
+                      <div className="template template-2">
+                        <div className="template-thumb">▲</div>
+                        <span>Classic</span>
+                      </div>
+                      <div className="template template-3">
+                        <div className="template-thumb">◆</div>
+                        <span>Luxury</span>
+                      </div>
                     </div>
-                    <div className="preview-image">📸</div>
-                    <div className="preview-details">
-                      <div className="preview-price">$850,000</div>
-                      <div className="preview-address">123 Luxury Lane</div>
+                    
+                    <div className="flyer-preview">
+                      <div className="property-image">■</div>
+                      <div className="property-details">
+                        <div className="price-animate">$850,000</div>
+                        <div className="address-animate">123 Dream Home Ln</div>
+                        <div className="features-animate">
+                          <span>• 3 bed</span>
+                          <span>• 2 bath</span>
+                          <span>• 2000 sqft</span>
+                        </div>
+                      </div>
+                      <div className="agent-branding">
+                        <div className="agent-name">{user.name || 'Your Name'}</div>
+                        <div className="contact-info">• (555) 123-4567</div>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="preview-card card-2">
-                    <div className="preview-header">
-                      <div className="preview-logo">🏡</div>
-                      <div className="preview-agent">{user.name || user.profile?.full_name || 'Your Name'}</div>
-                    </div>
-                    <div className="preview-image">📷</div>
-                    <div className="preview-details">
-                      <div className="preview-price">$650,000</div>
-                      <div className="preview-address">456 Family St</div>
-                    </div>
-                  </div>
-                  
-                  <div className="preview-card card-3">
-                    <div className="preview-header">
-                      <div className="preview-logo">🏢</div>
-                      <div className="preview-agent">{user.name || user.profile?.full_name || 'Your Name'}</div>
-                    </div>
-                    <div className="preview-image">🏙️</div>
-                    <div className="preview-details">
-                      <div className="preview-price">$1,200,000</div>
-                      <div className="preview-address">789 Urban Ave</div>
+                    
+                    <div className="creation-steps">
+                      <div className="step step-1 active">
+                        <div className="step-icon">1</div>
+                        <span>Template</span>
+                      </div>
+                      <div className="step step-2">
+                        <div className="step-icon">2</div>
+                        <span>Customize</span>
+                      </div>
+                      <div className="step step-3">
+                        <div className="step-icon">3</div>
+                        <span>Export</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -218,59 +231,60 @@ const Dashboard = ({ user, onNavigateToTool }) => {
               onClick={() => handleToolClick('socialspark')}
             >
               <div className="dashboard-tool-preview">
-                <div className="social-dashboard-mini sspark-preview">
-                  <div className="dashboard-header-mini">
-                    <h4>Social Dashboard</h4>
-                    <div className="dashboard-stats-mini">
-                      <div className="stat-mini sspark-stat" data-count="2400">
-                        <span className="stat-value">
-                          {followersCount < 1000 ? followersCount : `${(followersCount / 1000).toFixed(1)}K`}
-                        </span>
-                        <span className="stat-label">Followers</span>
-                        <span className="stat-change positive">+12%</span>
-                        <div className="sspark-progress">
-                          <div className="sspark-progress-bar" style={{'--pct': '75%'}}></div>
+                <div className="socialspark-feature-preview">
+                  <div className="social-automation-demo">
+                    <div className="content-creation">
+                      <div className="post-composer">
+                        <div className="post-text">
+                          <div className="typing-indicator">New listing alert! ■</div>
+                          <div className="hashtags">#RealEstate #NewListing #DreamHome</div>
                         </div>
                       </div>
-                      <div className="stat-mini sspark-stat" data-count="856">
-                        <span className="stat-value">{engagementCount}</span>
-                        <span className="stat-label">Engagement</span>
-                        <span className="stat-change positive">+24%</span>
-                        <div className="sspark-progress">
-                          <div className="sspark-progress-bar" style={{'--pct': '60%'}}></div>
+                      
+                      <div className="schedule-panel">
+                        <div className="schedule-time">
+                          <div className="time-slot active">• 9:00 AM</div>
+                          <div className="time-slot">• 1:00 PM</div>
+                          <div className="time-slot">• 6:00 PM</div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="platforms-row-mini sspark-platforms">
-                    {platforms.map((platform, index) => (
-                      <div 
-                        key={index} 
-                        className="platform-item-mini sspark-platform-icon" 
-                        style={{ 
-                          '--platform-color': platform.color,
-                          '--stagger-delay': `${index * 100}ms`
-                        }}
-                      >
-                        {platform.icon}
-                        <span>{platform.name}</span>
-                        <CheckCircle className="w-3 h-3 platform-connected" />
+                    
+                    <div className="platform-distribution">
+                      <div className="platform-row">
+                        <div className="platform-item instagram">
+                          <div className="platform-icon">■</div>
+                          <div className="platform-name">IG</div>
+                          <div className="publish-status publishing">•</div>
+                        </div>
+                        <div className="platform-item twitter">
+                          <div className="platform-icon">▶</div>
+                          <div className="platform-name">TW</div>
+                          <div className="publish-status scheduled">⏳</div>
+                        </div>
+                        <div className="platform-item linkedin">
+                          <div className="platform-icon">◆</div>
+                          <div className="platform-name">LI</div>
+                          <div className="publish-status published">✓</div>
+                        </div>
+                        <div className="platform-item facebook">
+                          <div className="platform-icon">●</div>
+                          <div className="platform-name">FB</div>
+                          <div className="publish-status scheduled">⏳</div>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                  
-                  <div className="scheduled-posts-mini">
-                    <h5>Upcoming Posts</h5>
-                    <div className="post-preview-mini sspark-scheduled">
-                      <div className="post-thumbnail-mini">🏠</div>
-                      <div className="post-details-mini">
-                        <p>New listing in Downtown!</p>
-                        <span className="post-time-mini">Today at 2:00 PM</span>
+                    </div>
+                    
+                    <div className="analytics-mini">
+                      <div className="metric">
+                        <span className="metric-number">{followersCount < 1000 ? followersCount : `${Math.floor(followersCount/1000)}K`}</span>
+                        <span className="metric-label">Reach</span>
+                        <div className="metric-trend up">↑ +12%</div>
                       </div>
-                      <div className="post-platforms-mini">
-                        <Instagram className="w-3 h-3" />
-                        <Facebook className="w-3 h-3" />
+                      <div className="metric">
+                        <span className="metric-number">{Math.floor(engagementCount/10)}</span>
+                        <span className="metric-label">Leads</span>
+                        <div className="metric-trend up">↑ +24%</div>
                       </div>
                     </div>
                   </div>

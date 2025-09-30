@@ -1,4 +1,4 @@
-/* Dashboard.css - Dark Theme to match Landing Page */
+/* Dashboard.css - Dark Theme to match Landing Page - Updated 2025 - 30% taller animations v11 */
 /* Dashboard styles work for both desktop and mobile */
 .dashboard {
   padding: 2rem;
@@ -116,7 +116,7 @@
 
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, minmax(350px, 1fr));
   gap: 1.5rem;
   width: 100%;
   margin-bottom: 2rem;
@@ -130,7 +130,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(200px, 0.8fr) 1.2fr;
   gap: 1.5rem;
   min-height: 280px;
   position: relative;
@@ -143,8 +143,11 @@
   box-shadow: 0 10px 25px rgba(233, 30, 99, 0.2);
 }
 
-/* Enhanced hover effect for FlyerPro card (green box) */
-.tool-card.flyerpro.hovered {
+
+/* Enhanced hover effects for both cards */
+.tool-card.flyerpro.hovered,
+.tool-card.socialspark.hovered,
+.tool-card.sspark-card.hovered {
   transform: translateY(-6px) scale(1.01);
   border-color: #e91e63;
   box-shadow: 0 15px 35px rgba(233, 30, 99, 0.25), 0 0 0 1px rgba(233, 30, 99, 0.1);
@@ -177,12 +180,12 @@
 .tool-preview {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  background: rgba(26, 26, 26, 0.8);
-  border: 1px solid rgba(51, 51, 51, 0.5);
-  border-radius: 6px;
-  padding: 8px;
-  overflow: visible;
+  justify-content: center;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  overflow: hidden;
   position: relative;
 }
 
@@ -266,75 +269,652 @@
   border-color: #e91e63 !important;
 }
 
-/* Override SocialSpark.css and FlyerPro.css button styles */
-.dashboard .tool-card .tool-cta,
-.dashboard .socialspark .tool-cta,
-.dashboard .flyerpro .tool-cta {
-  background: #2a2a2a !important;
-  color: #ffffff !important;
-  border: 1px solid #444 !important;
-  box-shadow: none !important;
+/* Button styles - applies to ALL dashboard tool cards */
+
+
+/* Dashboard Tool Preview - applies to ALL cards equally */
+.dashboard-tool-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 200px;
 }
 
-.dashboard .tool-card .tool-cta:hover,
-.dashboard .socialspark .tool-cta:hover,
-.dashboard .flyerpro .tool-cta:hover {
-  background: #3a3a3a !important;
-  border-color: #e91e63 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(233, 30, 99, 0.2) !important;
+/* FlyerPro Feature Preview Styles */
+.flyerpro-feature-preview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Override pseudo-elements */
-.dashboard .tool-card .tool-cta::before,
-.dashboard .socialspark .tool-cta::before,
-.dashboard .flyerpro .tool-cta::before {
-  display: none !important;
+.flyer-creation-demo {
+  width: 180px;
+  height: 260px;
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
 }
 
-/* FORCE OVERRIDE - Highest specificity for Dashboard */
-.dashboard .dashboard-tools .tools-grid .tool-card .tool-cta {
-  background: #e91e63 !important;
-  color: #ffffff !important;
-  border: 1px solid #e91e63 !important;
-  border-radius: 6px !important;
-  box-shadow: none !important;
+/* Template Selection */
+.template-selection {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
 }
 
-.dashboard .dashboard-tools .tools-grid .tool-card .tool-cta:hover {
-  background: #d81b60 !important;
-  border-color: #d81b60 !important;
-  box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4) !important;
+.template {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 4px;
+  background: #333;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  flex: 1;
+  animation: templateCycle 6s ease-in-out infinite;
 }
 
-/* Force card backgrounds to be grey */
-.dashboard .dashboard-tools .tools-grid .tool-card {
-  background: #2a2a2a !important;
-  border: 1px solid #444 !important;
+.template.active {
+  background: #e91e63;
+  transform: scale(1.05);
 }
 
-/* Force all blue backgrounds inside cards to be grey */
-.dashboard .dashboard-tools .tools-grid .tool-card .tool-preview,
-.dashboard .dashboard-tools .tools-grid .tool-card .social-dashboard-mini,
-.dashboard .dashboard-tools .tools-grid .tool-card .flyer-preview-stack,
-.dashboard .dashboard-tools .tools-grid .tool-card .preview-card {
-  background: #1a1a1a !important;
-  border: 1px solid #333 !important;
+.template-1 {
+  animation-delay: 0s;
 }
 
-/* Dashboard-specific overrides with responsive support */
-.dashboard .dashboard-tools-grid .dashboard-tool-card,
-.dashboard .tool-card.flyerpro,
-.dashboard .tool-card.socialspark {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  flex-direction: unset !important;
-  justify-content: unset !important;
-  text-align: left !important;
-  min-height: 280px !important;
-  max-height: none !important;
-  width: 100% !important;
+.template-2 {
+  animation-delay: 2s;
 }
+
+.template-3 {
+  animation-delay: 4s;
+}
+
+.template-thumb {
+  font-size: 14px;
+}
+
+.template span {
+  font-size: 8px;
+  color: #fff;
+  font-weight: 500;
+}
+
+@keyframes templateCycle {
+  0%, 33%, 100% {
+    background: #333;
+    transform: scale(1);
+  }
+  16% {
+    background: #e91e63;
+    transform: scale(1.05);
+  }
+}
+
+/* Flyer Preview */
+.flyer-preview {
+  flex: 1;
+  background: #1a1a1a;
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #444;
+}
+
+.property-image {
+  width: 100%;
+  height: 50px;
+  background: #333;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 8px;
+  animation: imageChange 4s ease-in-out infinite;
+}
+
+@keyframes imageChange {
+  0%, 100% {
+    background: #333;
+  }
+  50% {
+    background: linear-gradient(45deg, #666, #444);
+    transform: scale(1.02);
+  }
+}
+
+.property-details {
+  flex: 1;
+}
+
+.price-animate {
+  font-size: 14px;
+  font-weight: bold;
+  color: #e91e63;
+  margin-bottom: 2px;
+  animation: priceUpdate 3s ease-in-out infinite;
+}
+
+@keyframes priceUpdate {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+    color: #f06292;
+  }
+}
+
+.address-animate {
+  font-size: 10px;
+  color: #ccc;
+  margin-bottom: 4px;
+  animation: addressType 8s linear infinite;
+}
+
+.features-animate {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.features-animate span {
+  font-size: 8px;
+  color: #aaa;
+  animation: featureHighlight 2s ease-in-out infinite;
+}
+
+.features-animate span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.features-animate span:nth-child(2) {
+  animation-delay: 0.7s;
+}
+
+.features-animate span:nth-child(3) {
+  animation-delay: 1.4s;
+}
+
+@keyframes featureHighlight {
+  0%, 90%, 100% {
+    color: #aaa;
+  }
+  45% {
+    color: #e91e63;
+    transform: scale(1.1);
+  }
+}
+
+.agent-branding {
+  border-top: 1px solid #444;
+  padding-top: 4px;
+  margin-top: 4px;
+}
+
+.agent-name {
+  font-size: 9px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.contact-info {
+  font-size: 8px;
+  color: #aaa;
+}
+
+/* Creation Steps */
+.creation-steps {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 4px;
+  background: #333;
+  transition: all 0.3s ease;
+  animation: stepProgress 9s ease-in-out infinite;
+}
+
+.step.active {
+  background: #e91e63;
+}
+
+.step-1 {
+  animation-delay: 0s;
+}
+
+.step-2 {
+  animation-delay: 3s;
+}
+
+.step-3 {
+  animation-delay: 6s;
+}
+
+@keyframes stepProgress {
+  0%, 33%, 100% {
+    background: #333;
+    transform: scale(1);
+  }
+  16% {
+    background: #e91e63;
+    transform: scale(1.1);
+  }
+}
+
+.step-icon {
+  font-size: 12px;
+}
+
+.step span {
+  font-size: 7px;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* SocialSpark Feature Preview Styles */
+.socialspark-feature-preview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-automation-demo {
+  width: 180px;
+  height: 260px;
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+
+/* Content Creation */
+.content-creation {
+  background: #1a1a1a;
+  border-radius: 6px;
+  padding: 6px;
+  border: 1px solid #444;
+}
+
+.post-composer {
+  margin-bottom: 10px;
+}
+
+.post-text {
+  background: #333;
+  border-radius: 4px;
+  padding: 6px;
+  margin-bottom: 6px;
+}
+
+.typing-indicator {
+  font-size: 9px;
+  color: #fff;
+  animation: typeText 4s ease-in-out infinite;
+}
+
+@keyframes typeText {
+  0%, 10% {
+    width: 0;
+    opacity: 0;
+  }
+  50% {
+    width: 100%;
+    opacity: 1;
+  }
+  90%, 100% {
+    width: 100%;
+    opacity: 0.8;
+  }
+}
+
+.hashtags {
+  font-size: 7px;
+  color: #e91e63;
+  animation: hashtagGlow 3s ease-in-out infinite;
+}
+
+@keyframes hashtagGlow {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 5px #e91e63;
+  }
+}
+
+.schedule-panel {
+  display: flex;
+  justify-content: center;
+}
+
+.schedule-time {
+  display: flex;
+  gap: 3px;
+}
+
+.time-slot {
+  padding: 2px 4px;
+  background: #333;
+  border-radius: 3px;
+  font-size: 7px;
+  color: #aaa;
+  animation: timeSlotActivate 9s ease-in-out infinite;
+}
+
+.time-slot.active {
+  background: #e91e63;
+  color: #fff;
+}
+
+.time-slot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.time-slot:nth-child(2) {
+  animation-delay: 3s;
+}
+
+.time-slot:nth-child(3) {
+  animation-delay: 6s;
+}
+
+@keyframes timeSlotActivate {
+  0%, 33%, 100% {
+    background: #333;
+    color: #aaa;
+  }
+  11%, 22% {
+    background: #e91e63;
+    color: #fff;
+    transform: scale(1.05);
+  }
+}
+
+/* Platform Distribution */
+.platform-distribution {
+  background: #1a1a1a;
+  border-radius: 6px;
+  padding: 8px;
+  border: 1px solid #444;
+}
+
+.platform-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.platform-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 3px;
+  background: #333;
+  border-radius: 4px;
+  flex: 1;
+}
+
+.platform-icon {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 1px;
+}
+
+.platform-name {
+  font-size: 7px;
+  color: #aaa;
+  font-weight: 500;
+}
+
+.platform-item.instagram {
+  animation: publishStatus 8s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.platform-item.twitter {
+  animation: publishStatus 8s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.platform-item.linkedin {
+  animation: publishStatus 8s ease-in-out infinite;
+  animation-delay: 4s;
+}
+
+.platform-item.facebook {
+  animation: publishStatus 8s ease-in-out infinite;
+  animation-delay: 6s;
+}
+
+@keyframes publishStatus {
+  0%, 12.5%, 100% {
+    background: #333;
+  }
+  6.25% {
+    background: #e91e63;
+    transform: scale(1.05);
+  }
+}
+
+.publish-status {
+  font-size: 8px;
+  margin-top: 1px;
+}
+
+.publish-status.publishing {
+  color: #e91e63;
+  animation: publishing 1s ease-in-out infinite;
+}
+
+.publish-status.scheduled {
+  color: #ff9800;
+}
+
+.publish-status.published {
+  color: #4caf50;
+}
+
+@keyframes publishing {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Analytics Mini */
+.analytics-mini {
+  display: flex;
+  gap: 4px;
+}
+
+.metric {
+  flex: 1;
+  background: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 4px;
+  text-align: center;
+}
+
+.metric-number {
+  display: block;
+  font-size: 11px;
+  font-weight: bold;
+  color: #e91e63;
+  animation: metricCount 3s ease-in-out infinite;
+}
+
+@keyframes metricCount {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+    color: #f06292;
+  }
+}
+
+.metric-label {
+  display: block;
+  font-size: 7px;
+  color: #aaa;
+  margin-bottom: 2px;
+}
+
+.metric-trend {
+  font-size: 6px;
+  font-weight: bold;
+}
+
+.metric-trend.up {
+  color: #4caf50;
+  animation: trendUp 2s ease-in-out infinite;
+}
+
+@keyframes trendUp {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-1px);
+  }
+}
+
+
+/* Dashboard Tool Content - applies to ALL cards equally */
+.dashboard-tool-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.dashboard-tool-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.dashboard-tool-icon {
+  width: 48px;
+  height: 48px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #e91e63;
+}
+
+.dashboard-tool-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.dashboard-tool-description {
+  font-size: 1rem;
+  color: #aaaaaa;
+  margin: 0 0 1.25rem 0;
+  line-height: 1.6;
+}
+
+.dashboard-tool-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+}
+
+.dashboard-tool-features li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #ffffff;
+}
+
+.dashboard-feature-check {
+  color: #e91e63;
+  font-size: 14px;
+}
+
+.dashboard-tool-cta {
+  background: #e91e63;
+  color: #ffffff;
+  border: 1px solid #e91e63;
+  padding: 0.75rem 1.25rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dashboard-tool-cta:hover {
+  background: #d81b60;
+  border-color: #d81b60;
+  box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
+}
+
+/* Ensure both dashboard tool cards use proper grid layout */
+.dashboard-tool-card {
+  display: grid;
+  grid-template-columns: minmax(200px, 0.8fr) 1.2fr;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+/* Removed high-specificity SocialSpark overrides for consistency */
+
+/* Removed SocialSpark-specific overrides to keep parity across cards */
+
 
 /* Mobile: Floating dashboard at bottom like mobile app */
 @media (max-width: 768px) {
@@ -525,34 +1105,6 @@
   }
 }
 
-.dashboard .dashboard-tools .tools-grid .tool-card .tool-header,
-.dashboard .tool-card.flyerpro .tool-header,
-.dashboard .tool-card.socialspark .tool-header {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: flex-start !important;
-  gap: 0.75rem !important;
-  text-align: left !important;
-  margin-bottom: 1rem !important;
-}
-
-.dashboard .dashboard-tools .tools-grid .tool-card .tool-title-section,
-.dashboard .tool-card.flyerpro .tool-title-section,
-.dashboard .tool-card.socialspark .tool-title-section {
-  flex: 1 !important;
-  width: unset !important;
-  text-align: left !important;
-  margin-top: 0 !important;
-}
-
-.dashboard .dashboard-tools .tools-grid .tool-card .tool-content,
-.dashboard .tool-card.flyerpro .tool-content,
-.dashboard .tool-card.socialspark .tool-content {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  text-align: left !important;
-}
 
 /* Collections Section */
 .dashboard-collections {
@@ -772,14 +1324,7 @@
   color: #64748b;
 }
 
-/* Social Dashboard Mini Styles */
-.social-dashboard-mini {
-  background: white;
-  border-radius: 12px;
-  padding: 12px;
-  width: 220px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+/* Social Dashboard Mini Styles - REMOVED CONFLICTING LIGHT THEME VERSION */
 
 .dashboard-header-mini h4 {
   font-size: 14px;
@@ -918,22 +1463,15 @@
 }
 
 /* Flyer Preview Styles - Dark Theme - Responsive */
-.flyer-preview-stack {
-  position: relative;
-  width: clamp(160px, 25vw, 240px);
-  height: clamp(200px, 32vw, 300px);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin: 0 auto;
-}
 
 .preview-card {
   position: absolute;
-  width: clamp(130px, 20vw, 190px);
-  height: clamp(180px, 28vw, 260px);
+  width: clamp(110px, 18vw, 160px);
+  height: clamp(150px, 24vw, 200px);
   background: #1a1a1a;
   border: 1px solid #333;
   border-radius: 6px;
-  padding: clamp(0.75rem, 1.5vw, 1.25rem);
+  padding: clamp(0.6rem, 1.2vw, 1rem);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1015,146 +1553,8 @@
 }
 
 /* Social Dashboard Mini Styles - Dark Theme - Responsive */
-.social-dashboard-mini {
-  background: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 6px;
-  padding: clamp(8px, 2vw, 16px);
-  width: 100%;
-  max-width: clamp(200px, 30vw, 300px);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: visible;
-  transform-origin: center;
-  box-sizing: border-box;
-  margin: 0 auto;
-}
 
-/* Zoom animation for SocialSpark preview (blue box) */
-.sspark-card.hovered .social-dashboard-mini {
-  transform: scale(1.02);
-  box-shadow: 0 8px 25px rgba(233, 30, 99, 0.15);
-  border-color: rgba(233, 30, 99, 0.3);
-  background: #1a1a1a !important;
-}
 
-.dashboard-header-mini h4 {
-  font-size: clamp(0.8rem, 1.5vw, 1rem);
-  font-weight: 600;
-  color: #ffffff;
-  margin: 0 0 0.75rem 0;
-}
-
-.dashboard-stats-mini {
-  display: flex;
-  gap: clamp(0.5rem, 1.5vw, 1.5rem);
-  margin-bottom: 1rem;
-}
-
-.stat-mini {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: clamp(0.35rem, 1vw, 0.65rem);
-  background: #1a1a1a !important;
-  border: 1px solid #333;
-  border-radius: 4px;
-  flex: 1;
-}
-
-.stat-value {
-  font-size: clamp(0.85rem, 1.8vw, 1.1rem);
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 2px;
-}
-
-.stat-label {
-  font-size: clamp(0.55rem, 1.2vw, 0.75rem);
-  color: #aaaaaa;
-  margin-bottom: 2px;
-}
-
-.stat-change {
-  font-size: clamp(0.5rem, 1vw, 0.7rem);
-  font-weight: 600;
-}
-
-.stat-change.positive {
-  color: #e91e63;
-}
-
-.platforms-row-mini {
-  display: flex;
-  gap: clamp(0.25rem, 1vw, 0.75rem);
-  margin-bottom: 1rem;
-}
-
-.platform-item-mini {
-  display: flex;
-  align-items: center;
-  gap: clamp(0.15rem, 0.5vw, 0.35rem);
-  padding: clamp(0.25rem, 0.8vw, 0.5rem) clamp(0.35rem, 1vw, 0.65rem);
-  background: #1a1a1a !important;
-  border: 1px solid #333;
-  border-radius: 4px;
-  font-size: clamp(0.55rem, 1.1vw, 0.75rem);
-  color: #aaaaaa;
-  flex: 1;
-  justify-content: center;
-}
-
-.platform-connected {
-  color: #e91e63;
-}
-
-.scheduled-posts-mini h5 {
-  font-size: clamp(0.65rem, 1.3vw, 0.85rem);
-  font-weight: 600;
-  color: #ffffff;
-  margin: 0 0 0.5rem 0;
-}
-
-.post-preview-mini {
-  display: flex;
-  align-items: center;
-  gap: clamp(0.35rem, 1vw, 0.65rem);
-  padding: clamp(0.35rem, 1vw, 0.65rem);
-  background: #1a1a1a !important;
-  border: 1px solid #333;
-  border-radius: 4px;
-}
-
-.post-thumbnail-mini {
-  width: clamp(24px, 4vw, 32px);
-  height: clamp(24px, 4vw, 32px);
-  background: #333;
-  border-radius: 3px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(10px, 2vw, 14px);
-}
-
-.post-details-mini {
-  flex: 1;
-}
-
-.post-details-mini p {
-  font-size: clamp(0.6rem, 1.2vw, 0.8rem);
-  font-weight: 500;
-  color: #ffffff;
-  margin: 0 0 2px 0;
-}
-
-.post-time-mini {
-  font-size: clamp(0.5rem, 1vw, 0.7rem);
-  color: #aaaaaa;
-}
-
-.post-platforms-mini {
-  display: flex;
-  gap: clamp(0.15rem, 0.5vw, 0.35rem);
-}
 
 .w-4 {
   width: clamp(12px, 2.5vw, 20px);
@@ -1176,206 +1576,7 @@
   height: 12px;
 }
 
-/* SocialSpark Enhanced Animations */
-/* 
- * These animations enhance the user experience for the SocialSpark card:
- * - Card scales slightly and lifts with enhanced shadow
- * - Stats animate with count-up effect and glow
- * - Progress bars grow to show engagement metrics visually
- * - Platform icons stagger-animate to show connection status
- * - Scheduled posts pulse to indicate activity
- * - All animations respect prefers-reduced-motion for accessibility
- */
-/* Card-level hover animation with subtle scaling and enhanced shadow */
-@keyframes sspark-cardHover {
-  0% { 
-    transform: translateY(-4px) scale(1); 
-    box-shadow: 0 10px 25px rgba(233, 30, 99, 0.2);
-  }
-  100% { 
-    transform: translateY(-8px) scale(1.02); 
-    box-shadow: 0 20px 40px rgba(233, 30, 99, 0.3), 0 0 0 1px rgba(233, 30, 99, 0.1);
-  }
-}
 
-/* Platform icons stagger animation - slide up and fade in */
-@keyframes sspark-iconRise {
-  from {
-    opacity: 0.7;
-    transform: translateY(8px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Progress bar grow animation */
-@keyframes sspark-chartGrow {
-  from {
-    width: 0;
-    opacity: 0;
-  }
-  to {
-    width: var(--pct);
-    opacity: 1;
-  }
-}
-
-/* Scheduled post row pulse animation */
-@keyframes sspark-pulseRow {
-  0%, 100% {
-    background: transparent;
-    transform: translateX(0);
-  }
-  50% {
-    background: rgba(233, 30, 99, 0.08);
-    transform: translateX(2px);
-  }
-}
-
-/* Stat value glow animation */
-@keyframes sspark-statGlow {
-  0%, 100% {
-    text-shadow: none;
-  }
-  50% {
-    text-shadow: 0 0 8px rgba(233, 30, 99, 0.6);
-  }
-}
-
-/* Enhanced SocialSpark card hover states */
-.sspark-card.hovered {
-  animation: sspark-cardHover 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  will-change: transform, box-shadow;
-}
-
-/* Reset will-change when not hovered for performance */
-.sspark-card:not(.hovered),
-.tool-card.flyerpro:not(.hovered) {
-  will-change: auto;
-}
-
-/* Stats animation with glow effect */
-.sspark-card.hovered .sspark-stat .stat-value {
-  animation: sspark-statGlow 1.2s ease-in-out infinite;
-  transition: color 0.3s ease;
-  color: #ffffff;
-}
-
-/* Progress bars that grow on hover */
-.sspark-progress {
-  width: 100%;
-  height: clamp(2px, 0.5vw, 4px);
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
-  margin-top: clamp(2px, 0.5vw, 6px);
-  overflow: hidden;
-}
-
-.sspark-progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #e91e63, #f06292);
-  border-radius: clamp(1px, 0.3vw, 3px);
-  width: 0;
-  opacity: 0;
-  transition: all 0.3s ease;
-}
-
-.sspark-card.hovered .sspark-progress-bar {
-  animation: sspark-chartGrow 600ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  animation-delay: 200ms;
-}
-
-/* Platform icons stagger animation */
-.sspark-platform-icon {
-  transition: all 0.3s ease;
-  transform: translateY(0) scale(1);
-}
-
-.sspark-card.hovered .sspark-platform-icon {
-  animation: sspark-iconRise 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  animation-delay: var(--stagger-delay);
-}
-
-/* Scheduled post pulse animation */
-.sspark-scheduled {
-  transition: all 0.3s ease;
-  border-radius: 6px;
-}
-
-.sspark-card.hovered .sspark-scheduled {
-  animation: sspark-pulseRow 2s ease-in-out infinite;
-  animation-delay: 800ms;
-}
-
-/* Enhanced platform connected indicator */
-.sspark-card.hovered .platform-connected {
-  color: #e91e63 !important;
-  filter: drop-shadow(0 0 4px rgba(233, 30, 99, 0.6));
-  animation: sspark-iconRise 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  animation-delay: calc(var(--stagger-delay) + 100ms);
-}
-
-/* Accessibility: Respect reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  .sspark-card.hovered,
-  .sspark-card.hovered .sspark-stat .stat-value,
-  .sspark-card.hovered .sspark-progress-bar,
-  .sspark-card.hovered .sspark-platform-icon,
-  .sspark-card.hovered .sspark-scheduled,
-  .sspark-card.hovered .platform-connected,
-  .tool-card.flyerpro.hovered .flyer-preview-stack,
-  .tool-card.flyerpro.hovered .preview-card,
-  .sspark-card.hovered .social-dashboard-mini {
-    animation: none !important;
-    transform: none !important;
-    transition: none !important;
-  }
-  
-  .sspark-card.hovered {
-    transform: translateY(-4px) scale(1) !important;
-    box-shadow: 0 10px 25px rgba(233, 30, 99, 0.2);
-  }
-  
-  .tool-card.flyerpro.hovered {
-    transform: translateY(-4px) scale(1) !important;
-    box-shadow: 0 10px 25px rgba(233, 30, 99, 0.2);
-  }
-  
-  .sspark-card.hovered .sspark-progress-bar {
-    width: var(--pct);
-    opacity: 1;
-  }
-}
-
-/* Container and Layout Fixes */
-.dashboard * {
-  box-sizing: border-box;
-}
-
-.dashboard .container {
-  overflow: hidden;
-}
-
-.tool-preview {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 6px;
-  padding: clamp(1rem, 2.5vw, 2rem);
-  overflow: hidden;
-  position: relative;
-  min-height: clamp(120px, 20vw, 200px);
-}
-
-.flyer-preview-stack,
-.social-dashboard-mini {
-  position: relative;
-  z-index: 1;
-}
 
 .collections-preview {
   display: grid;
@@ -1692,77 +1893,3 @@
   }
 }
 
-/* SocialSpark Content Responsive Overrides - High Priority */
-@media (min-width: 1400px) {
-  .social-dashboard-mini.sspark-preview {
-    max-width: 320px !important;
-    padding: 18px !important;
-  }
-  
-  .dashboard-stats-mini {
-    gap: 1.5rem !important;
-  }
-  
-  .stat-mini.sspark-stat {
-    padding: 0.75rem !important;
-  }
-  
-  .stat-value {
-    font-size: 1.2rem !important;
-  }
-  
-  .stat-label {
-    font-size: 0.8rem !important;
-  }
-  
-  .platform-item-mini.sspark-platform-icon {
-    padding: 0.6rem 0.8rem !important;
-    font-size: 0.8rem !important;
-    gap: 0.4rem !important;
-  }
-  
-  .post-preview-mini.sspark-scheduled {
-    padding: 0.75rem !important;
-    gap: 0.75rem !important;
-  }
-  
-  .post-thumbnail-mini {
-    width: 36px !important;
-    height: 36px !important;
-    font-size: 16px !important;
-  }
-  
-  .post-details-mini p {
-    font-size: 0.85rem !important;
-  }
-  
-  .post-time-mini {
-    font-size: 0.75rem !important;
-  }
-}
-
-/* Force responsive behavior for SocialSpark at all screen sizes */
-.sspark-preview {
-  width: 100% !important;
-  max-width: clamp(200px, 35vw, 320px) !important;
-  margin: 0 auto !important;
-}
-
-.sspark-stat .stat-value {
-  font-size: clamp(0.85rem, 2vw, 1.2rem) !important;
-}
-
-.sspark-stat .stat-label {
-  font-size: clamp(0.55rem, 1.2vw, 0.8rem) !important;
-}
-
-.sspark-platform-icon {
-  font-size: clamp(0.55rem, 1.3vw, 0.8rem) !important;
-  padding: clamp(0.25rem, 1vw, 0.6rem) clamp(0.35rem, 1.2vw, 0.8rem) !important;
-  gap: clamp(0.15rem, 0.6vw, 0.4rem) !important;
-}
-
-.sspark-scheduled {
-  padding: clamp(0.35rem, 1.2vw, 0.75rem) !important;
-  gap: clamp(0.35rem, 1.2vw, 0.75rem) !important;
-}

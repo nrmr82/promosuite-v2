@@ -1,6 +1,6 @@
 import React from 'react';
 import Sidebar from './Sidebar';
-import './MainLayout.css';
+import '../../../components/MainLayout.css';
 
 
 

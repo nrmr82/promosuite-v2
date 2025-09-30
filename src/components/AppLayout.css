@@ -1,0 +1,259 @@
+/* AppLayout.css - Main layout system with sidebar positioning */
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  background-color: #1a1a1a;
+}
+
+/* Main content area that adjusts to sidebar */
+.main-content {
+  flex: 1;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Desktop sidebar positioning */
+@media (min-width: 769px) {
+  .main-content.sidebar-expanded {
+    margin-left: 280px;
+    width: calc(100vw - 280px);
+    min-width: 0;
+  }
+  
+  .main-content.sidebar-collapsed {
+    margin-left: 70px;
+    width: calc(100vw - 70px);
+    min-width: 0;
+  }
+}
+
+/* Ensure sidebar doesn't interfere with content on desktop */
+@media (min-width: 769px) {
+  .app-layout {
+    padding-left: 0;
+  }
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+  }
+  
+  .main-content.with-mobile-header {
+    padding-top: 56px; /* Account for mobile header */
+    margin-left: 0;
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .mobile-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    z-index: 1010;
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(51, 51, 51, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+  }
+  
+  .mobile-menu-btn {
+    background: none;
+    border: none;
+    color: #cccccc;
+    cursor: pointer;
+    padding: 0.75rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .mobile-menu-btn:hover {
+    background: rgba(42, 42, 42, 0.6);
+    color: #ffffff;
+  }
+  
+  .mobile-product-info {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .mobile-product-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+  
+  .mobile-user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e91e63;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    overflow: hidden;
+  }
+  
+  .mobile-user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  
+  .avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+}
+
+/* Full width when no sidebar */
+.main-content.full-width {
+  margin-left: 0;
+  width: 100%;
+}
+
+/* Sidebar backdrop for transition management */
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.sidebar-backdrop.expanded {
+  /* Styles for expanded sidebar backdrop if needed */
+}
+
+.sidebar-backdrop.collapsed {
+  /* Styles for collapsed sidebar backdrop if needed */
+}
+
+.sidebar-backdrop.mobile-open {
+  /* Styles for mobile sidebar open if needed */
+}
+
+.sidebar-backdrop.mobile-closed {
+  /* Styles for mobile sidebar closed if needed */
+}
+
+/* Keyboard shortcuts overlay (hidden by default) */
+.keyboard-shortcuts {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(26, 26, 26, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(51, 51, 51, 0.8);
+  border-radius: 8px;
+  padding: 2rem;
+  z-index: 2000;
+  display: none; /* Hidden by default - show via JavaScript when needed */
+  min-width: 300px;
+}
+
+.keyboard-shortcuts.show {
+  display: block;
+}
+
+.shortcuts-content h4 {
+  color: #ffffff;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.shortcut-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.shortcut-item kbd {
+  background: rgba(42, 42, 42, 0.8);
+  color: #ffffff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-right: 0.25rem;
+}
+
+.shortcut-item span {
+  color: #cccccc;
+  font-size: 0.9rem;
+  margin-left: 1rem;
+}
+
+/* Error boundary and loading states */
+.app-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: #ffffff;
+  background: #1a1a1a;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #333;
+  border-top: 3px solid #e91e63;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Ensure content doesn't get cut off */
+.app-layout * {
+  box-sizing: border-box;
+}

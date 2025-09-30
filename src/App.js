@@ -13,6 +13,7 @@ import SocialSpark from './components/SocialSpark';
 import Pricing from './components/Pricing';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
+import EditorQuickTest from './components/EditorQuickTest';
 import SessionTimeoutWarning from './components/SessionTimeoutWarning';
 import OAuthCallback from './components/oauth/OAuthCallback';
 import authService from './services/authService';
@@ -194,6 +195,8 @@ function App() {
         return <Settings user={user} onLogout={handleLogout} />;
       case 'oauth_callback':
         return <OAuthCallback />;
+      case 'editor-test':
+        return <EditorQuickTest />;
       default:
         return <Dashboard user={user} onNavigateToTool={handleNavigateToTool} />;
     }

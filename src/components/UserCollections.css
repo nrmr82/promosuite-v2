@@ -405,6 +405,25 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.collection-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+  color: white;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .item-actions {
   position: absolute;
   top: 0;
@@ -452,6 +471,17 @@
 .action-btn.delete:hover {
   background: rgba(239, 68, 68, 0.2);
   border-color: rgba(239, 68, 68, 0.5);
+}
+
+.action-btn.remove {
+  background: rgba(255, 165, 0, 0.1);
+  border-color: rgba(255, 165, 0, 0.3);
+  color: #ffa500;
+}
+
+.action-btn.remove:hover {
+  background: rgba(255, 165, 0, 0.2);
+  border-color: rgba(255, 165, 0, 0.5);
 }
 
 .favorited {
@@ -576,6 +606,20 @@
   gap: 0.2rem;
 }
 
+.collection-badge-small {
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+  color: white;
+  padding: 0.1rem 0.25rem;
+  border-radius: 3px;
+  font-size: 0.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
 .row-description {
   font-size: 0.85rem;
   color: #aaaaaa;
@@ -647,6 +691,21 @@
   margin-left: auto;
   margin-right: auto;
   line-height: 1.5;
+}
+
+/* Collection Management */
+.collection-item-card .ai-badge {
+  z-index: 2;
+}
+
+.collection-item-card .collection-badge {
+  z-index: 2;
+}
+
+/* Ensure badges don't overlap */
+.collection-item-card .ai-badge + .collection-badge,
+.collection-item-card .collection-badge + .ai-badge {
+  top: 2.5rem;
 }
 
 /* Responsive Design */

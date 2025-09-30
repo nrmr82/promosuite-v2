@@ -1,7 +1,7 @@
 import React from 'react';
 import Sidebar from './Sidebar';
 import '../mobile.css';
-import './MainLayout.css';
+import '../../../../components/MainLayout.css';
 
 const MainLayout = ({ children, user, onLogout, credits }) => {
   return (

@@ -83,9 +83,11 @@ const UserCollections = ({ onEditTemplate, onEditFlyer, onClose }) => {
         type: 'template',
         isAIGenerated: template.template_data?.aiGenerated || false,
         generatedAt: template.template_data?.generatedAt || template.created_at,
-        previewData: template.template_data || {}
+        previewData: template.template_data || {},
+        canDelete: template.user_id === userId // Add flag to indicate if user can delete
       }));
 
+      console.log('Loaded user templates:', processedTemplates.length, 'templates');
       setTemplates(processedTemplates);
     } catch (error) {
       console.error('Error loading templates:', error);
@@ -124,30 +126,76 @@ const UserCollections = ({ onEditTemplate, onEditFlyer, onClose }) => {
   };
 
   const handleDelete = async (item) => {
+    console.log('Attempting to delete:', item.type, item.id, {
+      canDelete: item.canDelete,
+      userId: user?.id,
+      itemUserId: item.user_id
+    });
+    
     if (!window.confirm(`Are you sure you want to delete this ${item.type}?`)) {
       return;
     }
 
+    // Check if user has permission to delete this item
+    if (item.type === 'template' && item.canDelete === false) {
+      alert('You can only delete templates that you created.');
+      return;
+    }
+
     try {
+      let deleteSuccessful = false;
+      
       if (item.type === 'template') {
+        console.log('Deleting template from database:', item.id);
+        
         // Delete template
-        await supabase
+        const { data, error } = await supabase
           .from('templates')
           .delete()
           .eq('id', item.id)
-          .eq('user_id', user.id);
+          .eq('user_id', user.id)
+          .select(); // Add select to see what was actually deleted
         
-        setTemplates(prev => prev.filter(t => t.id !== item.id));
+        console.log('Delete result:', { data, error });
+        
+        if (error) {
+          throw error;
+        }
+        
+        // Check if any rows were actually deleted
+        if (!data || data.length === 0) {
+          throw new Error('No template was deleted - you may not have permission to delete this template');
+        }
+        
+        deleteSuccessful = true;
+        console.log('Updating templates state, removing:', item.id);
+        setTemplates(prev => {
+          const filtered = prev.filter(t => t.id !== item.id);
+          console.log('Templates after filter:', filtered.length, 'remaining');
+          return filtered;
+        });
       } else if (item.type === 'flyer') {
+        console.log('Deleting flyer:', item.id);
+        
         // Delete flyer
-        await flyerProService.deleteFlyer(item.id);
-        setFlyers(prev => prev.filter(f => f.id !== item.id));
+        const result = await flyerProService.deleteFlyer(item.id);
+        console.log('Flyer delete result:', result);
+        
+        if (result.success) {
+          deleteSuccessful = true;
+          setFlyers(prev => prev.filter(f => f.id !== item.id));
+        } else {
+          throw new Error(result.message || 'Failed to delete flyer');
+        }
       }
       
-      alert(`${item.type} deleted successfully`);
+      if (deleteSuccessful) {
+        console.log(`✅ ${item.type} deleted successfully:`, item.id);
+        alert(`${item.type} deleted successfully!`);
+      }
     } catch (error) {
-      console.error('Error deleting item:', error);
-      alert(`Failed to delete ${item.type}`);
+      console.error('❌ Error deleting item:', error);
+      alert(`Failed to delete ${item.type}: ${error.message}`);
     }
   };
 
@@ -248,13 +296,16 @@ const UserCollections = ({ onEditTemplate, onEditFlyer, onClose }) => {
             >
               <Heart size={14} className={item.is_favorite ? 'favorited' : ''} />
             </button>
-            <button 
-              className="action-btn delete"
-              onClick={() => handleDelete(item)}
-              title="Delete"
-            >
-              <Trash2 size={14} />
-            </button>
+            {/* Only show delete button for items user can delete */}
+            {(item.canDelete !== false && (item.type !== 'template' || item.user_id === user?.id)) && (
+              <button 
+                className="action-btn delete"
+                onClick={() => handleDelete(item)}
+                title="Delete"
+              >
+                <Trash2 size={14} />
+              </button>
+            )}
           </div>
         </div>
 
@@ -321,9 +372,12 @@ const UserCollections = ({ onEditTemplate, onEditFlyer, onClose }) => {
           >
             <Heart size={14} className={item.is_favorite ? 'favorited' : ''} />
           </button>
-          <button className="action-btn delete" onClick={() => handleDelete(item)}>
-            <Trash2 size={14} />
-          </button>
+          {/* Only show delete button for items user can delete */}
+          {(item.canDelete !== false && (item.type !== 'template' || item.user_id === user?.id)) && (
+            <button className="action-btn delete" onClick={() => handleDelete(item)}>
+              <Trash2 size={14} />
+            </button>
+          )}
         </div>
       </div>
     );

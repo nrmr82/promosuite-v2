@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from './Icon';
+import favoritesService from '../services/favoritesService';
+import templateService from '../services/templateService';
+import { getCurrentUser } from '../utils/supabase';
 import './FlyerTemplateBrowser.css';
 
 const FlyerTemplateBrowser = ({ 
@@ -14,9 +17,120 @@ const FlyerTemplateBrowser = ({
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('popular');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [favorites, setFavorites] = useState(new Set());
+  const [user, setUser] = useState(null);
+  const [realTemplates, setRealTemplates] = useState([]);
+  const [categories, setCategories] = useState([]);
 
-  const categories = [
+  // Load templates, categories, user data and favorites on component mount
+  useEffect(() => {
+    const loadAllData = async () => {
+      try {
+        setLoading(true);
+
+        // Load templates and categories in parallel
+        const [templatesResult, categoriesResult] = await Promise.all([
+          templateService.getTemplates({
+            limit: 50,
+            orderBy: 'usage_count',
+            ascending: false
+          }),
+          templateService.getCategories()
+        ]);
+
+        if (templatesResult.success) {
+          // Transform templates to match the expected format
+          const transformedTemplates = templatesResult.templates.map(template => ({
+            id: template.id,
+            name: template.name || template.title,
+            category: template.template_categories?.name || 'General',
+            preview: template.template_categories?.icon || '🏠',
+            imageUrl: template.preview_image_url || template.thumbnail_url,
+            popular: template.usage_count > 10,
+            description: template.description || 'Professional real estate template',
+            features: template.tags || []
+          }));
+          setRealTemplates(transformedTemplates);
+        }
+
+        if (categoriesResult.success) {
+          // Transform categories to match expected format
+          const transformedCategories = [
+            { id: 'all', label: 'All Templates' },
+            ...categoriesResult.categories.map(cat => ({
+              id: cat.name,
+              label: cat.name
+            }))
+          ];
+          setCategories(transformedCategories);
+        }
+
+        // Load user and favorites
+        const currentUser = await getCurrentUser();
+        if (currentUser) {
+          setUser(currentUser);
+          const result = await favoritesService.getUserFavorites(currentUser.id);
+          if (result.success) {
+            const favoriteIds = new Set(result.data.map(fav => fav.template_id));
+            setFavorites(favoriteIds);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+        // Fallback to empty arrays but don't fail completely
+        setRealTemplates([]);
+        setCategories([{ id: 'all', label: 'All Templates' }]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadAllData();
+  }, []);
+
+  // Handle favorite toggle
+  const handleToggleFavorite = async (template) => {
+    if (!user) {
+      alert('Please log in to save favorites');
+      return;
+    }
+
+    // IMMEDIATELY update UI for instant feedback
+    const newFavorites = new Set(favorites);
+    const wasFavorited = favorites.has(template.id);
+    
+    if (wasFavorited) {
+      newFavorites.delete(template.id);
+    } else {
+      newFavorites.add(template.id);
+    }
+    setFavorites(newFavorites);
+
+    try {
+      const result = await favoritesService.toggleFavorite(
+        user.id, 
+        template.id, 
+        'flyer_template'
+      );
+      
+      if (!result.success) {
+        // Revert on failure
+        console.error('Failed to update favorites, reverting UI change');
+        setFavorites(favorites); // Revert to original state
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      // Revert on error
+      setFavorites(favorites); 
+    }
+  };
+
+  // Use real templates from database, fallback to provided templates, then empty array
+  const templatesToUse = realTemplates.length > 0 ? realTemplates : (templates.length > 0 ? templates : []);
+  
+  // Use dynamic categories from database or fallback
+  const categoriesToUse = categories.length > 0 ? categories : [
     { id: 'all', label: 'All Templates' },
     { id: 'Luxury', label: 'Luxury Homes' },
     { id: 'Modern', label: 'Modern Properties' },
@@ -29,8 +143,8 @@ const FlyerTemplateBrowser = ({
     { id: 'Rentals', label: 'Rental Properties' },
     { id: 'New Builds', label: 'New Construction' }
   ];
-
-  const filteredTemplates = templates.filter(template => {
+  
+  const filteredTemplates = templatesToUse.filter(template => {
     const matchesSearch = template.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          template.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          template.category?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -41,11 +155,12 @@ const FlyerTemplateBrowser = ({
   const sortedTemplates = [...filteredTemplates].sort((a, b) => {
     switch (sortBy) {
       case 'popular':
-        return (b.popular ? 1 : 0) - (a.popular ? 1 : 0) || b.id - a.id;
+        return (b.popular ? 1 : 0) - (a.popular ? 1 : 0) || (a.name || '').localeCompare(b.name || '');
       case 'name':
         return (a.name || '').localeCompare(b.name || '');
       case 'newest':
-        return b.id - a.id;
+        // For UUIDs, we can't do numeric comparison, use name as fallback
+        return (a.name || '').localeCompare(b.name || '');
       case 'category':
         return (a.category || '').localeCompare(b.category || '');
       default:
@@ -102,8 +217,9 @@ const FlyerTemplateBrowser = ({
               Select from our collection of professional real estate flyer templates
             </p>
           </div>
-          <button className="flyer-browser-close" onClick={onClose}>
+          <button className="flyer-browser-close" onClick={onClose} title="Close template browser">
             <Icon name="close" />
+            <span className="close-text">Close</span>
           </button>
         </div>
 
@@ -127,7 +243,7 @@ const FlyerTemplateBrowser = ({
               onChange={(e) => handleFilterChange(e.target.value)}
               className="flyer-browser-category-select"
             >
-              {categories.map(category => (
+              {categoriesToUse.map(category => (
                 <option key={category.id} value={category.id}>
                   {category.label}
                 </option>
@@ -193,6 +309,18 @@ const FlyerTemplateBrowser = ({
                         onClick={() => handleTemplatePreview(template)}
                       >
                         <Icon name="visibility" />
+                      </button>
+                      <button
+                        className={`flyer-browser-overlay-btn favorite-btn ${
+                          favorites.has(template.id) ? 'favorited' : ''
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleFavorite(template);
+                        }}
+                        title={favorites.has(template.id) ? 'Remove from favorites' : 'Add to favorites'}
+                      >
+                        <Icon name="heart" />
                       </button>
                       <button
                         className="flyer-browser-overlay-btn use-btn"

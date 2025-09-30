@@ -6,6 +6,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { useTemplate } from '../contexts/TemplateContext';
+import UnifiedImageEditor from '../../../components/UnifiedImageEditor/UnifiedImageEditor';
 // Temporarily commenting out complex imports for debugging
 // import VideoPlayer from './VideoPlayer';
 // import { LoadingState } from './LoadingSkeleton';
@@ -45,6 +46,10 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
   const [_editorTemplate, setEditorTemplate] = useState(null);
   const [_propertyData, setPropertyData] = useState({});
   const [_brandData, setBrandData] = useState({});
+  
+  // Advanced Editor state
+  const [showAdvancedEditor, setShowAdvancedEditor] = useState(false);
+  const [savedImage, setSavedImage] = useState(null);
 
   // Error handling and accessibility hooks - simplified for debugging
   // const { handleError, handleTemplateError } = useErrorHandler();
@@ -332,10 +337,25 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
 
   const handleDesignEditor = () => {
     trackEvent(ANALYTICS_EVENTS.DESIGN_EDITOR_CLICKED);
-    // Open editor with a sample template
-    const sampleTemplate = templates[0]; // Use first template as sample
-    setEditorTemplate(sampleTemplate);
-    setShowPropertyInput(true);
+    // Open the new unified image editor
+    console.log('🎨 Opening Unified Image Editor');
+    setShowAdvancedEditor(true);
+  };
+
+  // Advanced Editor handlers
+  const handleAdvancedEditorSave = (imageData) => {
+    setSavedImage(imageData);
+    console.log('Image saved from advanced editor:', imageData);
+    // Here you could integrate with your existing save logic
+  };
+
+  const handleAdvancedEditorClose = () => {
+    setShowAdvancedEditor(false);
+  };
+
+  const handleAdvancedEditorExport = (imageData) => {
+    console.log('Image exported from advanced editor:', imageData);
+    // Here you could integrate with your existing export logic
   };
 
   // AI Generator handlers
@@ -394,6 +414,19 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
   // Removed testimonials and success stats as requested
 
   // Removed testimonial carousel effect
+
+  // If advanced editor is open, show it instead of the main FlyerPro page
+  if (showAdvancedEditor) {
+    return (
+      <UnifiedImageEditor
+        onSave={handleAdvancedEditorSave}
+        onClose={handleAdvancedEditorClose}
+        onExport={handleAdvancedEditorExport}
+        initialImage={savedImage}
+        returnTo="flyerpro"
+      />
+    );
+  }
 
   return (
     <div className="flyerpro-page compact-page">
@@ -485,24 +518,24 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
                   <Palette className="w-6 h-6" />
                 </div>
                 <div className="tool-title-section">
-                  <h3 className="tool-title">Design Editor</h3>
+                  <h3 className="tool-title">Advanced Image Editor</h3>
                   <p className="tool-description">
-                    Professional drag-and-drop editor with advanced tools
+                    Professional editor with AI beautification and inpainting tools
                   </p>
                 </div>
               </div>
               <div className="tool-features">
                 <div className="feature-item">
-                  <span className="feature-icon">🖱️</span>
-                  <span>Drag & drop</span>
+                  <span className="feature-icon">🤖</span>
+                  <span>AI beautification</span>
                 </div>
                 <div className="feature-item">
-                  <span className="feature-icon">🎨</span>
-                  <span>Brand matching</span>
+                  <span className="feature-icon">🎯</span>
+                  <span>Object removal</span>
                 </div>
                 <div className="feature-item">
-                  <span className="feature-icon">📐</span>
-                  <span>Smart guides</span>
+                  <span className="feature-icon">💎</span>
+                  <span>Credit-based</span>
                 </div>
               </div>
               <button className="tool-cta" onClick={() => handleFeatureClick('advanced-design-editor')}>

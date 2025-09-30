@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useTemplate } from '../contexts/TemplateContext';
 import FlyerTemplateBrowser from './FlyerTemplateBrowser';
+import UnifiedEditorModal from './UnifiedEditorModal/UnifiedEditorModal';
 // Temporarily commenting out complex imports for debugging
 // import VideoPlayer from './VideoPlayer';
 // import { LoadingState } from './LoadingSkeleton';
@@ -31,6 +32,10 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
   const [, setEditorTemplate] = useState(null);
   const [, setIsLoadingTemplates] = useState(true);
   const [, setShowPropertyInput] = useState(false);
+  
+  // Advanced Editor state
+  const [showAdvancedEditor, setShowAdvancedEditor] = useState(false);
+  const [savedImage, setSavedImage] = useState(null);
 
   // Error handling and accessibility hooks - simplified for debugging
   // const { handleError, handleTemplateError } = useErrorHandler();
@@ -304,11 +309,33 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
 
 
   const handleDesignEditor = () => {
+    console.log('🎨 handleDesignEditor called!');
+    console.log('🎨 Current showAdvancedEditor state:', showAdvancedEditor);
+    console.log('🎨 Opening Unified Editor Modal');
     trackEvent(ANALYTICS_EVENTS.DESIGN_EDITOR_CLICKED);
-    // Open editor with a sample template
-    const sampleTemplate = templates[0]; // Use first template as sample
-    setEditorTemplate(sampleTemplate);
-    setShowPropertyInput(true);
+    setShowAdvancedEditor(true);
+    console.log('🎨 setShowAdvancedEditor(true) called');
+    
+    // Force re-render to debug
+    setTimeout(() => {
+      console.log('🎨 After timeout - showAdvancedEditor should be:', true);
+    }, 100);
+  };
+
+  // Advanced Editor handlers
+  const handleAdvancedEditorSave = (imageData) => {
+    setSavedImage(imageData);
+    console.log('Image saved from advanced editor:', imageData);
+    // Here you could integrate with your existing save logic
+  };
+
+  const handleAdvancedEditorClose = () => {
+    setShowAdvancedEditor(false);
+  };
+
+  const handleAdvancedEditorExport = (imageData) => {
+    console.log('Image exported from advanced editor:', imageData);
+    // Here you could integrate with your existing export logic
   };
 
   // Template browser handlers
@@ -385,6 +412,7 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
 
   // Removed testimonial carousel effect
 
+
   return (
     <div className="flyerpro-page compact-page">
       {/* Main Content Section */}
@@ -436,38 +464,6 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
-            
-            <div className="tool-card template-feature-card">
-              <div className="tool-header">
-                <div className="tool-icon template-icon">
-                  <Layout className="w-6 h-6" />
-                </div>
-                <div className="tool-title-section">
-                  <h3 className="tool-title">Professional Templates</h3>
-                  <p className="tool-description">
-                    500+ conversion-optimized templates for every property type
-                  </p>
-                </div>
-              </div>
-              <div className="tool-features">
-                <div className="feature-item">
-                  <span className="feature-icon">📋</span>
-                  <span>500+ Templates</span>
-                </div>
-                <div className="feature-item">
-                  <span className="feature-icon">🎯</span>
-                  <span>Market-tested</span>
-                </div>
-                <div className="feature-item">
-                  <span className="feature-icon">🎨</span>
-                  <span>Fully customizable</span>
-                </div>
-              </div>
-              <button className="tool-cta" onClick={() => handleFeatureClick('professional-templates')}>
-                Browse Templates
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
 
             <div className="tool-card editor-feature-card">
               <div className="tool-header">
@@ -475,30 +471,92 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
                   <Palette className="w-6 h-6" />
                 </div>
                 <div className="tool-title-section">
-                  <h3 className="tool-title">Design Editor</h3>
+                  <h3 className="tool-title">Advanced Image Editor</h3>
                   <p className="tool-description">
-                    Professional drag-and-drop editor with advanced tools
+                    Professional editor with AI beautification and inpainting tools
                   </p>
                 </div>
               </div>
               <div className="tool-features">
                 <div className="feature-item">
-                  <span className="feature-icon">🖱️</span>
-                  <span>Drag & drop</span>
+                  <span className="feature-icon">🤖</span>
+                  <span>AI beautification</span>
                 </div>
                 <div className="feature-item">
-                  <span className="feature-icon">🎨</span>
-                  <span>Brand matching</span>
+                  <span className="feature-icon">🎯</span>
+                  <span>Object removal</span>
                 </div>
                 <div className="feature-item">
-                  <span className="feature-icon">📐</span>
-                  <span>Smart guides</span>
+                  <span className="feature-icon">💎</span>
+                  <span>Credit-based</span>
                 </div>
               </div>
               <button className="tool-cta" onClick={() => handleFeatureClick('advanced-design-editor')}>
                 Try Editor
                 <ArrowRight className="w-4 h-4" />
               </button>
+            </div>
+            </div>
+
+          {/* Template Browser Section */}
+          <div className="template-browser-section">
+            <div className="section-header">
+              <div className="section-title-section">
+                <h2 className="section-title">Professional Flyer Templates</h2>
+                <p className="section-subtitle">
+                  Browse and select from our collection of conversion-optimized flyer templates designed for real estate professionals.
+                </p>
+              </div>
+            </div>
+            
+            <div className="template-categories">
+              <div className="template-category">
+                <div className="category-header">
+                  <div className="category-icon">
+                    <Layout className="w-6 h-6" />
+                  </div>
+                  <div className="category-info">
+                    <h3>Luxury Properties</h3>
+                    <p>Elegant templates for high-end property listings</p>
+                  </div>
+                </div>
+                <button className="category-cta" onClick={() => handleFeatureClick('professional-templates')}>
+                  {user ? 'Browse Templates' : 'Login to Browse'}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+              
+              <div className="template-category">
+                <div className="category-header">
+                  <div className="category-icon">
+                    <Palette className="w-6 h-6" />
+                  </div>
+                  <div className="category-info">
+                    <h3>Modern & Clean</h3>
+                    <p>Contemporary designs for all property types</p>
+                  </div>
+                </div>
+                <button className="category-cta" onClick={() => handleFeatureClick('professional-templates')}>
+                  {user ? 'Browse Templates' : 'Login to Browse'}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+              
+              <div className="template-category">
+                <div className="category-header">
+                  <div className="category-icon">
+                    🤖
+                  </div>
+                  <div className="category-info">
+                    <h3>AI-Generated</h3>
+                    <p>Custom templates created by our AI based on your needs</p>
+                  </div>
+                </div>
+                <button className="category-cta" onClick={() => handleFeatureClick('ai-template-creation')}>
+                  {user ? 'Generate Templates' : 'Login to Generate'}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -516,6 +574,16 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
           ANALYTICS_EVENTS={ANALYTICS_EVENTS}
         />
       )}
+      
+      {/* Unified Editor Modal */}
+      <UnifiedEditorModal
+        isOpen={showAdvancedEditor}
+        onSave={handleAdvancedEditorSave}
+        onClose={handleAdvancedEditorClose}
+        user={user}
+        initialImage={savedImage}
+        initialMode="flyer"
+      />
     </div>
   );
 };

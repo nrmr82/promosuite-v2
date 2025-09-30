@@ -12,6 +12,37 @@
   top: 0;
   z-index: 1000;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+/* Collapsed sidebar */
+.sidebar.collapsed {
+  width: 70px;
+}
+
+/* Mobile sidebar - hidden by default */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    z-index: 1020;
+  }
+  
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+}
+
+/* Desktop sidebar states */
+@media (min-width: 769px) {
+  .sidebar.collapsed {
+    width: 70px;
+  }
+  
+  .sidebar.collapsed .sidebar__nav-text,
+  .sidebar.collapsed .logo-text,
+  .sidebar.collapsed .sidebar__user-info {
+    display: none;
+  }
 }
 
 .sidebar__header {

@@ -98,7 +98,8 @@
   box-sizing: border-box;
 }
 
-.tool-card:hover {
+.tool-card:hover,
+.dashboard-tool-card:hover {
   transform: translateY(-4px);
   border-color: #e91e63;
   box-shadow: 0 10px 25px rgba(233, 30, 99, 0.2);
@@ -1129,7 +1130,8 @@
   overflow: hidden;
 }
 
-.tool-preview {
+.tool-preview,
+.dashboard-tool-preview {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1139,6 +1141,18 @@
   padding: 1.5rem;
   overflow: hidden;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fix specific SocialSpark preview positioning */
+.dashboard-tool-preview .social-dashboard-mini {
+  position: relative;
+  z-index: 1;
+  margin: 0 auto;
+  display: block;
+  max-width: 280px;
+  width: 100%;
 }
 
 .flyer-preview-stack,

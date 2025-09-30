@@ -24,3 +24,30 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* Hide Polotno Watermarks Globally */
+.po-watermark,
+.polotno-watermark,
+[class*="watermark"],
+[id*="watermark"],
+.po-brand,
+.polotno-brand,
+[class*="polotno-brand"],
+[class*="po-brand"],
+div[class*="brand"],
+div[data-testid*="watermark"],
+div[data-testid*="brand"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Simple modal overlay with maximum z-index */
+.unified-editor-modal-overlay {
+  z-index: 2147483647 !important;
+}

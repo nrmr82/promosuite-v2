@@ -56,14 +56,22 @@
   border: none;
   color: #999;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   border-radius: 6px;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
 }
 
 .flyer-browser-close:hover {
   color: #fff;
   background: rgba(255, 255, 255, 0.1);
+}
+
+.close-text {
+  font-size: 0.9rem;
 }
 
 .flyer-browser-controls {
@@ -302,6 +310,80 @@
   background: linear-gradient(135deg, #d81b60, #c2185b);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
+}
+
+.flyer-browser-overlay-btn.favorite-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #aaaaaa;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.flyer-browser-overlay-btn.favorite-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px) scale(1.1);
+  color: #ffffff;
+}
+
+.flyer-browser-overlay-btn.favorite-btn.favorited {
+  background: rgba(233, 30, 99, 0.2);
+  color: #e91e63;
+  border: 1px solid rgba(233, 30, 99, 0.5);
+}
+
+.flyer-browser-overlay-btn.favorite-btn.favorited:hover {
+  background: rgba(233, 30, 99, 0.3);
+  border-color: rgba(233, 30, 99, 0.7);
+  transform: translateY(-1px) scale(1.1);
+  color: #e91e63;
+}
+
+.flyer-browser-favorite-btn-persistent {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  background: rgba(255, 92, 92, 0.15);
+  color: #ff5c5c;
+  border: 1px solid rgba(255, 92, 92, 0.4);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  z-index: 2;
+}
+
+.flyer-browser-favorite-btn-persistent:hover {
+  background: rgba(255, 92, 92, 0.3);
+  border-color: rgba(255, 92, 92, 0.6);
+  transform: scale(1.1);
+  color: #ff4444;
+}
+
+.flyer-browser-favorite-btn-persistent.favorited {
+  background: rgba(255, 92, 92, 0.3);
+  color: #ff4444;
+  border-color: rgba(255, 92, 92, 0.6);
+}
+
+.flyer-browser-favorite-btn-persistent.favorited:hover {
+  background: rgba(255, 92, 92, 0.4);
+  border-color: rgba(255, 92, 92, 0.8);
+  transform: scale(1.15);
+  color: #ff2222;
 }
 
 .flyer-browser-template-info {

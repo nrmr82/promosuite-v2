@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from './Icon';
+import favoritesService from '../services/favoritesService';
+import { getCurrentUser } from '../utils/supabase';
 import './SocialTemplateBrowser.css';
 
 const SocialTemplateBrowser = ({ 
@@ -13,56 +15,116 @@ const SocialTemplateBrowser = ({
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('popular');
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
+  const [favorites, setFavorites] = useState(new Set());
+  const [user, setUser] = useState(null);
+
+  // Load user and favorites on component mount
+  useEffect(() => {
+    const loadUserAndFavorites = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        if (currentUser) {
+          setUser(currentUser);
+          const result = await favoritesService.getUserFavorites(currentUser.id);
+          if (result.success) {
+            const favoriteIds = new Set(result.data.map(fav => fav.template_id));
+            setFavorites(favoriteIds);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user favorites:', error);
+      }
+    };
+    
+    loadUserAndFavorites();
+  }, []);
+
+  // Handle favorite toggle
+  const handleToggleFavorite = async (template) => {
+    if (!user) {
+      alert('Please log in to save favorites');
+      return;
+    }
+
+    // IMMEDIATELY update UI for instant feedback
+    const newFavorites = new Set(favorites);
+    const wasFavorited = favorites.has(template.id);
+    
+    if (wasFavorited) {
+      newFavorites.delete(template.id);
+    } else {
+      newFavorites.add(template.id);
+    }
+    setFavorites(newFavorites);
+
+    try {
+      const result = await favoritesService.toggleFavorite(
+        user.id, 
+        template.id, 
+        'social_template'
+      );
+      
+      if (!result.success) {
+        // Revert on failure
+        console.error('Failed to update favorites, reverting UI change');
+        setFavorites(favorites); // Revert to original state
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      // Revert on error
+      setFavorites(favorites); 
+    }
+  };
 
   // Social media template data
   const socialTemplates = [
     {
-      id: 1,
+      id: '650e8400-e29b-41d4-a716-446655440001',
       name: "Property Showcase Reel",
       category: "Reels",
       preview: "🎬",
-      imageUrl: "/api/placeholder/300/400?text=Property+Reel",
+      imageUrl: "https://via.placeholder.com/300x400/2a2a2a/e91e63?text=Property+Reel",
       popular: true,
       description: "Dynamic property showcase for Instagram Reels",
       features: ["Vertical Format", "Animation", "Music Sync"]
     },
     {
-      id: 2,
+      id: '650e8400-e29b-41d4-a716-446655440002',
       name: "Just Listed Story",
       category: "Stories",
       preview: "📱",
-      imageUrl: "/api/placeholder/300/400?text=Just+Listed+Story",
+      imageUrl: "https://via.placeholder.com/300x400/2a2a2a/48bb78?text=Just+Listed+Story",
       popular: true,
       description: "Eye-catching story template for new listings",
       features: ["24h Format", "Interactive Elements", "Swipe Up"]
     },
     {
-      id: 3,
+      id: '650e8400-e29b-41d4-a716-446655440003',
       name: "Open House Event",
       category: "Square Posts",
       preview: "🏠",
-      imageUrl: "/api/placeholder/400/400?text=Open+House+Post",
+      imageUrl: "https://via.placeholder.com/400x400/2a2a2a/7877c6?text=Open+House+Post",
       popular: false,
       description: "Square format for open house announcements",
       features: ["Square Format", "Event Details", "Location Map"]
     },
     {
-      id: 4,
+      id: '650e8400-e29b-41d4-a716-446655440004',
       name: "Property Features Carousel",
       category: "Carousels",
       preview: "📸",
-      imageUrl: "/api/placeholder/400/400?text=Property+Carousel",
+      imageUrl: "https://via.placeholder.com/400x400/2a2a2a/ed8936?text=Property+Carousel",
       popular: true,
       description: "Multi-slide carousel showcasing property features",
       features: ["Multiple Slides", "Feature Highlights", "Swipeable"]
     },
     {
-      id: 5,
+      id: '650e8400-e29b-41d4-a716-446655440005',
       name: "Luxury Home Ad",
       category: "Ads",
       preview: "💎",
-      imageUrl: "/api/placeholder/400/300?text=Luxury+Ad",
+      imageUrl: "https://via.placeholder.com/400x300/2a2a2a/ff7675?text=Luxury+Ad",
       popular: true,
       description: "Premium ad template for luxury properties",
       features: ["Paid Promotion", "CTA Button", "Conversion Tracking"]
@@ -72,7 +134,7 @@ const SocialTemplateBrowser = ({
       name: "Market Update Video",
       category: "Reels",
       preview: "📊",
-      imageUrl: "/api/placeholder/300/400?text=Market+Update",
+      imageUrl: "https://via.placeholder.com/300x400/2a2a2a/6c5ce7?text=Market+Update",
       popular: false,
       description: "Educational content about market trends",
       features: ["Data Visualization", "Professional Look", "Voice Over"]
@@ -82,7 +144,7 @@ const SocialTemplateBrowser = ({
       name: "Client Testimonial Story",
       category: "Stories",
       preview: "⭐",
-      imageUrl: "/api/placeholder/300/400?text=Testimonial+Story",
+      imageUrl: "https://via.placeholder.com/300x400/2a2a2a/a0aec0?text=Testimonial+Story",
       popular: true,
       description: "Showcase client reviews and success stories",
       features: ["Quote Format", "Photo Integration", "Brand Colors"]
@@ -92,7 +154,7 @@ const SocialTemplateBrowser = ({
       name: "Neighborhood Guide",
       category: "Square Posts",
       preview: "🗺️",
-      imageUrl: "/api/placeholder/400/400?text=Neighborhood+Guide",
+      imageUrl: "https://via.placeholder.com/400x400/2a2a2a/00b894?text=Neighborhood+Guide",
       popular: false,
       description: "Informative post about local neighborhoods",
       features: ["Local Info", "Amenities", "Lifestyle Focus"]
@@ -102,7 +164,7 @@ const SocialTemplateBrowser = ({
       name: "Before & After Renovation",
       category: "Carousels",
       preview: "🔨",
-      imageUrl: "/api/placeholder/400/400?text=Before+After",
+      imageUrl: "https://via.placeholder.com/400x400/2a2a2a/0984e3?text=Before+After",
       popular: true,
       description: "Showcase property transformations",
       features: ["Comparison Slides", "Progress Story", "Value Addition"]
@@ -112,7 +174,7 @@ const SocialTemplateBrowser = ({
       name: "First Time Buyer Tips",
       category: "Reels",
       preview: "🎓",
-      imageUrl: "/api/placeholder/300/400?text=Buyer+Tips",
+      imageUrl: "https://via.placeholder.com/300x400/2a2a2a/fab1a0?text=Buyer+Tips",
       popular: false,
       description: "Educational content for first-time buyers",
       features: ["Educational", "Step by Step", "Helpful Tips"]
@@ -122,7 +184,7 @@ const SocialTemplateBrowser = ({
       name: "Sold Property Celebration",
       category: "Stories",
       preview: "🎉",
-      imageUrl: "/api/placeholder/300/400?text=Sold+Celebration",
+      imageUrl: "https://via.placeholder.com/300x400/2a2a2a/fd79a8?text=Sold+Celebration",
       popular: true,
       description: "Celebrate successful property sales",
       features: ["Celebration Theme", "Success Story", "Thank You Message"]
@@ -132,7 +194,7 @@ const SocialTemplateBrowser = ({
       name: "Investment Property Ad",
       category: "Ads",
       preview: "💰",
-      imageUrl: "/api/placeholder/400/300?text=Investment+Ad",
+      imageUrl: "https://via.placeholder.com/400x300/2a2a2a/55a3ff?text=Investment+Ad",
       popular: false,
       description: "Targeted ad for investment properties",
       features: ["ROI Focus", "Financial Benefits", "Investor Targeting"]
@@ -220,8 +282,9 @@ const SocialTemplateBrowser = ({
               Select from our collection of social media content templates
             </p>
           </div>
-          <button className="social-browser-close" onClick={onClose}>
+          <button className="social-browser-close" onClick={onClose} title="Close template browser">
             <Icon name="close" />
+            <span className="close-text">Close</span>
           </button>
         </div>
 
@@ -311,6 +374,18 @@ const SocialTemplateBrowser = ({
                         onClick={() => handleTemplatePreview(template)}
                       >
                         <Icon name="visibility" />
+                      </button>
+                      <button
+                        className={`social-browser-overlay-btn favorite-btn ${
+                          favorites.has(template.id) ? 'favorited' : ''
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleFavorite(template);
+                        }}
+                        title={favorites.has(template.id) ? 'Remove from favorites' : 'Add to favorites'}
+                      >
+                        <Icon name="heart" />
                       </button>
                       <button
                         className="social-browser-overlay-btn use-btn"

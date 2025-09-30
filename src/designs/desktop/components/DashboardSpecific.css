@@ -66,13 +66,68 @@
 .dashboard-tool-preview {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   background: #1a1a1a;
   border: 1px solid #333;
   border-radius: 6px;
   padding: 8px;
   overflow: visible;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fix specific SocialSpark preview positioning */
+.dashboard-tool-preview .social-dashboard-mini {
+  position: relative;
+  z-index: 1;
+  margin: 0 auto !important;
+  display: block;
+  max-width: 280px;
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* Force SocialSpark to be centered - highest priority with maximum specificity */
+.dashboard .dashboard-tools-grid .dashboard-tool-card.socialspark .dashboard-tool-preview,
+.dashboard .dashboard-tools-grid .dashboard-tool-card.sspark-card .dashboard-tool-preview {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  padding: 1.5rem !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.dashboard .dashboard-tools-grid .dashboard-tool-card.socialspark .social-dashboard-mini,
+.dashboard .dashboard-tools-grid .dashboard-tool-card.sspark-card .social-dashboard-mini {
+  margin: 0 auto !important;
+  text-align: left !important;
+  background: #1a1a1a !important;
+  width: 100% !important;
+  max-width: 280px;
+  flex-shrink: 0 !important;
+  position: relative !important;
+}
+
+/* Backup rules for fallback */
+.dashboard-tool-card.socialspark .dashboard-tool-preview,
+.dashboard-tool-card.sspark-card .dashboard-tool-preview {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  padding: 1.5rem !important;
+}
+
+.dashboard-tool-card.socialspark .social-dashboard-mini,
+.dashboard-tool-card.sspark-card .social-dashboard-mini {
+  margin: 0 auto !important;
+  text-align: left !important;
+  background: #1a1a1a !important;
+  width: 100% !important;
+  max-width: 280px;
 }
 
 /* Dashboard Tool Content */

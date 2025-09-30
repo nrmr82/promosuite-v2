@@ -96,12 +96,17 @@ export const TABLES = {
   SUBSCRIPTION_PLANS: 'subscription_plans',
   TEMPLATES: 'templates',
   TEMPLATE_CATEGORIES: 'template_categories',
+  TEMPLATE_LIKES: 'template_likes',
   FLYERS: 'flyers',
   MEDIA: 'media',
   SOCIAL_POSTS: 'social_posts',
+  COLLECTIONS: 'collections',
+  COLLECTION_ITEMS: 'collection_items',
+  USER_FAVORITES: 'user_favorites',
   ANALYTICS: 'analytics',
   USER_USAGE: 'user_usage',
-  USER_ANALYTICS: 'user_analytics'
+  USER_ANALYTICS: 'user_analytics',
+  NOTIFICATIONS: 'notifications'
 };
 
 /**

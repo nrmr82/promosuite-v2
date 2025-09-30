@@ -66,13 +66,25 @@
 .dashboard-tool-preview {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   background: #1a1a1a;
   border: 1px solid #333;
   border-radius: 6px;
   padding: 8px;
   overflow: visible;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fix specific SocialSpark preview positioning */
+.dashboard-tool-preview .social-dashboard-mini {
+  position: relative;
+  z-index: 1;
+  margin: 0 auto;
+  display: block;
+  max-width: 280px;
+  width: 100%;
 }
 
 /* Dashboard Tool Content */
