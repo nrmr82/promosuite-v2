@@ -7,9 +7,6 @@ import {
   FaCheckCircle
 } from 'react-icons/fa';
 import { 
-  Instagram,
-  Twitter,
-  Linkedin,
   FolderOpen
 } from 'lucide-react';
 import UserCollections from './UserCollections';
