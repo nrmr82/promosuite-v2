@@ -50,7 +50,6 @@ const UnifiedEditorModal = ({
   user = null
 }) => {
   const [currentMode, setCurrentMode] = useState(initialMode);
-  const [savedData, setSavedData] = useState(null);
   const flyerStudioRef = useRef(null);
   const portraitStudioRef = useRef(null);
 
@@ -59,7 +58,6 @@ const UnifiedEditorModal = ({
   }, []);
 
   const handleEditorSave = useCallback((data) => {
-    setSavedData(data);
     onSave(data);
     console.log('Editor saved:', data);
   }, [onSave]);

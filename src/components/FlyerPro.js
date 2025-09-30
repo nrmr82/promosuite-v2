@@ -333,10 +333,6 @@ const FlyerPro = ({ onOpenAuth, onToolUsage, user }) => {
     setShowAdvancedEditor(false);
   };
 
-  const handleAdvancedEditorExport = (imageData) => {
-    console.log('Image exported from advanced editor:', imageData);
-    // Here you could integrate with your existing export logic
-  };
 
   // Template browser handlers
   const handleTemplateSelect = (template) => {

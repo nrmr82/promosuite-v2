@@ -30,3 +30,5 @@ yarn-error.log*
 QUICK_SETUP.md
 supabase/config.toml
 .env.example
+
+.vercel

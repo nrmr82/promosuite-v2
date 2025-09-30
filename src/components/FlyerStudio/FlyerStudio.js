@@ -390,7 +390,6 @@ const FlyerStudio = forwardRef(({
 
   // Use default sections only for now
   // TODO: Add custom template and photos sections when polotno exports are fixed
-  const sections = [];
 
   return (
     <div className="flyer-studio">

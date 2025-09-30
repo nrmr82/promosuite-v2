@@ -10,8 +10,6 @@ import {
   Instagram,
   Twitter,
   Linkedin,
-  CheckCircle,
-  Facebook,
   FolderOpen
 } from 'lucide-react';
 import UserCollections from './UserCollections';
@@ -63,12 +61,6 @@ const Dashboard = ({ user, onNavigateToTool }) => {
   // Count-up values for SocialSpark stats - animate only when card is hovered
   const followersCount = useCountUp(2400, 600, hoveredTool === 'socialspark');
   const engagementCount = useCountUp(856, 650, hoveredTool === 'socialspark');
-
-  const platforms = [
-    { name: "Instagram", icon: <Instagram className="w-4 h-4" />, color: "#E4405F" },
-    { name: "Twitter", icon: <Twitter className="w-4 h-4" />, color: "#1DA1F2" },
-    { name: "LinkedIn", icon: <Linkedin className="w-4 h-4" />, color: "#0A66C2" },
-  ];
 
   const tools = [
     {

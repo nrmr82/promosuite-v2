@@ -119,7 +119,6 @@ const PortraitStudio = forwardRef(({
   
   // Mask/Inpainting state
   const [maskMode, setMaskMode] = useState(false);
-  const [maskPath, setMaskPath] = useState(null);
 
   // Initialize canvas with proper React lifecycle management
   useEffect(() => {
@@ -190,7 +189,7 @@ const PortraitStudio = forwardRef(({
         }
       }
     };
-  }, []); // Only run once on mount
+  }, [canvas, initialImage, loadImageToCanvas]); // Include dependencies
 
   const loadImageToCanvas = useCallback(async (fabricCanvas, imageSource) => {
     if (!fabricCanvas) return;
@@ -306,7 +305,7 @@ const PortraitStudio = forwardRef(({
           break;
       }
     }
-  }, [canvas]);
+  }, [canvas, setupCropMode]);
 
   const setupCropMode = useCallback(() => {
     if (!canvas || !currentImage) return;
@@ -412,16 +411,16 @@ const PortraitStudio = forwardRef(({
     }
     
     // Apply filter
-    const filters = currentImage.filters || [];
-    const existingFilterIndex = filters.findIndex(f => f.type === filter.type);
+    const currentFilters = currentImage.filters || [];
+    const existingFilterIndex = currentFilters.findIndex(f => f.type === filter.type);
     
     if (existingFilterIndex >= 0) {
-      filters[existingFilterIndex] = filter;
+      currentFilters[existingFilterIndex] = filter;
     } else {
-      filters.push(filter);
+      currentFilters.push(filter);
     }
     
-    currentImage.filters = filters;
+    currentImage.filters = currentFilters;
     currentImage.applyFilters();
     canvas.renderAll();
   }, [canvas, currentImage]);
