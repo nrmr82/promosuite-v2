@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Calendar, 
-  BarChart3, 
-  Target, 
   Video,
   ArrowRight,
   Instagram,
@@ -21,7 +19,6 @@ import { useSocialConnections } from '../../../hooks/useSocialConnections';
 import './SocialSpark.css';
 
 const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
-  const [showConnectionModal, setShowConnectionModal] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState('instagram');
   const [prompt, setPrompt] = useState('');
   const [generating, setGenerating] = useState(false);
@@ -29,7 +26,6 @@ const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
   // Initialize hook and prevent early returns
   const socialConnections = useSocialConnections();
   const {
-    connections,
     loading: connectionsLoading,
     error,
     connectPlatform,
@@ -64,7 +60,7 @@ const SocialSpark = ({ onOpenAuth, onToolUsage, user }) => {
     };
     
     initializeConnections();
-  }, [socialConnections]);
+  }, [socialConnections, isPlatformConnected, refreshPlatform]);
 
   const platforms = [
     { 

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { createStore } from 'polotno/model/store';
 
 // Import professional components
@@ -27,20 +27,19 @@ const UnifiedImageEditor = ({
   const [currentMode, setCurrentMode] = useState('design');
   const [isLoading, setIsLoading] = useState(false);
   const [hasImage, setHasImage] = useState(false);
-  const [currentFile, setCurrentFile] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(true);
 
   // Custom hooks
   const { credits, deductCredits, checkBalance } = useCredits();
   const { processInpainting, isProcessing: inpaintProcessing } = useInpainting(store);
-  const { saveState, loadState, canUndo, canRedo, undo, redo } = useCanvasState(store);
+  const { saveState } = useCanvasState(store);
 
   // Initialize with initial image if provided
   useEffect(() => {
     if (initialImage) {
       loadImageToCanvas(initialImage);
     }
-  }, [initialImage]);
+  }, [initialImage, loadImageToCanvas]);
 
   const loadImageToCanvas = useCallback(async (imageSource) => {
     setIsLoading(true);
@@ -61,7 +60,6 @@ const UnifiedImageEditor = ({
             height: 500
           });
           setHasImage(true);
-          setCurrentFile(imageSource);
         };
         reader.readAsDataURL(imageSource);
       } else {

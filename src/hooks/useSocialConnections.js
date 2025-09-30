@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import socialConnectionsService from '../services/socialConnectionsService';
 import errorHandler from '../services/ErrorHandler';
-import tokenRefreshManager from '../services/TokenRefreshManager';
 import { toast } from 'react-toastify';
 
 /**
@@ -108,7 +107,7 @@ export const useSocialConnections = () => {
         clearInterval(healthCheckTimerRef.current);
       }
     };
-  }, [connections]);
+  }, [connections, HEALTH_CHECK_INTERVAL]);
   
   /**
    * Batch connection operations
@@ -131,6 +130,39 @@ export const useSocialConnections = () => {
     return results;
   }, []);
   
+  /**
+   * Batch connection operations
+   */
+  const batchConnect = useCallback(async (platforms) => {
+    const results = await batchOperation(connectPlatform, platforms);
+    if (results.failed.length > 0) {
+      toast.error(`Failed to connect to ${results.failed.map(f => f.platform).join(', ')}`);
+    }
+    if (results.success.length > 0) {
+      toast.success(`Successfully connected to ${results.success.join(', ')}`);
+    }
+  }, [batchOperation, connectPlatform]);
+
+  const batchDisconnect = useCallback(async (platforms) => {
+    const results = await batchOperation(disconnectPlatform, platforms);
+    if (results.failed.length > 0) {
+      toast.error(`Failed to disconnect from ${results.failed.map(f => f.platform).join(', ')}`);
+    }
+    if (results.success.length > 0) {
+      toast.success(`Successfully disconnected from ${results.success.join(', ')}`);
+    }
+  }, [batchOperation, disconnectPlatform]);
+
+  const batchRefresh = useCallback(async (platforms) => {
+    const results = await batchOperation(refreshPlatform, platforms);
+    if (results.failed.length > 0) {
+      toast.error(`Failed to refresh ${results.failed.map(f => f.platform).join(', ')}`);
+    }
+    if (results.success.length > 0) {
+      toast.success(`Successfully refreshed ${results.success.join(', ')}`);
+    }
+  }, [batchOperation, refreshPlatform]);
+
   /**
    * Queue platform for batch operation
    */
@@ -162,10 +194,12 @@ export const useSocialConnections = () => {
           case 'refresh':
             batchRefresh(platforms);
             break;
+          default:
+            console.warn(`Unknown batch operation: ${operation}`);
         }
       });
     }, BATCH_DELAY);
-  }, []);
+  }, [batchConnect, batchDisconnect, batchRefresh]);
   
   /**
    * Connect to a social platform
@@ -248,39 +282,6 @@ export const useSocialConnections = () => {
       setConnecting(prev => ({ ...prev, [platform]: false }));
     }
   }, []);
-
-  /**
-   * Batch connection operations
-   */
-  const batchConnect = useCallback(async (platforms) => {
-    const results = await batchOperation(connectPlatform, platforms);
-    if (results.failed.length > 0) {
-      toast.error(`Failed to connect to ${results.failed.map(f => f.platform).join(', ')}`);
-    }
-    if (results.success.length > 0) {
-      toast.success(`Successfully connected to ${results.success.join(', ')}`);
-    }
-  }, [batchOperation, connectPlatform]);
-
-  const batchDisconnect = useCallback(async (platforms) => {
-    const results = await batchOperation(disconnectPlatform, platforms);
-    if (results.failed.length > 0) {
-      toast.error(`Failed to disconnect from ${results.failed.map(f => f.platform).join(', ')}`);
-    }
-    if (results.success.length > 0) {
-      toast.success(`Successfully disconnected from ${results.success.join(', ')}`);
-    }
-  }, [batchOperation, disconnectPlatform]);
-
-  const batchRefresh = useCallback(async (platforms) => {
-    const results = await batchOperation(refreshPlatform, platforms);
-    if (results.failed.length > 0) {
-      toast.error(`Failed to refresh ${results.failed.map(f => f.platform).join(', ')}`);
-    }
-    if (results.success.length > 0) {
-      toast.success(`Successfully refreshed ${results.success.join(', ')}`);
-    }
-  }, [batchOperation, refreshPlatform]);
 
   // Cleanup function
   const cleanup = useCallback(() => {

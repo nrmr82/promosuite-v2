@@ -1,5 +1,4 @@
 import { OAuthHandler, OAuthError, OAuthErrorType } from './OAuthHandler';
-import { supabase } from '../../utils/supabase';
 
 /**
  * Instagram OAuth handler implementation
@@ -237,6 +236,9 @@ export class InstagramOAuthHandler extends OAuthHandler {
       case 2:
         type = OAuthErrorType.SERVER_ERROR;
         message = 'Instagram server error';
+        break;
+      default:
+        // Keep default values set above
         break;
     }
 

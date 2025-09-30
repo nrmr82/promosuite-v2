@@ -23,7 +23,7 @@ const useInpainting = (store) => {
     } finally {
       setIsProcessing(false);
     }
-  }, [store]);
+  }, []); // Store is not used in the function, so remove it from dependencies
 
   return {
     processInpainting,

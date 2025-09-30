@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Search, 
   Grid, 
@@ -36,11 +36,11 @@ const UserCollections = ({ onEditTemplate, onEditFlyer, onClose, mode = 'modal' 
   const [itemOwnership, setItemOwnership] = useState(new Map()); // Track which items user owns
   
   // Expose refresh function
-  const refreshFavorites = async () => {
+  const refreshFavorites = useCallback(async () => {
     if (user) {
       await loadUserFavorites(user.id);
     }
-  };
+  }, [user, loadUserFavorites]);
 
   // Auto-refresh favorites every 5 seconds in dashboard mode
   useEffect(() => {
@@ -51,7 +51,7 @@ const UserCollections = ({ onEditTemplate, onEditFlyer, onClose, mode = 'modal' 
       
       return () => clearInterval(interval);
     }
-  }, [mode, user]);
+  }, [mode, user, refreshFavorites]);
 
   // Load user and data
   useEffect(() => {
@@ -80,10 +80,10 @@ const UserCollections = ({ onEditTemplate, onEditFlyer, onClose, mode = 'modal' 
     };
 
     loadUserAndData();
-  }, []); // Empty dependency array is intentional - we only want to load once on mount
+  }, []); // Empty dependency - loadUserAndData is self-contained
 
   // Load user's generated templates
-  const loadUserTemplates = async (userId) => {
+  const loadUserTemplates = useCallback(async (userId) => {
     try {
       // First, load templates created by the user
       const { data: ownedTemplates, error: ownedError } = await supabase
@@ -158,7 +158,7 @@ const UserCollections = ({ onEditTemplate, onEditFlyer, onClose, mode = 'modal' 
     } catch (error) {
       console.error('Error loading templates:', error);
     }
-  };
+  }, []);
 
   // Helper function to get template IDs from user's collections
   const getUserCollectionTemplateIds = async (userId) => {
@@ -220,7 +220,7 @@ const UserCollections = ({ onEditTemplate, onEditFlyer, onClose, mode = 'modal' 
   };
 
   // Load user's favorite templates
-  const loadUserFavorites = async (userId) => {
+  const loadUserFavorites = useCallback(async (userId) => {
     try {
       console.log('Loading user favorites...');
       const { data, success } = await favoritesService.getUserFavorites(userId);
@@ -276,7 +276,7 @@ const UserCollections = ({ onEditTemplate, onEditFlyer, onClose, mode = 'modal' 
       console.error('Error loading favorites:', error);
       setFavorites([]);
     }
-  };
+  }, []);
 
   // Handle item actions
   const handleEdit = (item) => {

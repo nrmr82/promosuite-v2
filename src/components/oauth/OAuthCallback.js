@@ -2,12 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import oAuthHandlerFactory from '../../services/oauth/OAuthHandlerFactory';
 import { useSocialConnections } from '../../hooks/useSocialConnections';
-import authService from '../../services/authService';
 
 const OAuthCallback = ({ onAuthSuccess }) => {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
-  const [processing, setProcessing] = useState(true);
   const { savePlatformConnection } = useSocialConnections();
 
   useEffect(() => {

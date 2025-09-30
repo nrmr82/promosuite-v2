@@ -120,77 +120,7 @@ const PortraitStudio = forwardRef(({
   // Mask/Inpainting state
   const [maskMode, setMaskMode] = useState(false);
 
-  // Initialize canvas with proper React lifecycle management
-  useEffect(() => {
-    let fabricCanvas = null;
-    
-    const initializeCanvas = () => {
-      if (canvasRef.current && !canvas) {
-        try {
-          fabricCanvas = new Canvas(canvasRef.current, {
-            width: 800,
-            height: 600,
-            backgroundColor: '#1a1a1a', // Match theme
-            selection: true,
-            preserveObjectStacking: true
-          });
-          
-          // Configure drawing for masking
-          fabricCanvas.isDrawingMode = false;
-          fabricCanvas.freeDrawingBrush.width = 10;
-          fabricCanvas.freeDrawingBrush.color = 'rgba(233, 30, 99, 0.8)'; // Pink theme color
-          
-          // Add event listeners for React state sync
-          fabricCanvas.on('selection:created', () => {
-            // Sync selection state if needed
-          });
-          
-          fabricCanvas.on('selection:cleared', () => {
-            // Sync selection state if needed
-          });
-          
-          fabricCanvas.on('object:modified', () => {
-            // Auto-save state on modifications
-            fabricCanvas.renderAll();
-          });
-          
-          setCanvas(fabricCanvas);
-          
-          // Load initial image if provided
-          if (initialImage) {
-            loadImageToCanvas(fabricCanvas, initialImage);
-          }
-          
-        } catch (error) {
-          console.error('Failed to initialize Fabric canvas:', error);
-        }
-      }
-    };
-    
-    initializeCanvas();
-    
-    // Cleanup function - CRITICAL for React compatibility
-    return () => {
-      if (fabricCanvas) {
-        try {
-          // Remove all event listeners
-          fabricCanvas.off('selection:created');
-          fabricCanvas.off('selection:cleared');
-          fabricCanvas.off('object:modified');
-          
-          // Clear all objects
-          fabricCanvas.clear();
-          
-          // Dispose of the canvas
-          fabricCanvas.dispose();
-          fabricCanvas = null;
-        } catch (error) {
-          console.error('Error disposing Fabric canvas:', error);
-        }
-      }
-    };
-  }, [canvas, initialImage, loadImageToCanvas]); // Include dependencies
-
+  // Define functions before they are used
   const loadImageToCanvas = useCallback(async (fabricCanvas, imageSource) => {
     if (!fabricCanvas) return;
     
@@ -330,6 +260,77 @@ const PortraitStudio = forwardRef(({
     setCropRect(rect);
     canvas.renderAll();
   }, [canvas, currentImage]);
+
+  // Initialize canvas with proper React lifecycle management
+  useEffect(() => {
+    let fabricCanvas = null;
+    
+    const initializeCanvas = () => {
+      if (canvasRef.current && !canvas) {
+        try {
+          fabricCanvas = new Canvas(canvasRef.current, {
+            width: 800,
+            height: 600,
+            backgroundColor: '#1a1a1a', // Match theme
+            selection: true,
+            preserveObjectStacking: true
+          });
+          
+          // Configure drawing for masking
+          fabricCanvas.isDrawingMode = false;
+          fabricCanvas.freeDrawingBrush.width = 10;
+          fabricCanvas.freeDrawingBrush.color = 'rgba(233, 30, 99, 0.8)'; // Pink theme color
+          
+          // Add event listeners for React state sync
+          fabricCanvas.on('selection:created', () => {
+            // Sync selection state if needed
+          });
+          
+          fabricCanvas.on('selection:cleared', () => {
+            // Sync selection state if needed
+          });
+          
+          fabricCanvas.on('object:modified', () => {
+            // Auto-save state on modifications
+            fabricCanvas.renderAll();
+          });
+          
+          setCanvas(fabricCanvas);
+          
+          // Load initial image if provided
+          if (initialImage) {
+            loadImageToCanvas(fabricCanvas, initialImage);
+          }
+          
+        } catch (error) {
+          console.error('Failed to initialize Fabric canvas:', error);
+        }
+      }
+    };
+    
+    initializeCanvas();
+    
+    // Cleanup function - CRITICAL for React compatibility
+    return () => {
+      if (fabricCanvas) {
+        try {
+          // Remove all event listeners
+          fabricCanvas.off('selection:created');
+          fabricCanvas.off('selection:cleared');
+          fabricCanvas.off('object:modified');
+          
+          // Clear all objects
+          fabricCanvas.clear();
+          
+          // Dispose of the canvas
+          fabricCanvas.dispose();
+          fabricCanvas = null;
+        } catch (error) {
+          console.error('Error disposing Fabric canvas:', error);
+        }
+      }
+    };
+  }, [initialImage, loadImageToCanvas]); // Remove canvas from dependencies to prevent infinite loop
 
   const applyCrop = useCallback(() => {
     if (!canvas || !currentImage || !cropRect) return;
