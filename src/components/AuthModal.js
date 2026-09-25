@@ -149,27 +149,8 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
         }
         
         setIsRegistering(true);
-        
-        // FIRST: Check for existing accounts BEFORE attempting registration
-        console.log('🔍 Registration Debug - Checking for existing accounts...');
-        try {
-          const email = formData.email.trim().toLowerCase();
-          const existingUserCheck = await authService.checkUserExists(email);
-          
-          if (existingUserCheck.exists) {
-            // User already exists - provide specific error message
-            const conflictMessage = await authService.getAuthConflictMessage(email);
-            throw new Error(conflictMessage);
-          }
-        } catch (conflictError) {
-          // If it's our conflict message, re-throw it
-          if (conflictError.message.includes('already exists')) {
-            throw conflictError;
-          }
-          // Otherwise, continue with registration (the check might have failed)
-          console.log('🔍 Registration Debug - User existence check failed, proceeding with registration:', conflictError.message);
-        }
-        
+
+        // Existing accounts are detected by authService.register() from the signUp response
         // For registration, run database tests first to diagnose issues
         console.log('🔍 Registration Debug - Running pre-registration database tests...');
         const dbTests = await runDatabaseTests();

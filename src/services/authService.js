@@ -126,6 +126,12 @@ class SupabaseAuthService {
         userId: data.user?.id
       });
 
+      // Supabase doesn't error on a duplicate email when confirmations are on;
+      // it returns a user with no identities instead
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        throw new Error('User already registered');
+      }
+
       // If registration successful but email confirmation required
       if (data.user && !data.session) {
         console.log('🔍 Registration Debug - Email confirmation required');
@@ -217,17 +223,9 @@ class SupabaseAuthService {
           error.message?.includes('duplicate key value violates unique constraint') ||
           error.message?.includes('user_already_exists')) {
         
-        // Try to determine if this is an OAuth/email conflict
         const email = userData?.email;
         if (email) {
-          // Use helper method to get specific conflict message
-          try {
-            const conflictMessage = await this.getAuthConflictMessage(email);
-            throw new Error(conflictMessage);
-          } catch (checkError) {
-            // Fallback if the check fails
-            throw new Error(`An account with ${email} already exists. If you previously signed up with Google or LinkedIn, please use that login method instead. Otherwise, try the 'Sign In' tab if you have an account.`);
-          }
+          throw new Error(`An account with ${email} already exists. If you previously signed up with Google or LinkedIn, please use that login method instead. Otherwise, try the 'Sign In' tab if you have an account.`);
         } else {
           throw new Error('An account with this email already exists. Please try signing in instead.');
         }
@@ -777,23 +775,13 @@ class SupabaseAuthService {
 
       console.log('🗑️ Starting hard delete via server for user:', currentUser.id);
 
-      // Call the server-side endpoint for hard deletion
-      // The server will use the service_role key (never exposed to browser)
-      const endpoint = process.env.NODE_ENV === 'production' 
-        ? '/.netlify/functions/delete-account'
-        : 'http://localhost:8888/.netlify/functions/delete-account';
-
-      console.log('🗑️ Calling secure server endpoint:', endpoint);
-
-      const response = await fetch(endpoint, {
+      // Server-side hard delete (functions/api/delete-account.js); it uses the
+      // service_role key, which is never exposed to the browser
+      const response = await fetch('/api/delete-account', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-        },
-        body: JSON.stringify({
-          userId: currentUser.id
-        })
+        }
       });
 
       if (!response.ok) {
@@ -816,74 +804,13 @@ class SupabaseAuthService {
       return {
         success: true,
         message: result.message || 'Account permanently deleted',
-        authDeleted: true,
-        deletionResults: result.deletionResults
+        authDeleted: true
       };
       
     } catch (error) {
       console.error('🗑️ Account deletion failed:', error);
       throw new Error(`Failed to delete account: ${error.message}`);
     }
-  }
-
-  /**
-   * Check if user exists by email and detect auth providers
-   */
-  async checkUserExists(email) {
-    try {
-      // Try to initiate password reset - this will tell us if user exists
-      // without actually sending a reset email (we'll catch the error)
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://example.com/nowhere' // Use invalid redirect to avoid sending email
-      });
-      
-      // If no error, user exists
-      if (!error) {
-        return { 
-          exists: true,
-          message: 'User exists - can use password reset'
-        };
-      }
-      
-      // Check specific error messages
-      if (error.message?.includes('User not found') || 
-          error.message?.includes('user_not_found')) {
-        return { exists: false };
-      }
-      
-      // Check for OAuth-only accounts
-      if (error.message?.includes('Signup requires a valid password') ||
-          error.message?.includes('Password not set') ||
-          error.message?.includes('User created via oauth')) {
-        return { 
-          exists: true, 
-          isOAuthOnly: true,
-          message: 'This account was created with Google or LinkedIn. Please use the social login buttons.'
-        };
-      }
-      
-      // For other errors, we can't determine - assume user might exist
-      console.warn('Could not determine if user exists:', error);
-      return { exists: null, error: error.message };
-    } catch (error) {
-      console.error('Error checking if user exists:', error);
-      return { exists: null, error: error.message };
-    }
-  }
-  
-  /**
-   * Helper method to provide user-friendly error messages for auth conflicts
-   */
-  async getAuthConflictMessage(email) {
-    const userCheck = await this.checkUserExists(email);
-    
-    if (userCheck.isOAuthOnly) {
-      return `An account with ${email} already exists and was created with Google or LinkedIn. Please use the social login buttons instead.`;
-    } else if (userCheck.exists) {
-      return `An account with ${email} already exists. You can login with your password or reset it if you've forgotten.`;
-    }
-    
-    return `Unable to determine account status for ${email}. Please try signing up or logging in.`;
   }
 
   /**
@@ -1029,31 +956,12 @@ class SupabaseAuthService {
       this.initializeSessionTimeout();
     }
 
-    // If browser was closed, check when it was closed
-    const wasBrowserClosed = localStorage.getItem('ps_browser_closed') === 'true' || 
-                            sessionStorage.getItem('ps_browser_closed') === 'true';
-    if (wasBrowserClosed) {
-      console.log('🕒 Detected previous browser close - checking timeout');
-      const closeTime = parseInt(localStorage.getItem('ps_browser_close_time') || 
-                                sessionStorage.getItem('ps_browser_close_time') || '0');
-      const timeoutDuration = 30 * 60 * 1000; // 30 minutes in milliseconds
-      const timeSinceClose = Date.now() - closeTime;
+    // Clear flags left by older versions, which set them on every page unload
+    // (including refreshes and OAuth redirects) and so logged users out
+    localStorage.removeItem('ps_browser_closed');
+    localStorage.removeItem('ps_last_tab_closed');
+    sessionStorage.removeItem('ps_browser_closed');
 
-      if (timeSinceClose > timeoutDuration) {
-        console.log('🕒 Session expired due to browser close timeout');
-        this.stopSessionTimeout();
-        localStorage.removeItem('promosuiteUser');
-        // Clear browser close flags and time
-        localStorage.removeItem('ps_browser_closed');
-        localStorage.removeItem('ps_browser_close_time');
-        sessionStorage.removeItem('ps_browser_closed');
-        sessionStorage.removeItem('ps_browser_close_time');
-        return false;
-      } else {
-        console.log('🕒 Browser was closed but within timeout window - restoring session');
-      }
-    }
-    
     const isValid = sessionTimeoutService.checkSessionValidity();
     if (!isValid) {
       console.log('🕒 Initial session check failed - session expired');

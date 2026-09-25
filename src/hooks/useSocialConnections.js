@@ -110,6 +110,88 @@ export const useSocialConnections = () => {
   }, [connections, HEALTH_CHECK_INTERVAL]);
   
   /**
+   * Connect to a social platform
+   */
+  const connectPlatform = useCallback(async (platform) => {
+    try {
+      setConnecting(prev => ({ ...prev, [platform]: true }));
+      setError(null);
+      
+      const { connection } = await socialConnectionsService.initiatePlatformConnection(platform);
+      
+      // Update connections state
+      setConnections(prev => ({
+        ...prev,
+        [platform]: connection
+      }));
+      
+      return { success: true, connection };
+    } catch (err) {
+      console.error(`Error connecting to ${platform}:`, err);
+      const errorMessage = `Failed to connect to ${platform}`;
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setConnecting(prev => ({ ...prev, [platform]: false }));
+    }
+  }, []);
+
+  /**
+   * Disconnect from a social platform
+   */
+  const disconnectPlatform = useCallback(async (platform) => {
+    try {
+      setConnecting(prev => ({ ...prev, [platform]: true }));
+      setError(null);
+      
+      await socialConnectionsService.disconnectPlatform(platform);
+      
+      // Remove from connections state
+      setConnections(prev => {
+        const updated = { ...prev };
+        delete updated[platform];
+        return updated;
+      });
+      
+      return { success: true };
+    } catch (err) {
+      console.error(`Error disconnecting from ${platform}:`, err);
+      const errorMessage = `Failed to disconnect from ${platform}`;
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setConnecting(prev => ({ ...prev, [platform]: false }));
+    }
+  }, []);
+
+  /**
+   * Refresh a platform connection
+   */
+  const refreshPlatform = useCallback(async (platform) => {
+    try {
+      setConnecting(prev => ({ ...prev, [platform]: true }));
+      setError(null);
+      
+      const { connection } = await socialConnectionsService.refreshPlatformConnection(platform);
+      
+      // Update connections state
+      setConnections(prev => ({
+        ...prev,
+        [platform]: connection
+      }));
+      
+      return { success: true, connection };
+    } catch (err) {
+      console.error(`Error refreshing ${platform} connection:`, err);
+      const errorMessage = `Failed to refresh ${platform} connection`;
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setConnecting(prev => ({ ...prev, [platform]: false }));
+    }
+  }, []);
+
+  /**
    * Batch connection operations
    */
   const batchOperation = useCallback(async (operation, platforms) => {
@@ -200,88 +282,6 @@ export const useSocialConnections = () => {
       });
     }, BATCH_DELAY);
   }, [batchConnect, batchDisconnect, batchRefresh]);
-  
-  /**
-   * Connect to a social platform
-   */
-  const connectPlatform = useCallback(async (platform) => {
-    try {
-      setConnecting(prev => ({ ...prev, [platform]: true }));
-      setError(null);
-      
-      const { connection } = await socialConnectionsService.initiatePlatformConnection(platform);
-      
-      // Update connections state
-      setConnections(prev => ({
-        ...prev,
-        [platform]: connection
-      }));
-      
-      return { success: true, connection };
-    } catch (err) {
-      console.error(`Error connecting to ${platform}:`, err);
-      const errorMessage = `Failed to connect to ${platform}`;
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setConnecting(prev => ({ ...prev, [platform]: false }));
-    }
-  }, []);
-
-  /**
-   * Disconnect from a social platform
-   */
-  const disconnectPlatform = useCallback(async (platform) => {
-    try {
-      setConnecting(prev => ({ ...prev, [platform]: true }));
-      setError(null);
-      
-      await socialConnectionsService.disconnectPlatform(platform);
-      
-      // Remove from connections state
-      setConnections(prev => {
-        const updated = { ...prev };
-        delete updated[platform];
-        return updated;
-      });
-      
-      return { success: true };
-    } catch (err) {
-      console.error(`Error disconnecting from ${platform}:`, err);
-      const errorMessage = `Failed to disconnect from ${platform}`;
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setConnecting(prev => ({ ...prev, [platform]: false }));
-    }
-  }, []);
-
-  /**
-   * Refresh a platform connection
-   */
-  const refreshPlatform = useCallback(async (platform) => {
-    try {
-      setConnecting(prev => ({ ...prev, [platform]: true }));
-      setError(null);
-      
-      const { connection } = await socialConnectionsService.refreshPlatformConnection(platform);
-      
-      // Update connections state
-      setConnections(prev => ({
-        ...prev,
-        [platform]: connection
-      }));
-      
-      return { success: true, connection };
-    } catch (err) {
-      console.error(`Error refreshing ${platform} connection:`, err);
-      const errorMessage = `Failed to refresh ${platform} connection`;
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setConnecting(prev => ({ ...prev, [platform]: false }));
-    }
-  }, []);
 
   // Cleanup function
   const cleanup = useCallback(() => {

@@ -1,45 +1,29 @@
-import { loadStripe } from '@stripe/stripe-js';
+import { supabase } from './supabase';
 
-// Initialize Stripe with the publishable key
-export const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
+/**
+ * Start Stripe Checkout: the server (functions/api/create-checkout-session.js)
+ * creates the session with the secret key and returns its hosted URL.
+ * @param {string} priceId - Stripe price ID
+ * @param {'subscription'|'payment'} mode - 'payment' for one-time purchases like credit packs
+ */
+export const handleSubscription = async (priceId, mode = 'subscription') => {
+  if (!priceId) throw new Error('This plan is not available for purchase yet');
 
-// Function to create a checkout session
-export const createCheckoutSession = async (priceId) => {
-  try {
-    const response = await fetch('/api/create-checkout-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        priceId,
-      }),
-    });
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Please sign in to continue');
 
-    const session = await response.json();
-    return session;
-  } catch (error) {
-    console.error('Error creating checkout session:', error);
-    throw error;
+  const response = await fetch('/api/create-checkout-session', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({ priceId, mode }),
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.url) {
+    throw new Error(result.error || 'Could not start checkout');
   }
-};
 
-// Function to handle subscription payment
-export const handleSubscription = async (priceId) => {
-  try {
-    const stripe = await stripePromise;
-    const session = await createCheckoutSession(priceId);
-    
-    // Redirect to Stripe Checkout
-    const result = await stripe.redirectToCheckout({
-      sessionId: session.id,
-    });
-
-    if (result.error) {
-      throw new Error(result.error.message);
-    }
-  } catch (error) {
-    console.error('Error handling subscription:', error);
-    throw error;
-  }
+  window.location.assign(result.url);
 };

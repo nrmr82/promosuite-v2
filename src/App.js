@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider } from './contexts/AuthContext';
 import { TemplateProvider } from './contexts/TemplateContext';
 import { ProductProvider } from './contexts/ProductContext';
@@ -13,7 +12,6 @@ import SocialSpark from './components/SocialSpark';
 import Pricing from './components/Pricing';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
-import EditorQuickTest from './components/EditorQuickTest';
 import SessionTimeoutWarning from './components/SessionTimeoutWarning';
 import OAuthCallback from './components/oauth/OAuthCallback';
 import authService from './services/authService';
@@ -194,8 +192,6 @@ function App() {
         return <Settings user={user} onLogout={handleLogout} />;
       case 'oauth_callback':
         return <OAuthCallback />;
-      case 'editor-test':
-        return <EditorQuickTest />;
       default:
         return <Dashboard user={user} onNavigateToTool={handleNavigateToTool} />;
     }
@@ -209,7 +205,6 @@ function App() {
       <div className="app-loading">
         <div className="loading-spinner"></div>
         <p>Loading PromoSuite...</p>
-        <Analytics />
       </div>
     );
   }
@@ -225,7 +220,6 @@ function App() {
               isMobile={true} // Indicate that it's a mobile landing page
             />
           </AuthProvider>
-          <Analytics />
         </ErrorBoundary>
       );
     }
@@ -238,7 +232,6 @@ function App() {
             <LandingPage onAuthSuccess={handleAuthSuccess} />
           </div>
         </AuthProvider>
-        <Analytics />
       </ErrorBoundary>
     );
   }
@@ -280,7 +273,6 @@ function App() {
             </ProductProvider>
           </TemplateProvider>
         </AuthProvider>
-        <Analytics />
       </ErrorBoundary>
     );
   }
@@ -303,7 +295,6 @@ function App() {
           </ProductProvider>
         </TemplateProvider>
       </AuthProvider>
-      <Analytics />
     </ErrorBoundary>
   );
 }

@@ -117,8 +117,8 @@ const Pricing = ({ user, onUpgrade, onClose }) => {
       // Get the Stripe price ID for the credit package
       const priceId = getCreditPackagePriceId(packageId);
       
-      // Redirect to Stripe Checkout
-      await handleSubscription(priceId);
+      // Redirect to Stripe Checkout (one-time payment)
+      await handleSubscription(priceId, 'payment');
       
       if (onUpgrade) {
         onUpgrade(packageId, 'credits');
