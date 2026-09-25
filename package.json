@@ -8,7 +8,6 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "@vercel/analytics": "^1.5.0",
     "canvas-to-blob": "^1.0.0",
     "fabric": "^6.7.1",
     "fabric-history": "^2.0.0",
@@ -32,7 +31,9 @@
     "start": "react-scripts start",
     "build": "CI=false react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "pages:dev": "npm run build && wrangler pages dev --port 8788",
+    "functions:dev": "wrangler pages dev build --port 8788"
   },
   "eslintConfig": {
     "extends": [
@@ -53,7 +54,9 @@
     ]
   },
   "devDependencies": {
+    "http-proxy-middleware": "^2.0.10",
     "react-scripts": "^5.0.1",
-    "vite": "^7.1.6"
+    "vite": "^7.1.6",
+    "wrangler": "^4.140.0"
   }
 }
