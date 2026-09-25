@@ -775,23 +775,13 @@ class SupabaseAuthService {
 
       console.log('🗑️ Starting hard delete via server for user:', currentUser.id);
 
-      // Call the server-side endpoint for hard deletion
-      // The server will use the service_role key (never exposed to browser)
-      const endpoint = process.env.NODE_ENV === 'production' 
-        ? '/.netlify/functions/delete-account'
-        : 'http://localhost:8888/.netlify/functions/delete-account';
-
-      console.log('🗑️ Calling secure server endpoint:', endpoint);
-
-      const response = await fetch(endpoint, {
+      // Server-side hard delete (functions/api/delete-account.js); it uses the
+      // service_role key, which is never exposed to the browser
+      const response = await fetch('/api/delete-account', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-        },
-        body: JSON.stringify({
-          userId: currentUser.id
-        })
+        }
       });
 
       if (!response.ok) {
@@ -814,8 +804,7 @@ class SupabaseAuthService {
       return {
         success: true,
         message: result.message || 'Account permanently deleted',
-        authDeleted: true,
-        deletionResults: result.deletionResults
+        authDeleted: true
       };
       
     } catch (error) {
