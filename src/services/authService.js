@@ -967,31 +967,12 @@ class SupabaseAuthService {
       this.initializeSessionTimeout();
     }
 
-    // If browser was closed, check when it was closed
-    const wasBrowserClosed = localStorage.getItem('ps_browser_closed') === 'true' || 
-                            sessionStorage.getItem('ps_browser_closed') === 'true';
-    if (wasBrowserClosed) {
-      console.log('🕒 Detected previous browser close - checking timeout');
-      const closeTime = parseInt(localStorage.getItem('ps_browser_close_time') || 
-                                sessionStorage.getItem('ps_browser_close_time') || '0');
-      const timeoutDuration = 30 * 60 * 1000; // 30 minutes in milliseconds
-      const timeSinceClose = Date.now() - closeTime;
+    // Clear flags left by older versions, which set them on every page unload
+    // (including refreshes and OAuth redirects) and so logged users out
+    localStorage.removeItem('ps_browser_closed');
+    localStorage.removeItem('ps_last_tab_closed');
+    sessionStorage.removeItem('ps_browser_closed');
 
-      if (timeSinceClose > timeoutDuration) {
-        console.log('🕒 Session expired due to browser close timeout');
-        this.stopSessionTimeout();
-        localStorage.removeItem('promosuiteUser');
-        // Clear browser close flags and time
-        localStorage.removeItem('ps_browser_closed');
-        localStorage.removeItem('ps_browser_close_time');
-        sessionStorage.removeItem('ps_browser_closed');
-        sessionStorage.removeItem('ps_browser_close_time');
-        return false;
-      } else {
-        console.log('🕒 Browser was closed but within timeout window - restoring session');
-      }
-    }
-    
     const isValid = sessionTimeoutService.checkSessionValidity();
     if (!isValid) {
       console.log('🕒 Initial session check failed - session expired');

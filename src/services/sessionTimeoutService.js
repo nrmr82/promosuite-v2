@@ -120,10 +120,7 @@ class SessionTimeoutService {
       const count = parseInt(localStorage.getItem(this.config.storageKeys.activeTabCount) || '1');
       try {
         if (count <= 1) {
-          // Mark browser as closed but don't immediately clear user data
-          localStorage.setItem('ps_browser_closed', 'true');
           localStorage.setItem('ps_browser_close_time', Date.now().toString());
-          // Don't clear user data here - let the timeout service handle it based on time
         } else {
           // Decrement tab count
           localStorage.setItem(this.config.storageKeys.activeTabCount, (count - 1).toString());
@@ -229,17 +226,9 @@ class SessionTimeoutService {
     
     try {
       // Use synchronous storage operations to ensure they complete
+      // Only record the time: beforeunload also fires on refreshes and OAuth
+      // redirects, so it can't be treated as the browser closing
       localStorage.setItem(this.config.storageKeys.browserCloseTime, now.toString());
-      localStorage.setItem('ps_browser_closed', 'true');
-      
-      // Don't immediately clear auth data - let timeout service handle it
-      // The user might just be navigating or refreshing
-      
-      // Set last tab flag if this is the last tab
-      const count = parseInt(localStorage.getItem(this.config.storageKeys.activeTabCount) || '1');
-      if (count <= 1) {
-        localStorage.setItem('ps_last_tab_closed', 'true');
-      }
     } catch (error) {
       console.error('🕒 Error during browser close cleanup:', error);
     }
@@ -302,16 +291,6 @@ class SessionTimeoutService {
       return false;
     }
 
-    // Check browser closed flags first
-    const wasBrowserClosed = localStorage.getItem('ps_browser_closed') === 'true' || 
-                            sessionStorage.getItem('ps_browser_closed') === 'true';
-    const wasLastTab = localStorage.getItem('ps_last_tab_closed') === 'true';
-    
-    if (wasBrowserClosed || wasLastTab) {
-      console.log('🕒 SessionTimeout: Browser was closed, enforcing timeout');
-      return false;
-    }
-    
     // If no explicit close flag but we have a close time, check timeout
     if (browserCloseTime > 0) {
       const timeSinceClose = now - browserCloseTime;
