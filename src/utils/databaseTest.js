@@ -119,8 +119,8 @@ export const testTableExists = async (tableName) => {
 };
 
 export const getSupabaseInfo = () => {
-  const url = process.env.REACT_APP_SUPABASE_URL;
-  const anonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+  const url = import.meta.env.VITE_SUPABASE_URL;
+  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
   
   return {
     url: url ? url.substring(0, 30) + '...' : 'Not configured',

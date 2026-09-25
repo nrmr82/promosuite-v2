@@ -6,21 +6,21 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Supabase configuration
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Validate required environment variables
 if (!supabaseUrl || !supabaseAnonKey) {
   const errorMessage = `Missing Supabase environment variables:
-- REACT_APP_SUPABASE_URL: ${supabaseUrl ? '✓' : '✗ Missing'}
-- REACT_APP_SUPABASE_ANON_KEY: ${supabaseAnonKey ? '✓' : '✗ Missing'}
+- VITE_SUPABASE_URL: ${supabaseUrl ? '✓' : '✗ Missing'}
+- VITE_SUPABASE_ANON_KEY: ${supabaseAnonKey ? '✓' : '✗ Missing'}
 
 Please check your .env file (local) or Vercel environment variables (production).`;
   
   console.error(errorMessage);
   
   // In production, throw an error instead of falling back to dummy values
-  if (process.env.NODE_ENV === 'production') {
+  if (import.meta.env.PROD) {
     throw new Error(errorMessage);
   }
   
@@ -32,7 +32,7 @@ if ((supabaseUrl && supabaseUrl.includes('dummy.supabase.co')) ||
     (supabaseAnonKey && supabaseAnonKey.includes('dummy'))) {
   const errorMessage = 'Detected dummy Supabase configuration in production. Please set real Supabase environment variables.';
   console.error(errorMessage);
-  if (process.env.NODE_ENV === 'production') {
+  if (import.meta.env.PROD) {
     throw new Error(errorMessage);
   }
 }

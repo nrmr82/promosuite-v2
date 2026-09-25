@@ -50,7 +50,7 @@ export class ErrorHandler {
     }
 
     // Console log in development
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.error('Error logged:', errorEntry);
     }
 
@@ -64,7 +64,7 @@ export class ErrorHandler {
   async reportError(errorEntry) {
     try {
       // In a real app, send to error reporting service (Sentry, LogRocket, etc.)
-      if (process.env.NODE_ENV === 'production') {
+      if (import.meta.env.PROD) {
         // Example: await fetch('/api/errors', { method: 'POST', body: JSON.stringify(errorEntry) });
       }
     } catch (reportingError) {

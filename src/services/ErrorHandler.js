@@ -281,9 +281,9 @@ class ErrorHandler {
    * Track error in analytics
    */
   trackError(error, recoveryResult) {
-    if (process.env.REACT_APP_ERROR_TRACKING_ENDPOINT) {
+    if (import.meta.env.VITE_ERROR_TRACKING_ENDPOINT) {
       try {
-        fetch(process.env.REACT_APP_ERROR_TRACKING_ENDPOINT, {
+        fetch(import.meta.env.VITE_ERROR_TRACKING_ENDPOINT, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

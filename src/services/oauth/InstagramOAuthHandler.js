@@ -8,8 +8,8 @@ export class InstagramOAuthHandler extends OAuthHandler {
     super('instagram');
     this.baseUrl = 'https://api.instagram.com';
     this.graphUrl = 'https://graph.instagram.com';
-    this.clientId = process.env.REACT_APP_INSTAGRAM_CLIENT_ID;
-    this.clientSecret = process.env.REACT_APP_INSTAGRAM_CLIENT_SECRET;
+    this.clientId = import.meta.env.VITE_INSTAGRAM_CLIENT_ID;
+    this.clientSecret = import.meta.env.VITE_INSTAGRAM_CLIENT_SECRET;
     this.redirectUri = `${window.location.origin}/auth/callback/instagram`;
     this.requiredScopes = ['user_profile', 'user_media'];
   }

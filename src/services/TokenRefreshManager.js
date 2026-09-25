@@ -231,9 +231,9 @@ class TokenRefreshManager {
       if (updateError) throw updateError;
 
       // Trigger webhook if configured
-      if (process.env.REACT_APP_REFRESH_ERROR_WEBHOOK) {
+      if (import.meta.env.VITE_REFRESH_ERROR_WEBHOOK) {
         try {
-          await fetch(process.env.REACT_APP_REFRESH_ERROR_WEBHOOK, {
+          await fetch(import.meta.env.VITE_REFRESH_ERROR_WEBHOOK, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

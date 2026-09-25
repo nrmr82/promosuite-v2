@@ -77,8 +77,8 @@ class SocialConnectionsService {
       await tokenRefreshManager.forceRefresh(connection.id);
       
       // Send webhook notification if configured
-      if (process.env.REACT_APP_CONNECTION_WEBHOOK) {
-        await fetch(process.env.REACT_APP_CONNECTION_WEBHOOK, {
+      if (import.meta.env.VITE_CONNECTION_WEBHOOK) {
+        await fetch(import.meta.env.VITE_CONNECTION_WEBHOOK, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -421,35 +421,35 @@ return { connections: connections || [] };
     const configs = {
       instagram: {
         authUrl: 'https://api.instagram.com/oauth/authorize',
-        clientId: process.env.REACT_APP_INSTAGRAM_CLIENT_ID,
+        clientId: import.meta.env.VITE_INSTAGRAM_CLIENT_ID,
         scopes: ['user_profile', 'user_media'],
         redirectUri,
         responseType: 'code'
       },
       twitter: {
         authUrl: 'https://twitter.com/i/oauth2/authorize',
-        clientId: process.env.REACT_APP_TWITTER_CLIENT_ID,
+        clientId: import.meta.env.VITE_TWITTER_CLIENT_ID,
         scopes: ['tweet.read', 'users.read', 'tweet.write'],
         redirectUri,
         responseType: 'code'
       },
       linkedin: {
         authUrl: 'https://www.linkedin.com/oauth/v2/authorization',
-        clientId: process.env.REACT_APP_LINKEDIN_CLIENT_ID,
+        clientId: import.meta.env.VITE_LINKEDIN_CLIENT_ID,
         scopes: ['r_liteprofile', 'w_member_social'],
         redirectUri,
         responseType: 'code'
       },
       youtube: {
         authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
-        clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+        clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         scopes: ['https://www.googleapis.com/auth/youtube.readonly', 'https://www.googleapis.com/auth/youtube.upload'],
         redirectUri,
         responseType: 'code'
       },
       tiktok: {
         authUrl: 'https://www.tiktok.com/auth/authorize/',
-        clientId: process.env.REACT_APP_TIKTOK_CLIENT_ID,
+        clientId: import.meta.env.VITE_TIKTOK_CLIENT_ID,
         scopes: ['user.info.basic', 'video.list'],
         redirectUri,
         responseType: 'code'

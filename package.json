@@ -4,59 +4,37 @@
   "private": true,
   "dependencies": {
     "@supabase/supabase-js": "^2.31.0",
-    "@testing-library/dom": "^9.3.1",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "canvas-to-blob": "^1.0.0",
     "fabric": "^6.7.1",
-    "fabric-history": "^2.0.0",
-    "framer-motion": "^10.15.0",
-    "html2canvas": "^1.4.1",
-    "jszip": "^3.10.1",
-    "localforage": "^1.10.0",
     "lucide-react": "^0.263.1",
-    "material-icons": "^1.13.14",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-dropzone": "^14.3.8",
     "react-icons": "^5.5.0",
-    "react-image-crop": "^11.0.10",
     "react-router-dom": "^6.30.1",
-    "react-toastify": "^10.0.6",
-    "react-zoom-pan-pinch": "^3.7.0",
-    "web-vitals": "^2.1.4"
+    "react-toastify": "^10.0.6"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "CI=false react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "lint": "eslint src",
     "pages:dev": "npm run build && wrangler pages dev --port 8788",
     "functions:dev": "wrangler pages dev build --port 8788"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
-    "http-proxy-middleware": "^2.0.10",
-    "react-scripts": "^5.0.1",
-    "vite": "^7.1.6",
+    "@eslint/js": "^10.0.1",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@vitejs/plugin-react": "^6.1.1",
+    "eslint": "^10.11.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.12.0",
+    "jsdom": "^30.1.1",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.1",
     "wrangler": "^4.140.0"
-  }
+  },
+  "type": "module"
 }
