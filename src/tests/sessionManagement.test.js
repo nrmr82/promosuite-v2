@@ -1,54 +1,81 @@
-import { render, act, screen, waitFor } from '@testing-library/react';
+import { render, act, screen, fireEvent } from '@testing-library/react';
 import authService from '../services/authService';
 import sessionTimeoutService from '../services/sessionTimeoutService';
 import SessionTimeoutWarning from '../components/SessionTimeoutWarning';
+import { supabase } from '../utils/supabase';
 
-// Mock timer related functions
-jest.useFakeTimers();
+const GRACE_PERIOD_MS = 5000;
+// SessionTimeoutWarning runs its first check 5.5s after mounting
+const INITIAL_WARNING_CHECK_MS = 5500;
+
+// Flush pending promise callbacks while fake timers are active
+const flushPromises = async () => {
+  for (let i = 0; i < 5; i++) {
+    await Promise.resolve();
+  }
+};
 
 describe('Session Management', () => {
-  beforeEach(() => {
-    // Clear storage before each test
-    localStorage.clear();
-    sessionStorage.clear();
-    jest.clearAllMocks();
+  const originalLocation = window.location;
+
+  beforeAll(() => {
+    delete window.location;
+    window.location = { href: '' };
   });
 
-  it('should not trigger timeout during grace period', async () => {
-    // Initialize auth service with mock user
-    await authService.initializeSessionTimeout();
+  afterAll(() => {
+    window.location = originalLocation;
+  });
 
-    // Check if in grace period
+  beforeEach(() => {
+    jest.useFakeTimers();
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = '';
+
+    // authService is a singleton; let each test initialize session timeout afresh
+    authService._sessionTimeoutInitialized = false;
+
+    jest.spyOn(supabase.auth, 'signOut').mockResolvedValue({ error: null });
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    authService.stopSessionTimeout();
+    jest.clearAllTimers();
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  const endGracePeriod = () => {
+    act(() => {
+      jest.advanceTimersByTime(GRACE_PERIOD_MS + 1000);
+    });
+  };
+
+  it('should not trigger timeout during grace period', () => {
+    authService.initializeSessionTimeout();
+
     expect(authService.isInGracePeriod()).toBe(true);
 
-    // Render warning component
     render(<SessionTimeoutWarning />);
 
     // Warning should not be visible during grace period
-    expect(screen.queryByText('Session Expiring Soon')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Session Expiring Soon/)).not.toBeInTheDocument();
 
     // Fast forward 3 seconds (still in grace period)
     act(() => {
       jest.advanceTimersByTime(3000);
     });
 
-    // Warning should still not be visible
-    expect(screen.queryByText('Session Expiring Soon')).not.toBeInTheDocument();
+    expect(authService.isInGracePeriod()).toBe(true);
+    expect(screen.queryByText(/Session Expiring Soon/)).not.toBeInTheDocument();
   });
 
-  it('should properly timeout after grace period', async () => {
-    // Initialize auth service
-    await authService.initializeSessionTimeout();
+  it('should show the expiry warning after the grace period and let the user extend', () => {
+    authService.initializeSessionTimeout();
+    endGracePeriod();
 
-    // Render warning component
-    render(<SessionTimeoutWarning />);
-
-    // Fast forward past grace period (6 seconds)
-    act(() => {
-      jest.advanceTimersByTime(6000);
-    });
-
-    // Session should no longer be in grace period
     expect(authService.isInGracePeriod()).toBe(false);
 
     // Simulate session near expiry
@@ -57,60 +84,107 @@ describe('Session Management', () => {
       isValid: true
     });
     jest.spyOn(authService, 'isSessionCloseToExpiring').mockReturnValue(true);
+    const extendSpy = jest.spyOn(authService, 'extendSession');
 
-    // Wait for warning to appear
-    await waitFor(() => {
-      expect(screen.getByText('Session Expiring Soon')).toBeInTheDocument();
+    render(<SessionTimeoutWarning />);
+
+    expect(screen.queryByText(/Session Expiring Soon/)).not.toBeInTheDocument();
+
+    act(() => {
+      jest.advanceTimersByTime(INITIAL_WARNING_CHECK_MS);
     });
+
+    expect(screen.getByText(/Session Expiring Soon/)).toBeInTheDocument();
+    expect(screen.getByText('5 minutes')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Yes, Keep Me Logged In'));
+
+    expect(extendSpy).toHaveBeenCalled();
+    expect(screen.queryByText(/Session Expiring Soon/)).not.toBeInTheDocument();
+  });
+
+  it('should log out and redirect when the session expires from inactivity', async () => {
+    authService.initializeSessionTimeout({ inactivityTimeout: 1 }); // 1 minute
+    localStorage.setItem('promosuiteUser', JSON.stringify({ id: 'user-1' }));
+
+    // Validity is checked every 60s; the first check lands exactly on the expiry
+    // time (still valid), so the second check is the one that times out
+    act(() => {
+      jest.advanceTimersByTime(60000);
+    });
+    await flushPromises();
+    expect(supabase.auth.signOut).not.toHaveBeenCalled();
+
+    act(() => {
+      jest.advanceTimersByTime(60000);
+    });
+    await flushPromises();
+
+    expect(supabase.auth.signOut).toHaveBeenCalled();
+    expect(localStorage.getItem('promosuiteUser')).toBeNull();
+    expect(localStorage.getItem('ps_session_start')).toBeNull();
+
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+
+    expect(window.location.href).toBe('/?session=expired&reason=session_expired');
   });
 
   it('should cleanup on logout', async () => {
-    // Initialize session
-    await authService.initializeSessionTimeout();
+    authService.initializeSessionTimeout();
 
-    // Add some session data
-    const sessionData = {
-      startTime: Date.now(),
-      graceperiod: true
-    };
-    sessionStorage.setItem('sessionData', JSON.stringify(sessionData));
-    localStorage.setItem('ps_session_start', Date.now().toString());
+    // Session timeout tracking is active
+    expect(localStorage.getItem('ps_session_start')).not.toBeNull();
+    expect(localStorage.getItem('ps_session_expiry')).not.toBeNull();
 
-    // Perform logout
+    localStorage.setItem('promosuiteUser', JSON.stringify({ id: 'user-1' }));
+    sessionStorage.setItem('supabase.auth.token', 'token');
+
     await authService.logout();
 
-    // Verify cleanup
-    expect(sessionStorage.getItem('sessionData')).toBeNull();
+    expect(supabase.auth.signOut).toHaveBeenCalled();
+    expect(localStorage.getItem('promosuiteUser')).toBeNull();
+    expect(sessionStorage.getItem('supabase.auth.token')).toBeNull();
     expect(localStorage.getItem('ps_session_start')).toBeNull();
-    expect(authService.isInGracePeriod()).toBe(false);
+    expect(localStorage.getItem('ps_last_activity')).toBeNull();
+    expect(localStorage.getItem('ps_session_expiry')).toBeNull();
+
+    // Timeout tracking is stopped, so the expiry check no longer logs the user out
+    supabase.auth.signOut.mockClear();
+    act(() => {
+      jest.advanceTimersByTime(10 * 60 * 1000);
+    });
+    await flushPromises();
+    expect(supabase.auth.signOut).not.toHaveBeenCalled();
   });
 
-  it('should prevent infinite loops with error handling', async () => {
+  it('should prevent infinite loops with error handling', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    
+
+    authService.initializeSessionTimeout();
+    endGracePeriod();
+
     // Make sessionTimeoutService throw an error
     jest.spyOn(sessionTimeoutService, 'getRemainingTime').mockImplementation(() => {
       throw new Error('Test error');
     });
 
-    // Initialize and render
-    await authService.initializeSessionTimeout();
     render(<SessionTimeoutWarning />);
 
-    // Fast forward past grace period
     act(() => {
-      jest.advanceTimersByTime(6000);
+      jest.advanceTimersByTime(INITIAL_WARNING_CHECK_MS);
     });
 
     // Warning should not be visible despite error
-    expect(screen.queryByText('Session Expiring Soon')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Session Expiring Soon/)).not.toBeInTheDocument();
+    expect(consoleSpy).toHaveBeenCalledWith('Error checking session status:', expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledTimes(1);
 
-    // Error should be logged but not cause infinite loop
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Error checking session status:',
-      expect.any(Error)
-    );
-
-    consoleSpy.mockRestore();
+    // Checks keep running on their normal 30s interval rather than retrying in a loop
+    act(() => {
+      jest.advanceTimersByTime(30000);
+    });
+    expect(consoleSpy).toHaveBeenCalledTimes(2);
   });
 });

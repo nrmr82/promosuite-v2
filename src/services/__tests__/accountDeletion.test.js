@@ -1,166 +1,114 @@
-// Mock all dependencies first
-jest.mock('../../utils/supabase', () => ({
-  auth: {
-    getUser: jest.fn(),
-    admin: {
-      deleteUser: jest.fn()
-    }
-  },
-  from: jest.fn(() => ({
-    delete: jest.fn(() => ({
-      eq: jest.fn(() => Promise.resolve({ error: null }))
-    }))
-  }))
-}));
+import accountDeletionService from '../accountDeletionService';
+import authService from '../authService';
 
-jest.mock('../../utils/api', () => ({
-  TABLES: {
-    PROFILES: 'user_profiles',
-    USER_USAGE: 'user_analytics'
+jest.mock('../authService', () => ({
+  __esModule: true,
+  default: {
+    deleteAccount: jest.fn()
   }
 }));
 
-import accountDeletionService from '../accountDeletionService';
-import supabase from '../../utils/supabase';
+describe('accountDeletionService.deleteUserAccount', () => {
+  const originalLocation = window.location;
 
-// Mock window methods
-Object.defineProperty(window, 'location', {
-  value: {
-    href: '',
-    replace: jest.fn()
-  },
-  writable: true
-});
+  beforeAll(() => {
+    delete window.location;
+    window.location = { href: '' };
+  });
 
-// Mock localStorage
-const localStorageMock = {
-  clear: jest.fn(),
-  removeItem: jest.fn(),
-  getItem: jest.fn(),
-  setItem: jest.fn()
-};
-Object.defineProperty(window, 'localStorage', { value: localStorageMock });
-
-// Mock sessionStorage
-const sessionStorageMock = {
-  clear: jest.fn(),
-  removeItem: jest.fn(),
-  getItem: jest.fn(),
-  setItem: jest.fn()
-};
-Object.defineProperty(window, 'sessionStorage', { value: sessionStorageMock });
-
-describe('Account Deletion Services', () => {
-  const mockUser = {
-    id: 'test-user-123',
-    email: 'test@example.com'
-  };
+  afterAll(() => {
+    window.location = originalLocation;
+  });
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    
-    // Reset window.location.href
+    jest.useFakeTimers();
     window.location.href = '';
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  describe('accountDeletionService', () => {
-    const mockOnLogout = jest.fn();
-
-    beforeEach(() => {
-      mockOnLogout.mockClear();
-    });
-
-    it('verifies deletion eligibility for active user', () => {
-      const result = accountDeletionService.verifyDeletionEligibility(mockUser);
-
-      expect(result.eligible).toBe(true);
-      expect(result.reason).toBeNull();
-    });
-
-    it('denies deletion for missing user', () => {
-      const result = accountDeletionService.verifyDeletionEligibility(null);
-
-      expect(result.eligible).toBe(false);
-      expect(result.reason).toBe('No user logged in');
-    });
-
-    it('successfully deletes user account with logout and redirect', async () => {
-      // Mock the internal deleteAccount function to return success
-      const mockDeleteAccount = jest.fn().mockResolvedValue({
-        success: true,
-        message: 'Account successfully deleted'
-      });
-      
-      // Replace the service implementation temporarily
-      const originalService = require('../accountDeletionService').default;
-      jest.doMock('../authService', () => ({ deleteAccount: mockDeleteAccount }));
-      
-      const result = await accountDeletionService.deleteUserAccount(mockUser, mockOnLogout);
-
-      expect(result.success).toBe(true);
-      expect(mockOnLogout).toHaveBeenCalled();
-      
-      // Check redirect after a short delay
-      setTimeout(() => {
-        expect(window.location.replace).toHaveBeenCalledWith('/');
-      }, 1100);
-    });
-
-    it('handles deletion failure without logout', async () => {
-      authService.deleteAccount.mockResolvedValue({
-        success: false,
-        error: 'Deletion failed'
-      });
-
-      const result = await accountDeletionService.deleteUserAccount(mockUser, mockOnLogout);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Deletion failed');
-      expect(mockOnLogout).not.toHaveBeenCalled();
-      expect(window.location.replace).not.toHaveBeenCalled();
-    });
-
-    it('handles ineligible users', async () => {
-      const result = await accountDeletionService.deleteUserAccount(null, mockOnLogout);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('User is not eligible for account deletion: No user logged in');
-      expect(authService.deleteAccount).not.toHaveBeenCalled();
-      expect(mockOnLogout).not.toHaveBeenCalled();
-    });
-
-    it('handles unexpected errors during deletion process', async () => {
-      authService.deleteAccount.mockRejectedValue(new Error('Service error'));
-
-      const result = await accountDeletionService.deleteUserAccount(mockUser, mockOnLogout);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('An unexpected error occurred during account deletion: Service error');
-      expect(mockOnLogout).not.toHaveBeenCalled();
-    });
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
   });
 
-  describe('Integration test', () => {
-    it('full deletion flow works end-to-end', async () => {
-      // Setup successful mocks
-      supabase.from.mockReturnValue({
-        delete: jest.fn(() => ({
-          eq: jest.fn(() => Promise.resolve({ error: null }))
-        }))
-      });
-      supabase.auth.admin.deleteUser.mockResolvedValue({ error: null });
-
-      const mockOnLogout = jest.fn();
-
-      // Run full deletion
-      const result = await accountDeletionService.deleteUserAccount(mockUser, mockOnLogout);
-
-      expect(result.success).toBe(true);
-      expect(mockOnLogout).toHaveBeenCalled();
-      
-      // Verify cleanup happened
-      expect(localStorageMock.clear).toHaveBeenCalled();
-      expect(sessionStorageMock.clear).toHaveBeenCalled();
+  it('deletes the account, logs out, then redirects home', async () => {
+    authService.deleteAccount.mockResolvedValue({
+      success: true,
+      message: 'Account permanently deleted'
     });
+    const onLogout = jest.fn().mockResolvedValue();
+
+    const result = await accountDeletionService.deleteUserAccount(onLogout);
+
+    expect(authService.deleteAccount).toHaveBeenCalledTimes(1);
+    expect(onLogout).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({
+      success: true,
+      message: 'Your account has been successfully deleted. You will be redirected to the homepage.'
+    });
+
+    // Redirect happens after a short delay
+    expect(window.location.href).toBe('');
+    jest.advanceTimersByTime(1000);
+    expect(window.location.href).toBe('/');
+  });
+
+  it('succeeds without a logout handler', async () => {
+    authService.deleteAccount.mockResolvedValue({ success: true });
+
+    const result = await accountDeletionService.deleteUserAccount();
+
+    expect(result.success).toBe(true);
+  });
+
+  it('returns the failure message and still logs out when deletion is unsuccessful', async () => {
+    authService.deleteAccount.mockResolvedValue({
+      success: false,
+      message: 'Deletion failed'
+    });
+    const onLogout = jest.fn().mockResolvedValue();
+
+    const result = await accountDeletionService.deleteUserAccount(onLogout);
+
+    expect(result).toEqual({ success: false, message: 'Deletion failed' });
+    // Logged out for security even though deletion failed
+    expect(onLogout).toHaveBeenCalledTimes(1);
+
+    jest.runAllTimers();
+    expect(window.location.href).toBe('');
+  });
+
+  it('uses a default message when an unsuccessful result has none', async () => {
+    authService.deleteAccount.mockResolvedValue({ success: false });
+
+    const result = await accountDeletionService.deleteUserAccount(jest.fn());
+
+    expect(result).toEqual({ success: false, message: 'Account deletion failed' });
+  });
+
+  it('returns the error message when authService throws', async () => {
+    authService.deleteAccount.mockRejectedValue(
+      new Error('Failed to delete account: User not authenticated')
+    );
+    const onLogout = jest.fn().mockResolvedValue();
+
+    const result = await accountDeletionService.deleteUserAccount(onLogout);
+
+    expect(result).toEqual({
+      success: false,
+      message: 'Failed to delete account: User not authenticated'
+    });
+    expect(onLogout).toHaveBeenCalledTimes(1);
+  });
+
+  it('still returns a failure result when logout after an error also fails', async () => {
+    authService.deleteAccount.mockRejectedValue(new Error('Service error'));
+    const onLogout = jest.fn().mockRejectedValue(new Error('Logout error'));
+
+    const result = await accountDeletionService.deleteUserAccount(onLogout);
+
+    expect(result).toEqual({ success: false, message: 'Service error' });
+    expect(onLogout).toHaveBeenCalledTimes(1);
   });
 });

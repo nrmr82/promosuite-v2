@@ -1,19 +1,25 @@
-import React, { useState } from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import DeleteAccountModal from '../DeleteAccountModal';
 import Settings from '../../pages/Settings';
+import accountDeletionService from '../../services/accountDeletionService';
 
-// Mock the account deletion service
-const mockAccountDeletionService = {
-  verifyDeletionEligibility: jest.fn(() => ({ eligible: true, reason: null })),
-  deleteUserAccount: jest.fn()
-};
-jest.mock('../../services/accountDeletionService', () => mockAccountDeletionService);
+// jest.mock factories are hoisted above imports, so the mock is defined inline
+jest.mock('../../services/accountDeletionService', () => ({
+  __esModule: true,
+  default: {
+    verifyDeletionEligibility: jest.fn(),
+    deleteUserAccount: jest.fn()
+  }
+}));
 
 // Mock auth service
 jest.mock('../../services/authService', () => ({
-  deleteAccount: jest.fn()
+  __esModule: true,
+  default: {
+    deleteAccount: jest.fn()
+  }
 }));
 
 describe('Account Deletion', () => {
@@ -30,6 +36,7 @@ describe('Account Deletion', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    accountDeletionService.verifyDeletionEligibility.mockReturnValue({ eligible: true, reason: null });
   });
 
   describe('DeleteAccountModal', () => {
@@ -67,7 +74,7 @@ describe('Account Deletion', () => {
       expect(screen.getByText('Continue')).not.toBeDisabled();
     });
 
-    it('proceeds to step 2 when Continue is clicked', async () => {
+    it('proceeds to step 2 when Continue is clicked', () => {
       render(
         <DeleteAccountModal
           isOpen={true}
@@ -87,13 +94,11 @@ describe('Account Deletion', () => {
       fireEvent.click(continueButton);
 
       // Should now show step 2
-      await waitFor(() => {
-        expect(screen.getByText('🚨 Final Confirmation Required')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Type DELETE here')).toBeInTheDocument();
-      });
+      expect(screen.getByText('🚨 Final Confirmation Required')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Type DELETE here')).toBeInTheDocument();
     });
 
-    it('requires typing DELETE to enable final confirmation', async () => {
+    it('requires typing DELETE to enable final confirmation', () => {
       render(
         <DeleteAccountModal
           isOpen={true}
@@ -110,19 +115,17 @@ describe('Account Deletion', () => {
       const continueButton = screen.getByText('Continue');
       fireEvent.click(continueButton);
 
-      await waitFor(() => {
-        const confirmationInput = screen.getByPlaceholderText('Type DELETE here');
-        const deleteButton = screen.getByText('Delete Account Forever');
+      const confirmationInput = screen.getByPlaceholderText('Type DELETE here');
+      const deleteButton = screen.getByText('Delete Account Forever');
 
-        expect(deleteButton).toBeDisabled();
+      expect(deleteButton).toBeDisabled();
 
-        fireEvent.change(confirmationInput, { target: { value: 'DELETE' } });
+      fireEvent.change(confirmationInput, { target: { value: 'DELETE' } });
 
-        expect(deleteButton).not.toBeDisabled();
-      });
+      expect(deleteButton).not.toBeDisabled();
     });
 
-    it('calls onConfirmDelete when final button is clicked', async () => {
+    it('calls onConfirmDelete when final button is clicked', () => {
       const mockOnConfirmDelete = jest.fn();
       
       render(
@@ -141,22 +144,17 @@ describe('Account Deletion', () => {
       const continueButton = screen.getByText('Continue');
       fireEvent.click(continueButton);
 
-      await waitFor(async () => {
-        const confirmationInput = screen.getByPlaceholderText('Type DELETE here');
-        fireEvent.change(confirmationInput, { target: { value: 'DELETE' } });
+      const confirmationInput = screen.getByPlaceholderText('Type DELETE here');
+      fireEvent.change(confirmationInput, { target: { value: 'DELETE' } });
 
-        const deleteButton = screen.getByText('Delete Account Forever');
-        fireEvent.click(deleteButton);
+      const deleteButton = screen.getByText('Delete Account Forever');
+      fireEvent.click(deleteButton);
 
-        expect(mockOnConfirmDelete).toHaveBeenCalled();
-      });
+      expect(mockOnConfirmDelete).toHaveBeenCalledTimes(1);
     });
 
-    it('shows loading state during deletion', async () => {
-      let loadingState = false;
-      const mockOnConfirmDelete = jest.fn(() => {
-        loadingState = true;
-      });
+    it('shows loading state during deletion', () => {
+      const mockOnConfirmDelete = jest.fn();
 
       const TestWrapper = () => {
         const [loading, setLoading] = React.useState(false);
@@ -185,10 +183,8 @@ describe('Account Deletion', () => {
       const continueButton = screen.getByText('Continue');
       fireEvent.click(continueButton);
 
-      // Wait for step 2 to appear and type DELETE
-      await waitFor(() => {
-        expect(screen.getByText('🚨 Final Confirmation Required')).toBeInTheDocument();
-      });
+      // Step 2 appears; type DELETE
+      expect(screen.getByText('🚨 Final Confirmation Required')).toBeInTheDocument();
 
       const confirmationInput = screen.getByPlaceholderText('Type DELETE here');
       fireEvent.change(confirmationInput, { target: { value: 'DELETE' } });
@@ -197,10 +193,9 @@ describe('Account Deletion', () => {
       fireEvent.click(deleteButton);
 
       // Now check if loading states appear
-      await waitFor(() => {
-        expect(screen.getByText('Deleting your account and all associated data...')).toBeInTheDocument();
-        expect(screen.getByText('Deleting...')).toBeInTheDocument();
-      });
+      expect(mockOnConfirmDelete).toHaveBeenCalledTimes(1);
+      expect(screen.getByText('Deleting your account and all associated data...')).toBeInTheDocument();
+      expect(screen.getByText('Deleting...')).toBeInTheDocument();
     });
   });
 
@@ -212,15 +207,32 @@ describe('Account Deletion', () => {
       expect(screen.getByText('Permanently delete your account and all data')).toBeInTheDocument();
     });
 
-    it('opens modal when delete account button is clicked', async () => {
+    it('opens modal when delete account button is clicked', () => {
       render(<Settings user={mockUser} onLogout={mockOnLogout} />);
 
       const deleteButton = screen.getByRole('button', { name: 'Delete Account' });
       fireEvent.click(deleteButton);
 
-      await waitFor(() => {
-        expect(screen.getByText('⚠️ This action cannot be undone')).toBeInTheDocument();
+      expect(screen.getByText('⚠️ This action cannot be undone')).toBeInTheDocument();
+    });
+
+    it('deletes the account via accountDeletionService and shows failures', async () => {
+      accountDeletionService.deleteUserAccount.mockResolvedValue({
+        success: false,
+        message: 'Server deletion failed'
       });
+
+      render(<Settings user={mockUser} onLogout={mockOnLogout} />);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Delete Account' }));
+      fireEvent.click(screen.getByLabelText(/I understand that this action is permanent/));
+      fireEvent.click(screen.getByText('Continue'));
+      fireEvent.change(screen.getByPlaceholderText('Type DELETE here'), { target: { value: 'DELETE' } });
+      fireEvent.click(screen.getByText('Delete Account Forever'));
+
+      expect(accountDeletionService.verifyDeletionEligibility).toHaveBeenCalledWith(mockUser);
+      expect(accountDeletionService.deleteUserAccount).toHaveBeenCalledWith(mockOnLogout);
+      expect(await screen.findByText('Server deletion failed')).toBeInTheDocument();
     });
 
     it('shows export data button', () => {

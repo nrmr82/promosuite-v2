@@ -45,11 +45,15 @@ describe('Profile Component', () => {
 
   it('renders profile information correctly', () => {
     render(<Profile user={mockUser} onNavigate={mockOnNavigate} />);
-    
-    expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('john@example.com')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('+1234567890')).toBeInTheDocument();
+
+    // View mode shows plain text; name and email appear in the header card and the form
+    expect(screen.getByRole('heading', { name: 'John Doe' })).toBeInTheDocument();
+    expect(screen.getAllByText('John Doe')).toHaveLength(2);
+    expect(screen.getAllByText('john@example.com')).toHaveLength(2);
+    expect(screen.getByText('+1234567890')).toBeInTheDocument();
+    expect(screen.getByText('Test Company')).toBeInTheDocument();
     expect(screen.getByText('Free Plan')).toBeInTheDocument();
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
   it('shows Manage Subscription and View Usage buttons', () => {
@@ -96,5 +100,28 @@ describe('Profile Component', () => {
     // Should show Cancel and Save buttons in edit mode
     expect(screen.getByText('Cancel')).toBeInTheDocument();
     expect(screen.getByText('Save Changes')).toBeInTheDocument();
+
+    // Fields become inputs pre-filled with the current values
+    expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('john@example.com')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('+1234567890')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Test Company')).toBeInTheDocument();
+  });
+
+  it('saves edited values and discards cancelled edits', () => {
+    render(<Profile user={mockUser} onNavigate={mockOnNavigate} />);
+
+    fireEvent.click(screen.getByText('Edit Profile'));
+    fireEvent.change(screen.getByDisplayValue('John Doe'), { target: { value: 'Jane Roe' } });
+    fireEvent.click(screen.getByText('Save Changes'));
+
+    expect(screen.getByRole('heading', { name: 'Jane Roe' })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Edit Profile'));
+    fireEvent.change(screen.getByDisplayValue('Jane Roe'), { target: { value: 'Discarded' } });
+    fireEvent.click(screen.getByText('Cancel'));
+
+    expect(screen.getByRole('heading', { name: 'Jane Roe' })).toBeInTheDocument();
+    expect(screen.queryByText('Discarded')).not.toBeInTheDocument();
   });
 });
