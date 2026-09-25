@@ -28,12 +28,12 @@ Many existing tests are stale and fail (e.g. `src/App.test.js` still looks for C
 
 ## Environment variables
 
-- `.env.development` / `.env.test` (committed): public Supabase URL and anon key, so `npm start` and
-  `npm test` work without setup. The anon key is browser-safe by design.
+- `.env.development` / `.env.test` / `.env.production` (committed): public Supabase URL and anon key,
+  so `npm start`, `npm test` and every build (including Vercel previews) work without setup. The anon
+  key is browser-safe by design. Variables set in the Vercel dashboard override these.
 - `.env.local` (gitignored): put private or optional keys here, e.g. `REACT_APP_STRIPE_PUBLISHABLE_KEY`,
   `REACT_APP_REPLICATE_API_TOKEN`, `REACT_APP_HF_API_KEY`, OAuth client IDs. Run
   `grep -rhoE "process\.env\.[A-Z_0-9]+" src | sort -u` for the full list.
-- Production values live in the Vercel project settings.
 - `src/utils/supabase.js` throws if the Supabase vars are missing, which blanks the whole app.
 
 ## Code layout
