@@ -126,6 +126,12 @@ class SupabaseAuthService {
         userId: data.user?.id
       });
 
+      // Supabase doesn't error on a duplicate email when confirmations are on;
+      // it returns a user with no identities instead
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        throw new Error('User already registered');
+      }
+
       // If registration successful but email confirmation required
       if (data.user && !data.session) {
         console.log('🔍 Registration Debug - Email confirmation required');
@@ -217,17 +223,9 @@ class SupabaseAuthService {
           error.message?.includes('duplicate key value violates unique constraint') ||
           error.message?.includes('user_already_exists')) {
         
-        // Try to determine if this is an OAuth/email conflict
         const email = userData?.email;
         if (email) {
-          // Use helper method to get specific conflict message
-          try {
-            const conflictMessage = await this.getAuthConflictMessage(email);
-            throw new Error(conflictMessage);
-          } catch (checkError) {
-            // Fallback if the check fails
-            throw new Error(`An account with ${email} already exists. If you previously signed up with Google or LinkedIn, please use that login method instead. Otherwise, try the 'Sign In' tab if you have an account.`);
-          }
+          throw new Error(`An account with ${email} already exists. If you previously signed up with Google or LinkedIn, please use that login method instead. Otherwise, try the 'Sign In' tab if you have an account.`);
         } else {
           throw new Error('An account with this email already exists. Please try signing in instead.');
         }
@@ -824,66 +822,6 @@ class SupabaseAuthService {
       console.error('🗑️ Account deletion failed:', error);
       throw new Error(`Failed to delete account: ${error.message}`);
     }
-  }
-
-  /**
-   * Check if user exists by email and detect auth providers
-   */
-  async checkUserExists(email) {
-    try {
-      // Try to initiate password reset - this will tell us if user exists
-      // without actually sending a reset email (we'll catch the error)
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://example.com/nowhere' // Use invalid redirect to avoid sending email
-      });
-      
-      // If no error, user exists
-      if (!error) {
-        return { 
-          exists: true,
-          message: 'User exists - can use password reset'
-        };
-      }
-      
-      // Check specific error messages
-      if (error.message?.includes('User not found') || 
-          error.message?.includes('user_not_found')) {
-        return { exists: false };
-      }
-      
-      // Check for OAuth-only accounts
-      if (error.message?.includes('Signup requires a valid password') ||
-          error.message?.includes('Password not set') ||
-          error.message?.includes('User created via oauth')) {
-        return { 
-          exists: true, 
-          isOAuthOnly: true,
-          message: 'This account was created with Google or LinkedIn. Please use the social login buttons.'
-        };
-      }
-      
-      // For other errors, we can't determine - assume user might exist
-      console.warn('Could not determine if user exists:', error);
-      return { exists: null, error: error.message };
-    } catch (error) {
-      console.error('Error checking if user exists:', error);
-      return { exists: null, error: error.message };
-    }
-  }
-  
-  /**
-   * Helper method to provide user-friendly error messages for auth conflicts
-   */
-  async getAuthConflictMessage(email) {
-    const userCheck = await this.checkUserExists(email);
-    
-    if (userCheck.isOAuthOnly) {
-      return `An account with ${email} already exists and was created with Google or LinkedIn. Please use the social login buttons instead.`;
-    } else if (userCheck.exists) {
-      return `An account with ${email} already exists. You can login with your password or reset it if you've forgotten.`;
-    }
-    
-    return `Unable to determine account status for ${email}. Please try signing up or logging in.`;
   }
 
   /**
