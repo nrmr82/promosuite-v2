@@ -1,0 +1,13 @@
+# Cloudflare Pages config. Build command: npm run build, output: build/
+# Secrets (set in the Cloudflare dashboard, never here): SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY
+name = "promosuite-v2"
+pages_build_output_dir = "build"
+compatibility_date = "2026-09-01"
+
+[ai]
+binding = "AI"
+
+# Public values, same as .env.production
+[vars]
+SUPABASE_URL = "https://iimjgbzrtazeiuamhvlc.supabase.co"
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpbWpnYnpydGF6ZWl1YW1odmxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MDI1MjcsImV4cCI6MjA3MzE3ODUyN30.eZOmLoGvev2i2GD5ZbODHqbXTn0vwRkqn2lIIZvevB0"
