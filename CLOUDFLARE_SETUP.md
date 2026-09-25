@@ -20,7 +20,7 @@ requests fail until the next day instead of billing you.
 2. **Create the Pages project:** Workers & Pages → Create → Pages → *Connect to Git* →
    pick `nrmr82/promosuite-v2`.
    - Production branch: `master`
-   - Framework preset: *Create React App* (build command `npm run build`, output `build`)
+   - Framework preset: *React (Static)* (build command `npm run build`, output `build`)
    - Environment variable: `NODE_VERSION` = `22`
 3. **Add secrets:** project → Settings → Variables and Secrets → Add, type *Secret*:
    - `SUPABASE_SERVICE_ROLE_KEY`: Supabase dashboard → Project Settings → API Keys → `service_role`
@@ -33,7 +33,8 @@ requests fail until the next day instead of billing you.
    - Redirect URLs: `https://promosuite-v2.pages.dev/**`, `https://*.promosuite-v2.pages.dev/**`
      (preview deployments), `http://localhost:3000/**`
 5. **Analytics (optional):** project → Metrics → enable *Web Analytics*.
-6. **Retire Vercel** once the Pages site works: delete the Vercel project and
+6. **Database:** in Supabase → SQL Editor, run each script in `supabase/migrations/` (in order).
+7. **Retire Vercel** once the Pages site works: delete the Vercel project and
    `vercel.json`.
 
 Every push then deploys automatically: `master` goes to production, and every other
@@ -55,6 +56,6 @@ npm run pages:dev           # build + serve app and functions on http://localhos
 ```
 
 For hot reload while editing React code, run `npm run functions:dev` (serves the last
-build's functions on :8788) in one terminal and `npm start` in another;
-`src/setupProxy.js` forwards `/api` from :3000 to :8788. Local secrets go in
+build's functions on :8788) in one terminal and `npm run dev` in another; Vite
+(`vite.config.js`) forwards `/api` from :3000 to :8788. Local secrets go in
 `.dev.vars` (gitignored), for example `SUPABASE_SERVICE_ROLE_KEY=...`.

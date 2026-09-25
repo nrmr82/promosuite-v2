@@ -1,5 +1,0 @@
-Session Token Counter
-
-Start Time: 2025-09-18T10:15:46Z
-Tokens Generated: 0
-Last Updated: 2025-09-18T10:15:46Z

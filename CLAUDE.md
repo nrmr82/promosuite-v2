@@ -4,72 +4,68 @@ Guidance for Claude Code when working in this repository.
 
 ## Project
 
-PromoSuite V2: a React marketing suite for real estate agents.
-- **FlyerPro**: flyer creation from templates (Fabric.js / Polotno editors)
-- **SocialSpark**: social media post creation and scheduling
-- Landing page, auth, pricing/subscriptions (Stripe), profile/settings, collections and favorites
+PromoSuite: a marketing studio for individual real estate agents (teams/brokerages are "coming soon").
+Available now: Design Studio (flyers from templates, saved to Supabase), photo editor, profile/settings.
+Roadmap (shown in-app as "Soon", see `src/lib/roadmap.js`): brand kit and listings (Phase 1), AI writer
+(2), listing pages with lead capture (3), social planner (4), video reels (5).
 
-Stack: Create React App 5 (`react-scripts`), React 18, Supabase (auth + Postgres), Fabric.js
-(flyer and photo editors), Stripe Checkout. Hosted on **Cloudflare Pages** (free, commercial use OK):
-server code lives in `functions/` as Pages Functions (AI via Workers AI, Stripe checkout, account
-deletion); see `CLOUDFLARE_SETUP.md`. `vercel.json` only remains until the Vercel project is retired.
+Stack: React 18 + **Vite 8** (Create React App was removed), Tailwind CSS 4 with shadcn/ui-style
+components on Radix in `src/components/ui/`, React Router, Supabase (auth + Postgres + storage),
+Fabric.js editors, Stripe Checkout. Hosted on **Cloudflare Pages**; server code lives in `functions/`
+as Pages Functions (Workers AI, Stripe checkout, account deletion). See `CLOUDFLARE_SETUP.md`.
 
 Only free services: don't add paid SDKs or APIs (the app previously used Polotno and Replicate) or
-any secret in a `REACT_APP_*` variable, since those ship to the browser. Secrets belong in
-Pages Functions (`context.env`).
+put any secret in a `VITE_*` variable, since those ship to the browser. Secrets belong in Pages
+Functions (`context.env`).
 
 ## Commands
 
 ```bash
 npm install                     # dependencies (runs automatically in cloud sessions via .claude/hooks)
-npm start                       # dev server on http://localhost:3000 with hot reload
-npm run build                   # production build into build/ (CI=false, so lint warnings don't fail it)
-npm run pages:dev               # build + serve app and functions/ on :8788 (needs `npx wrangler login`)
-npm run functions:dev           # serve functions/ on :8788; `npm start` proxies /api there (src/setupProxy.js)
-npx eslint src/path/to/file.js  # lint a file
-CI=true npm test -- --watchAll=false            # run tests once
-CI=true npm test -- --watchAll=false <pattern>  # run a single test file
+npm run dev                     # Vite dev server on http://localhost:3000 (/api proxied to :8788)
+npm run build                   # production build into build/ (Cloudflare Pages output dir)
+npm test                        # Vitest (tests/)
+npm run lint                    # ESLint 9 flat config
+npm run functions:dev           # serve functions/ on :8788 (needs `npx wrangler login` for the AI binding)
+npm run pages:dev               # build + serve app and functions on :8788
 ```
-
-Many existing tests are stale and fail (e.g. `src/App.test.js` still looks for CRA's "learn react" text).
 
 ## Environment variables
 
-- `.env.development` / `.env.test` / `.env.production` (committed): public Supabase URL and anon key,
-  so `npm start`, `npm test` and every build (including deploy previews) work without setup. The anon
-  key is browser-safe by design. Build variables set in the hosting dashboard override these.
-- `.env.local` (gitignored): optional public build values such as Stripe price IDs
-  (`REACT_APP_STRIPE_*_PRICE_ID`). Run `grep -rhoE "process\.env\.[A-Z_0-9]+" src | sort -u` for the list.
+- `.env.development` / `.env.test` / `.env.production` (committed): public Supabase URL and anon key
+  (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`); the anon key is browser-safe by design.
+- Optional public build values (Stripe price IDs `VITE_STRIPE_PRO_{MONTHLY,YEARLY}_PRICE_ID`) go in
+  `.env.local` or the Cloudflare build settings; without them "Upgrade" shows a "launching soon" toast.
 - Server secrets (`SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`) are Cloudflare Pages secrets, or
   `.dev.vars` locally; public server values and the Workers AI binding are in `wrangler.toml`.
-- `src/utils/supabase.js` throws if the Supabase vars are missing, which blanks the whole app.
 
 ## Code layout
 
-- `src/App.js`: top-level app, routing and auth state
-- `src/components/`: pages and UI (Dashboard, FlyerPro, SocialSpark, LandingPage, editors, modals)
-- `src/pages/`: Profile, Settings, admin
-- `src/services/`: business logic and Supabase calls (`authService`, `subscriptionService`, ...)
-- `src/contexts/`: AuthContext, TemplateContext, ProductContext
-- `src/utils/supabase.js`: the Supabase client; `src/utils/stripe.js`: starts checkout via `/api`
-- `src/services/aiService.js`: AI text/images via `/api/ai/*`
-- `src/components/FlyerStudio/`: Fabric.js flyer editor and starter templates
+- `src/main.jsx` providers (theme, tooltip, router, auth, toasts); `src/App.jsx` routes
+- `src/layouts/`: `public-layout` (marketing/auth pages) and `app-layout` (sidebar app shell)
+- `src/pages/`: landing, pricing, auth (login/signup/forgot/reset/callback), dashboard, designs,
+  flyer-editor, photo-editor, settings, coming-soon, not-found
+- `src/components/ui/`: design-system components; `src/components/designs/`: template gallery, design grid
+- `src/components/FlyerStudio/`: Fabric.js flyer editor, templates, `templateObjects.js` (builder + previews)
+- `src/components/PortraitStudio/`: Fabric.js photo editor
+- `src/lib/`: `supabase`, `auth` (sign-in/up, profile), `designs` (CRUD), `stripe`, `ai`, `roadmap`, `utils` (`cn`)
+- `src/contexts/auth.jsx`: session, user, profile (`useAuth`)
+- `src/styles/app.css`: Tailwind entry and theme tokens (light default, `.dark` class)
 - `functions/`: Cloudflare Pages Functions (`/api/*`); `functions/_lib/auth.js` verifies the Supabase token
-- `src/platforms/desktop/`, `src/shared/`: platform split (see `IMPORTANT_PROJECT_STRUCTURE.md`)
-- `supabase/migrations/`, `database/`, `*.sql`: database schema and fixes
-- `backend/`: old FastAPI mock AI service; not deployed or used
-- `backup*/`: old copies of components; not used by the app
+- `supabase/migrations/`: database scripts to run in the Supabase SQL editor; `supabase/archive/`: old ones
+- `public/templates/*.png`: pre-rendered template previews (regenerate when templates change)
 
-## Constraints
+## Conventions
 
-- **Desktop only for now**: don't add mobile/tablet or touch-specific work (see
-  `DEVELOPMENT_CONSTRAINTS.md`, `WARP_SESSION_NOTE.md`).
-- The many `*_FIX*.md` / `*_SETUP*.md` files at the root are notes from earlier AI sessions;
-  they may be out of date.
+- Style with Tailwind classes and the theme tokens (`bg-background`, `text-muted-foreground`,
+  `bg-primary`, `text-gold`...); never hard-code colors, so light and dark both work.
+- Mark unfinished features honestly (a "Soon" badge, a coming-soon page); no fake data or stats.
+- **Desktop only for now**: don't add mobile/tablet-specific work.
 
 ## Cloud sessions
 
 The cloud container's network policy may block `*.supabase.co`, `*.cloudflare.com` and Stripe, so
-login, AI and data calls fail in in-container previews. `wrangler pages dev` needs a Cloudflare login
-for the AI binding; to smoke-test functions here, run it from a copy of `wrangler.toml` without the
-`[ai]` block. Check real behavior on a deployed preview.
+login, AI and data calls fail in in-container previews. To see logged-in pages here, mock Supabase in
+Playwright (seed `sb-<ref>-auth-token` in localStorage and fulfil `*.supabase.co` requests). To
+smoke-test functions, run `wrangler pages dev` from a copy of `wrangler.toml` without the `[ai]`
+block. Check real behavior on the Cloudflare preview for the branch.

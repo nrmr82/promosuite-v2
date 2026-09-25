@@ -1,76 +1,31 @@
-# 🚨 READ FIRST: IMPORTANT_PROJECT_STRUCTURE.md 🚨
+# PromoSuite
 
-**BEFORE MAKING ANY CODE CHANGES** read `IMPORTANT_PROJECT_STRUCTURE.md` to understand the multi-platform folder structure.
+Marketing studio for real estate agents: listing flyers and graphics from ready-made templates,
+a photo editor, and (on the roadmap) brand kits, listings, AI copy, listing pages, a social
+planner and video reels.
 
----
+- **App:** React 18 + Vite, Tailwind CSS 4, shadcn/ui-style components (Radix), React Router
+- **Editors:** Fabric.js (MIT)
+- **Backend:** Supabase (auth, Postgres, storage) and Cloudflare Pages Functions in `functions/`
+  (Workers AI, Stripe Checkout, account deletion)
+- **Hosting:** Cloudflare Pages (free tier, commercial use allowed)
 
-# Getting Started with Create React App
+## Develop
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+```bash
+npm install
+npm run dev          # http://localhost:3000
+npm test             # Vitest
+npm run lint         # ESLint
+npm run build        # production build into build/
+```
 
-## Available Scripts
+`npm run dev` works on its own for everything except `/api` (AI, checkout, account deletion).
+To run those locally, `npx wrangler login` once, then `npm run functions:dev` in a second
+terminal; Vite forwards `/api` to it.
 
-In the project directory, you can run:
+## Set up
 
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Hosting, secrets and Supabase redirect URLs: [CLOUDFLARE_SETUP.md](CLOUDFLARE_SETUP.md)
+- Database: run the scripts in `supabase/migrations/` in the Supabase SQL editor
+  (older scripts are kept in `supabase/archive/` for reference only)
