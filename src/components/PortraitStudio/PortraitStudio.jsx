@@ -524,133 +524,6 @@ const PortraitStudio = forwardRef(({
     canvas.renderAll();
   }, [canvas, currentImage]);
 
-  const handleBeautify = useCallback(async () => {
-    if (!user) {
-      alert('Please sign in to use AI beautification');
-      return;
-    }
-    
-    if (!canvas || !currentImage) {
-      alert('Please load an image first');
-      return;
-    }
-    
-    setIsBeautifying(true);
-    
-    try {
-      // Get current image data
-      const imageDataURL = canvas.toDataURL('image/png');
-      
-      // Call backend AI beautification
-      const response = await fetch('/api/beautify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.token}`
-        },
-        body: JSON.stringify({
-          image: imageDataURL,
-          options: {
-            enhance_face: true,
-            smooth_skin: true,
-            brighten_eyes: true,
-            enhance_lips: false
-          }
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Beautification failed');
-      }
-      
-      const result = await response.json();
-      
-      // Load beautified image
-      loadImageToCanvas(canvas, result.enhanced_image);
-      
-      console.log('AI beautification completed successfully');
-    } catch (error) {
-      console.error('Beautification error:', error);
-      alert('AI beautification failed. Please try again.');
-    } finally {
-      setIsBeautifying(false);
-    }
-  }, [canvas, currentImage, user, loadImageToCanvas]);
-
-  const handleInpaint = useCallback(async () => {
-    if (!user) {
-      alert('Please sign in to use AI inpainting');
-      return;
-    }
-    
-    if (!canvas || !currentImage) {
-      alert('Please load an image first');
-      return;
-    }
-    
-    // Check if there are any drawn paths
-    const drawnPaths = canvas.getObjects().filter(obj => obj.type === 'path');
-    if (drawnPaths.length === 0) {
-      alert('Please draw on the image to mark areas for inpainting first!');
-      return;
-    }
-    
-    alert('🚧 AI Inpainting feature is coming soon!\n\nThis will use AI to intelligently remove objects and fill in the background.\n\nFor now, you can use the mask tool to highlight areas.');
-    
-    // Future implementation:
-    // setIsLoading(true);
-    // try {
-    //   const maskCanvas = document.createElement('canvas');
-    //   const maskCtx = maskCanvas.getContext('2d');
-    //   maskCanvas.width = canvas.width;
-    //   maskCanvas.height = canvas.height;
-    //   
-    //   // Extract mask from drawing
-    //   canvas.getObjects().forEach(obj => {
-    //     if (obj.type === 'path' && obj.stroke) {
-    //       // Draw the path to mask canvas
-    //     }
-    //   });
-    //   
-    //   const maskDataURL = maskCanvas.toDataURL('image/png');
-    //   const imageDataURL = canvas.toDataURL('image/png');
-    //   
-    //   // Call backend inpainting service
-    //   const response = await fetch('/api/inpaint', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       'Authorization': `Bearer ${user.token}`
-    //     },
-    //     body: JSON.stringify({
-    //       image: imageDataURL,
-    //       mask: maskDataURL,
-    //       prompt: 'remove object and fill with background'
-    //     })
-    //   });
-    //   
-    //   if (!response.ok) {
-    //     throw new Error('Inpainting failed');
-    //   }
-    //   
-    //   const result = await response.json();
-    //   loadImageToCanvas(canvas, result.inpainted_image);
-    //   
-    //   // Clear mask drawings
-    //   canvas.getObjects().forEach(obj => {
-    //     if (obj.type === 'path') {
-    //       canvas.remove(obj);
-    //     }
-    //   });
-    //   canvas.renderAll();
-    // } catch (error) {
-    //   console.error('Inpainting error:', error);
-    //   alert('AI inpainting failed. Please try again.');
-    // } finally {
-    //   setIsLoading(false);
-    // }
-  }, [canvas, currentImage, user]);
-
   const handleSave = useCallback(async () => {
     if (!canvas || !hasImage) {
       alert('Please load an image first');
@@ -743,7 +616,7 @@ const PortraitStudio = forwardRef(({
       {/* Header */}
       <div className="portrait-studio-header">
         <div className="header-left">
-          <h2>Portrait Studio</h2>
+          <h2>Photo editor</h2>
           <div className="header-actions">
             <input
               type="file"
@@ -760,15 +633,6 @@ const PortraitStudio = forwardRef(({
         </div>
         
         <div className="header-right">
-          <button 
-            className="btn btn-primary beautify-btn"
-            onClick={handleBeautify}
-            disabled={isBeautifying || !currentImage}
-          >
-            <Icon name="sparkles" size={16} color="currentColor" />
-            {isBeautifying ? 'Beautifying...' : 'AI Beautify'}
-          </button>
-          
           <button 
             className="btn btn-primary"
             onClick={handleSave}
@@ -816,20 +680,6 @@ const PortraitStudio = forwardRef(({
                 <Icon name="rotate" size={16} color="currentColor" />
                 Rotate
               </button>
-              <button
-                className={`tool-btn ${currentTool === EDITING_TOOLS.MASK ? 'active' : ''}`}
-                onClick={() => handleToolChange(EDITING_TOOLS.MASK)}
-              >
-                <Icon name="mask" size={16} color="currentColor" />
-                Mask
-              </button>
-              <button
-                className={`tool-btn ${currentTool === EDITING_TOOLS.INPAINT ? 'active' : ''}`}
-                onClick={() => handleToolChange(EDITING_TOOLS.INPAINT)}
-              >
-                <Icon name="heal" size={16} color="currentColor" />
-                Inpaint
-              </button>
             </div>
           </div>
 
@@ -856,18 +706,6 @@ const PortraitStudio = forwardRef(({
                   +90°
                 </button>
               </div>
-            </div>
-          )}
-
-          {(currentTool === EDITING_TOOLS.MASK || currentTool === EDITING_TOOLS.INPAINT) && maskMode && (
-            <div className="tool-controls">
-              <h4>{currentTool === EDITING_TOOLS.INPAINT ? 'Inpaint' : 'Mask'} Mode</h4>
-              <p>Draw on the image to create a mask</p>
-              {currentTool === EDITING_TOOLS.INPAINT && (
-                <button className="btn btn-primary" onClick={handleInpaint}>
-                  Apply Inpainting
-                </button>
-              )}
             </div>
           )}
 

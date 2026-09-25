@@ -3,8 +3,8 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
-  background: #1a1a1a;
-  color: #ffffff;
+  background: var(--background);
+  color: var(--foreground);
   font-size: 13px;
 }
 
@@ -15,8 +15,8 @@
   justify-content: space-between;
   gap: 16px;
   padding: 12px 16px;
-  border-bottom: 1px solid #333333;
-  background: #1f1f1f;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
 }
 
 .flyer-studio-header .header-left {
@@ -41,30 +41,30 @@
   width: 1px;
   height: 20px;
   margin: 0 6px;
-  background: #444444;
+  background: var(--input);
 }
 
 .fs-zoom {
   min-width: 44px;
   text-align: center;
-  color: #cccccc;
+  color: var(--muted-foreground);
 }
 
 /* Buttons */
 .fs-btn {
   padding: 6px 10px;
-  border: 1px solid #444444;
+  border: 1px solid var(--input);
   border-radius: 6px;
-  background: #262626;
-  color: #ffffff;
+  background: var(--background);
+  color: var(--foreground);
   font-size: 13px;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 }
 
 .fs-btn:hover:not(:disabled) {
-  background: #333333;
-  border-color: #555555;
+  background: var(--muted);
+  border-color: var(--muted-foreground);
 }
 
 .fs-btn:disabled {
@@ -73,23 +73,25 @@
 }
 
 .fs-btn.active {
-  border-color: #e91e63;
-  background: rgba(233, 30, 99, 0.18);
+  border-color: var(--primary);
+  background: var(--accent);
 }
 
 .fs-btn-primary {
-  border-color: #e91e63;
-  background: #e91e63;
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
 
 .fs-btn-primary:hover:not(:disabled) {
-  border-color: #d81b60;
-  background: #d81b60;
+  border-color: var(--primary-hover);
+  background: var(--primary-hover);
 }
 
 .fs-btn-danger:hover:not(:disabled) {
-  border-color: #ef4444;
-  background: rgba(239, 68, 68, 0.2);
+  border-color: var(--destructive);
+  color: var(--destructive);
+  background: transparent;
 }
 
 .fs-btn-block {
@@ -109,15 +111,15 @@
   flex: 0 0 220px;
   overflow-y: auto;
   padding: 12px;
-  background: #1f1f1f;
+  background: var(--card);
 }
 
 .fs-panel-left {
-  border-right: 1px solid #333333;
+  border-right: 1px solid var(--border);
 }
 
 .fs-panel-right {
-  border-left: 1px solid #333333;
+  border-left: 1px solid var(--border);
 }
 
 .fs-panel section {
@@ -126,7 +128,7 @@
 
 .fs-panel h4 {
   margin: 0 0 8px;
-  color: #999999;
+  color: var(--muted-foreground);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -142,7 +144,7 @@
 
 .fs-hint {
   margin: 6px 0 0;
-  color: #999999;
+  color: var(--muted-foreground);
   font-size: 12px;
   line-height: 1.4;
 }
@@ -160,12 +162,25 @@
   aspect-ratio: 4 / 5;
   padding: 0;
   overflow: hidden;
-  border: 2px solid #444444;
+  border: 2px solid var(--input);
   border-radius: 6px;
   cursor: pointer;
 }
 
+.fs-template {
+  position: relative;
+}
+
+.fs-template img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .fs-template span {
+  position: relative;
   width: 100%;
   padding: 4px;
   background: rgba(0, 0, 0, 0.65);
@@ -175,7 +190,7 @@
 
 .fs-template:hover,
 .fs-template.active {
-  border-color: #e91e63;
+  border-color: var(--primary);
 }
 
 /* Add-text buttons */
@@ -184,16 +199,16 @@
   width: 100%;
   margin-bottom: 6px;
   padding: 8px 10px;
-  border: 1px solid #444444;
+  border: 1px solid var(--input);
   border-radius: 6px;
-  background: #262626;
-  color: #ffffff;
+  background: var(--background);
+  color: var(--foreground);
   text-align: left;
   cursor: pointer;
 }
 
 .fs-add:hover {
-  border-color: #e91e63;
+  border-color: var(--primary);
 }
 
 .fs-add-heading {
@@ -212,14 +227,14 @@
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 10px;
-  color: #cccccc;
+  color: var(--muted-foreground);
 }
 
 .fs-field input[type='color'] {
   width: 40px;
   height: 28px;
   padding: 0;
-  border: 1px solid #444444;
+  border: 1px solid var(--input);
   border-radius: 4px;
   background: none;
   cursor: pointer;
@@ -229,15 +244,15 @@
 .fs-field select {
   width: 110px;
   padding: 5px 6px;
-  border: 1px solid #444444;
+  border: 1px solid var(--input);
   border-radius: 4px;
-  background: #262626;
-  color: #ffffff;
+  background: var(--background);
+  color: var(--foreground);
 }
 
 .fs-field input[type='range'] {
   width: 110px;
-  accent-color: #e91e63;
+  accent-color: var(--primary);
 }
 
 /* Page area */
@@ -247,10 +262,10 @@
   min-width: 0;
   overflow: auto;
   padding: 24px;
-  background: #121212;
+  background: var(--muted);
 }
 
 .flyer-canvas-host {
   margin: auto;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12), 0 12px 32px rgba(15, 23, 42, 0.12);
 }

@@ -1,8 +1,9 @@
-import React, {
+import {
   useState, useCallback, useEffect, useRef, forwardRef, useImperativeHandle,
 } from 'react';
 import { Canvas, Textbox, Rect, Circle, Line, FabricImage } from 'fabric';
 import { FLYER_TEMPLATES, PAGE_WIDTH, PAGE_HEIGHT } from './flyerTemplates';
+import { BASE, createObject, renderTemplatePreview } from './templateObjects';
 
 import './FlyerStudio.css';
 
@@ -10,21 +11,6 @@ import './FlyerStudio.css';
 const EXTRA_PROPS = ['photoSlot', 'slotHint'];
 const HISTORY_LIMIT = 50;
 const FONTS = ['Arial', 'Georgia', 'Times New Roman', 'Verdana', 'Trebuchet MS', 'Courier New', 'Impact'];
-
-const BASE = { originX: 'left', originY: 'top' };
-
-// Build a Fabric object from a template element
-function createObject(el) {
-  const { type, text, photoSlot, slotHint, ...props } = el;
-  let obj;
-  if (type === 'text') obj = new Textbox(text, { ...BASE, ...props });
-  else if (type === 'rect') obj = new Rect({ ...BASE, ...props });
-  else if (type === 'circle') obj = new Circle({ ...BASE, ...props });
-  else return null;
-  if (photoSlot) obj.photoSlot = true;
-  if (slotHint) obj.slotHint = true;
-  return obj;
-}
 
 function snapshotOf(obj) {
   if (!obj) return null;
@@ -58,12 +44,16 @@ const FlyerStudio = forwardRef(({
   onSave = () => {},
   onClose = () => {},
   onExport = () => {},
+  onChange = () => {},
+  showHeaderActions = true,
 }, ref) => {
   const hostRef = useRef(null);
   const viewportRef = useRef(null);
   const fileInputRef = useRef(null);
   const canvasRef = useRef(null);
   const historyRef = useRef({ stack: [], index: -1, paused: false });
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
   const [zoom, setZoom] = useState(0.6);
   const [selection, setSelection] = useState(null);
@@ -85,6 +75,8 @@ const FlyerStudio = forwardRef(({
     if (h.stack.length > HISTORY_LIMIT) h.stack.shift();
     h.index = h.stack.length - 1;
     updateHistoryState();
+    // The first entry is the initial load, not a user edit
+    if (h.stack.length > 1) onChangeRef.current();
   }, []);
 
   const refreshSelection = useCallback(() => {
@@ -379,7 +371,10 @@ const FlyerStudio = forwardRef(({
     if (!canvas) return;
     onSave({
       image: renderImage('png'),
+      thumbnail: canvas.toDataURL({ format: 'jpeg', quality: 0.8, multiplier: 360 / PAGE_WIDTH / canvas.getZoom() }),
       data: canvas.toObject(EXTRA_PROPS),
+      width: PAGE_WIDTH,
+      height: PAGE_HEIGHT,
       template: templateId,
     });
   }, [onSave, renderImage, templateId]);
@@ -406,7 +401,7 @@ const FlyerStudio = forwardRef(({
     <div className="flyer-studio">
       <div className="flyer-studio-header">
         <div className="header-left">
-          <h2>Flyer Studio</h2>
+          {showHeaderActions && <h2>Flyer Studio</h2>}
           <div className="header-actions">
             <button className="fs-btn" onClick={() => stepHistory(-1)} disabled={!historyState.canUndo} title="Undo (Ctrl+Z)">↶ Undo</button>
             <button className="fs-btn" onClick={() => stepHistory(1)} disabled={!historyState.canRedo} title="Redo (Ctrl+Y)">↷ Redo</button>
@@ -419,7 +414,7 @@ const FlyerStudio = forwardRef(({
             <button className="fs-btn fs-btn-primary" onClick={() => handleExport('png')}>Export PNG</button>
           </div>
         </div>
-        <div className="header-right">
+        <div className="header-right" hidden={!showHeaderActions}>
           <button className="fs-btn fs-btn-primary" onClick={handleSave}>Save</button>
           <button className="fs-btn" onClick={onClose}>Close</button>
         </div>
@@ -439,6 +434,7 @@ const FlyerStudio = forwardRef(({
                   onClick={() => applyTemplate(t)}
                   title={`Start from ${t.name}`}
                 >
+                  <img src={renderTemplatePreview(t, 200)} alt="" />
                   <span>{t.name}</span>
                 </button>
               ))}

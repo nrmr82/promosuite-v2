@@ -1,0 +1,123 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  PromoSuite palette. Deep "estate" blue for actions (trust), navy ink for text,
+  gold used sparingly for premium highlights. Light is the default theme.
+*/
+:root {
+  --background: #ffffff;
+  --foreground: #0b1b33;
+  --card: #ffffff;
+  --card-foreground: #0b1b33;
+  --popover: #ffffff;
+  --popover-foreground: #0b1b33;
+  --primary: #1d4ed8;
+  --primary-hover: #1e40af;
+  --primary-foreground: #ffffff;
+  --secondary: #eef2f8;
+  --secondary-foreground: #0b1b33;
+  --muted: #f5f7fb;
+  --muted-foreground: #5b6b82;
+  --accent: #eef3ff;
+  --accent-foreground: #1d4ed8;
+  --gold: #c9962b;
+  --gold-soft: #fbf3e2;
+  --gold-foreground: #5b3f07;
+  --success: #15803d;
+  --success-soft: #e8f6ed;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #d6dde8;
+  --ring: #1d4ed8;
+  --sidebar: #f8fafc;
+  --radius: 0.625rem;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #0a1120;
+  --foreground: #e7ecf4;
+  --card: #0f1829;
+  --card-foreground: #e7ecf4;
+  --popover: #111c30;
+  --popover-foreground: #e7ecf4;
+  --primary: #4d7cff;
+  --primary-hover: #6b93ff;
+  --primary-foreground: #ffffff;
+  --secondary: #16233b;
+  --secondary-foreground: #e7ecf4;
+  --muted: #121d33;
+  --muted-foreground: #93a3bb;
+  --accent: #172a4d;
+  --accent-foreground: #a9c1ff;
+  --gold: #e0b34f;
+  --gold-soft: #2c2410;
+  --gold-foreground: #f3d58f;
+  --success: #34d399;
+  --success-soft: #0f2a22;
+  --destructive: #f87171;
+  --destructive-foreground: #0a1120;
+  --border: #1e2b44;
+  --input: #27365479;
+  --ring: #4d7cff;
+  --sidebar: #0c1526;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv11', 'ss01';
+  }
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}

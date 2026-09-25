@@ -1,0 +1,6 @@
+/* The page header replaces the studio's own title and its Save and Close buttons */
+.photo-editor-page .portrait-studio-header h2,
+.photo-editor-page .portrait-studio-header .header-right > button:first-child,
+.photo-editor-page .portrait-studio-header .header-right .btn-secondary {
+  display: none;
+}

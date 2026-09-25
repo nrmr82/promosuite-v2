@@ -6,6 +6,7 @@ export const PAGE_WIDTH = 800;
 export const PAGE_HEIGHT = 1000;
 
 const PINK = '#e91e63';
+const BLUE = '#1d4ed8';
 const NAVY = '#0f172a';
 
 export const FLYER_TEMPLATES = [
@@ -24,10 +25,10 @@ export const FLYER_TEMPLATES = [
       { type: 'text', text: 'JUST LISTED', left: 40, top: 38, width: 720, fontSize: 64, fontWeight: 'bold', fill: '#ffffff', textAlign: 'center', fontFamily: 'Arial' },
       { type: 'rect', left: 40, top: 180, width: 720, height: 420, fill: '#e2e8f0', photoSlot: true },
       { type: 'text', text: 'Property photo: select this box, then upload', slotHint: true, left: 40, top: 375, width: 720, fontSize: 22, fill: '#64748b', textAlign: 'center', fontFamily: 'Arial' },
-      { type: 'text', text: '$725,000', left: 40, top: 630, width: 720, fontSize: 56, fontWeight: 'bold', fill: PINK, textAlign: 'center', fontFamily: 'Arial' },
+      { type: 'text', text: '$725,000', left: 40, top: 630, width: 720, fontSize: 56, fontWeight: 'bold', fill: BLUE, textAlign: 'center', fontFamily: 'Arial' },
       { type: 'text', text: '123 Maple Street, Springfield', left: 40, top: 705, width: 720, fontSize: 30, fill: NAVY, textAlign: 'center', fontFamily: 'Arial' },
       { type: 'text', text: '4 Beds  •  3 Baths  •  2,450 sq ft', left: 40, top: 755, width: 720, fontSize: 26, fill: '#475569', textAlign: 'center', fontFamily: 'Arial' },
-      { type: 'rect', left: 0, top: 870, width: 800, height: 130, fill: PINK },
+      { type: 'rect', left: 0, top: 870, width: 800, height: 130, fill: BLUE },
       { type: 'text', text: 'Jane Agent  |  (555) 123-4567  |  jane@realty.com', left: 40, top: 918, width: 720, fontSize: 24, fill: '#ffffff', textAlign: 'center', fontFamily: 'Arial' },
     ],
   },
@@ -42,8 +43,7 @@ export const FLYER_TEMPLATES = [
       { type: 'text', text: 'Property photo: select this box, then upload', slotHint: true, left: 60, top: 415, width: 680, fontSize: 22, fill: '#9d174d', textAlign: 'center', fontFamily: 'Arial' },
       { type: 'text', text: '48 Ocean View Drive', left: 40, top: 665, width: 720, fontSize: 40, fontWeight: 'bold', fill: NAVY, textAlign: 'center', fontFamily: 'Georgia' },
       { type: 'text', text: 'Stunning 3 bed, 2 bath home with ocean views, updated kitchen and a private garden.', left: 90, top: 730, width: 620, fontSize: 24, fill: '#334155', textAlign: 'center', fontFamily: 'Arial' },
-      { type: 'circle', left: 355, top: 850, radius: 45, fill: NAVY },
-      { type: 'text', text: 'Come say hello!', left: 40, top: 950, width: 720, fontSize: 22, fill: NAVY, textAlign: 'center', fontFamily: 'Arial' },
+      { type: 'text', text: 'Jane Agent  •  (555) 123-4567  •  Come say hello!', left: 40, top: 880, width: 720, fontSize: 22, fill: NAVY, textAlign: 'center', fontFamily: 'Arial' },
     ],
   },
   {
