@@ -1,7 +1,14 @@
-import { loadStripe } from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js/pure';
 
-// Initialize Stripe with the publishable key
-export const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
+// Load Stripe lazily, only when checkout is used, so a blocked Stripe.js
+// (ad blockers, restricted networks) doesn't crash every page load
+let stripePromise;
+export const getStripe = () => {
+  if (!stripePromise) {
+    stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
+  }
+  return stripePromise;
+};
 
 // Function to create a checkout session
 export const createCheckoutSession = async (priceId) => {
@@ -27,7 +34,7 @@ export const createCheckoutSession = async (priceId) => {
 // Function to handle subscription payment
 export const handleSubscription = async (priceId) => {
   try {
-    const stripe = await stripePromise;
+    const stripe = await getStripe();
     const session = await createCheckoutSession(priceId);
     
     // Redirect to Stripe Checkout
